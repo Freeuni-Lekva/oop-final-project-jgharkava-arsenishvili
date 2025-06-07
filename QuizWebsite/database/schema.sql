@@ -3,6 +3,7 @@ use ja_project_db;
 drop table if exists users;
 create table users (
     user_id bigint primary key auto_increment,
+    password_hashed varchar(256) not null,
     username varchar(64) unique not null,
     registration_date timestamp default current_timestamp,
     user_photo mediumblob,
