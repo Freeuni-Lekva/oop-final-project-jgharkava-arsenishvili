@@ -238,6 +238,7 @@ create table history(
     quiz_id bigint not null,
     score double not null default 0,
     completion_time bigint not null,
+    completion_date timestamp default current_timestamp,
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (user_id) references users(user_id) on delete cascade
