@@ -7,7 +7,7 @@ create table users (
     password_hashed varchar(256) not null,
     username varchar(64) unique not null,
     registration_date timestamp default current_timestamp,
-    user_photo mediumblob,
+    user_photo varchar(256),
     user_status enum('administrator', 'user') not null default 'user'
 );
 
@@ -158,7 +158,7 @@ create table achievements(
     achievement_id bigint primary key auto_increment,
     achievement_name varchar(64) unique not null,
     achievement_description text not null,
-    achievement_photo mediumblob
+    achievement_photo varchar(256)
 );
 
 

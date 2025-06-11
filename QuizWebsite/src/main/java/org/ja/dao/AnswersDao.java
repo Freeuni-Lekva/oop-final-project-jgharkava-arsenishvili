@@ -6,6 +6,7 @@ import org.ja.model.OtherObjects.Answer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /*
@@ -20,78 +21,89 @@ create table answers(
 );
  */
 public class AnswersDao {
-    BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
+
     public AnswersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
+
     public void insertAnswer(Answer answer) {
-        String sql="INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        String sql = "INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+
             ps.setLong(1, answer.getQuestionId());
-            ps.setString(2, answer.getAnswer_text());
-            ps.setInt(3, answer.getAnswer_order());
-            ps.setBoolean(4, answer.getAnswer_validity());
+            ps.setString(2, answer.getAnswerText());
+            ps.setInt(3, answer.getAnswerOrder());
+            ps.setBoolean(4, answer.getAnswerValidity());
+
             ps.executeUpdate();
-            ResultSet rs=ps.getGeneratedKeys();
-            if(rs.next()){
-                answer.setAnswerId(rs.getLong(1));
+
+            try (ResultSet rs = ps.getGeneratedKeys()){
+                if (rs.next())
+                    answer.setAnswerId(rs.getLong(1));
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public void removeAnswer(long answerId) {
-        String sql="DELETE FROM answers WHERE answer_id=?";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql);
-            ps.setLong(1, answerId);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public Answer getAnswerById(int id) {
-        String sql="SELECT * FROM answers where answer_id=?";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql);
-            ps.setLong(1, id);
-            ResultSet rs=ps.executeQuery();
-            if(rs.next()){
-                Answer answer=new Answer();
-                answer.setAnswerId(rs.getLong(1));
-                answer.setQuestionId(rs.getLong("question_id"));
-                answer.setAnswer_text(rs.getString("answer_text"));
-                answer.setAnswer_order(rs.getInt("answer_order"));
-                answer.setAnswer_validity(rs.getBoolean("answer_validity"));
-                return answer;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-    public ArrayList<Answer> getQuestionAnswers(long questionId) {
-        String sql="SELECT * FROM answers WHERE question_id=?";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, questionId);
-            ps.executeUpdate();
-            ResultSet rs=ps.executeQuery();
-            ArrayList<Answer> answers=new ArrayList<>();
-            while(rs.next()){
-                Answer answer=new Answer();
-                answer.setAnswerId(rs.getLong(1));
-                answer.setQuestionId(rs.getLong("question_id"));
-                answer.setAnswer_text(rs.getString("answer_text"));
-                answer.setAnswer_order(rs.getInt("answer_order"));
-                answer.setAnswer_validity(rs.getBoolean("answer_validity"));
-                answers.add(answer);
-            }
-            return answers;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting answer into database", e);
         }
     }
 
+    public void removeAnswer(long answerId) {
+        String sql = "DELETE FROM answers WHERE answer_id=?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, answerId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing answer from database", e);
+        }
+    }
+
+    public Answer getAnswerById(int id) {
+        String sql = "SELECT * FROM answers where answer_id=?";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, id);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    return retrieveAnswer(rs);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying answer by id from database", e);
+        }
+        return null;
+    }
+
+    public ArrayList<Answer> getQuestionAnswers(long questionId) {
+        String sql = "SELECT * FROM answers WHERE question_id=?";
+
+        ArrayList<Answer> answers = new ArrayList<>();
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, questionId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    answers.add(retrieveAnswer(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying answers to a question from database", e);
+        }
+
+        return answers;
+    }
+
+    private Answer retrieveAnswer(ResultSet rs) throws SQLException {
+        return new Answer(rs.getLong("answer_id"), rs.getLong("question_id"),
+                rs.getString("answer_text"), rs.getInt("answer_order"),
+                rs.getBoolean("answer_validity"));
+    }
 }
