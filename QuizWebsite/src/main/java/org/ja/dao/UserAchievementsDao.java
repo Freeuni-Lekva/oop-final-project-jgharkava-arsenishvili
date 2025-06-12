@@ -22,7 +22,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class UserAchievementsDao {
-    private BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
 
     public UserAchievementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;

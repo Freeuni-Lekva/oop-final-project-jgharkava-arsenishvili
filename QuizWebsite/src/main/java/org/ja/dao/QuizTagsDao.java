@@ -7,6 +7,7 @@ import org.ja.model.OtherObjects.QuizTag;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /*
@@ -15,49 +16,63 @@ create table quiz_tag(
     tag_id bigint not null,
  */
 public class QuizTagsDao {
-    BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
+
     public QuizTagsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
+
     public void insertQuizTag(QuizTag quizTag) {
-        String sql="insert into quiz_tag values(?,?)";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql);
+        String sql = "insert into quiz_tag values(?,?)";
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
             ps.setLong(1, quizTag.getQuizId());
             ps.setLong(2, quizTag.getTagId());
-            ps.executeUpdate();
 
-        }catch(Exception e){
-            throw new RuntimeException(e);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting quiz tag into database", e);
         }
     }
+
     public void removeQuizTag(long qid, long tid) {
-        String sql="DELETE FROM quiz_tag WHERE quiz_id=? AND tag_id=?";
-        try(Connection c= dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql);
+        String sql = "DELETE FROM quiz_tag WHERE quiz_id=? AND tag_id=?";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
             ps.setLong(1, qid);
             ps.setLong(2, tid);
+
             ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing quiz tag from database", e);
         }
     }
+
     public ArrayList<QuizTag> getQuizTagsByQuizId(long quizId) {
-        String sql="select * from quiz_tag where quiz_id=?";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps=c.prepareStatement(sql);
+        ArrayList<QuizTag> quizTags = new ArrayList<>();
+
+        String sql = "select * from quiz_tag where quiz_id=?";
+        try (Connection c = dataSource.getConnection()){
+            PreparedStatement ps = c.prepareStatement(sql);
+
             ps.setLong(1, quizId);
-            ResultSet rs=ps.executeQuery();
-            ArrayList<QuizTag>ans=new ArrayList<>();
-            while(rs.next()){
-                QuizTag quizTag=new QuizTag();
-                quizTag.setQuizId(rs.getLong("quiz_id"));
-                quizTag.setTagId(rs.getLong("tag_id"));
-                ans.add(quizTag);
-            }
-            return ans;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next())
+                quizTags.add(retrieveQuizTag(rs));
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quiz tags by quiz id from database", e);
         }
+
+        return quizTags;
+    }
+
+    private QuizTag retrieveQuizTag(ResultSet rs) throws SQLException {
+        return new QuizTag(rs.getLong("quiz_id"), rs.getLong("tag_id"));
     }
 }

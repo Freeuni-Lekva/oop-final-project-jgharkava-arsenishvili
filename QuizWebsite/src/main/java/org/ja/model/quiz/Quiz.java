@@ -1,4 +1,8 @@
 package org.ja.model.quiz;
+
+import java.sql.Time;
+import java.sql.Timestamp;
+
 /*
 create table quizzes(
     quiz_id bigint primary key auto_increment,
@@ -30,7 +34,7 @@ public class Quiz {
     private String description;
     private float avgRating;
     private long participantCount;
-    private String creationDate;
+    private Timestamp creationDate;
     private int timeInMinutes;
     private long categoryId;
     private long creatorId;
@@ -41,7 +45,7 @@ public class Quiz {
 
     }
     public Quiz(long id, String name, String description, float avgRating, long participantCount,
-                String creationDate, int timeInMinutes,
+                Timestamp creationDate, int timeInMinutes,
                 long categoryId, long creatorId, String questionOrder,
                 String questionPlacement, String questionCorrection) {
         this.id = id;
@@ -87,10 +91,10 @@ public class Quiz {
     public void setParticipantCount(long participantCount) {
         this.participantCount = participantCount;
     }
-    public String getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
     public int getTimeInMinutes() {
