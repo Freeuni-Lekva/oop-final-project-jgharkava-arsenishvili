@@ -29,7 +29,8 @@ public class ChallengesDao {
 
     public void insertChallenge(Challenge challenge) {
         String sql = "INSERT INTO challenges (sender_user_id, recipient_user_id, quiz_id) VALUES (?,?,?)";
-        try(Connection c= dataSource.getConnection();
+
+        try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             ps.setLong(1, challenge.getSenderUserId());
@@ -37,6 +38,7 @@ public class ChallengesDao {
             ps.setLong(3, challenge.getQuizId());
 
             ps.executeUpdate();
+
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next())
                     challenge.setChallengeId(rs.getLong("challenge_id"));
@@ -48,10 +50,12 @@ public class ChallengesDao {
     }
 
     public void removeChallenge(long challengeId) {
-        String sql = "DELETE FROM challenges WHERE challenge_id=" + challengeId;
+        String sql = "DELETE FROM challenges WHERE challenge_id = ?";
 
         try (Connection c= dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, challengeId);
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -62,14 +66,17 @@ public class ChallengesDao {
     public ArrayList<Challenge> challengesAsSender(long senderId){
         ArrayList<Challenge> challenges = new ArrayList<>();
 
-        String sql = "SELECT * FROM challenges WHERE sender_user_id=" + senderId;
+        String sql = "SELECT * FROM challenges WHERE sender_user_id = ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next())
-                challenges.add(retrieveChallenge(rs));
+            ps.setLong(1, senderId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    challenges.add(retrieveChallenge(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying challenges of a sender user", e);
@@ -81,24 +88,24 @@ public class ChallengesDao {
     public ArrayList<Challenge> challengesAsReceiver(long receiverId){
         ArrayList<Challenge> challenges = new ArrayList<>();
 
-        String sql = "SELECT * FROM challenges WHERE recipient_user_id=" + receiverId;
+        String sql = "SELECT * FROM challenges WHERE recipient_user_id = ?";
 
-        try (Connection c= dataSource.getConnection();
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, receiverId);
 
-            while(rs.next())
-                challenges.add(retrieveChallenge(rs));
-            
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    challenges.add(retrieveChallenge(rs));
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException("Error querying challenges of a recipient user", e);
         }
 
         return challenges;
     }
-
-
 
     private Challenge retrieveChallenge(ResultSet rs) throws SQLException {
         return new Challenge(rs.getLong("challenge_id"), rs.getLong("sender_user_id"),

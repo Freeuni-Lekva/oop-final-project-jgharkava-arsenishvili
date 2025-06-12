@@ -30,10 +30,11 @@ public class TagsDao {
 
             preparedStatement.executeUpdate();
 
-            ResultSet keys = preparedStatement.getGeneratedKeys();
-            if (keys.next()) {
-                long newId = keys.getLong(1);
-                tag.setTagId(newId); // if you want to store it in your object
+            try (ResultSet keys = preparedStatement.getGeneratedKeys()){
+                if (keys.next()) {
+                    long newId = keys.getLong(1);
+                    tag.setTagId(newId); // if you want to store it in your object
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting tag into database", e);
@@ -41,7 +42,7 @@ public class TagsDao {
     }
 
     public void removeTag(Tag tag) {
-        String sql = "DELETE FROM tags WHERE tag_id=?";
+        String sql = "DELETE FROM tags WHERE tag_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement preparedStatement =
                     c.prepareStatement(sql)){
@@ -53,16 +54,18 @@ public class TagsDao {
         }
     }
 
-    public Tag getTagById(long id) {
-        String sql = "SELECT * FROM tags WHERE tag_id=?";
+    public Tag getTagById (long id) {
+        String sql = "SELECT * FROM tags WHERE tag_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, id);
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next())
-                return retrieveTag(rs);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    return retrieveTag(rs);
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException("Error querying tag from by id database", e);
         }
@@ -70,16 +73,17 @@ public class TagsDao {
     }
 
     public Tag getTagByName(String tagName) {
-        String sql="SELECT * FROM tags WHERE tag_name=?";
+        String sql="SELECT * FROM tags WHERE tag_name = ?";
         try (Connection c=dataSource.getConnection();
             PreparedStatement ps=c.prepareStatement(sql)){
 
             ps.setString(1, tagName);
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    return retrieveTag(rs);
+            }
 
-            if(rs.next())
-                return retrieveTag(rs);
         } catch (SQLException e) {
             throw new RuntimeException("Error querying tag from by name database", e);
         }

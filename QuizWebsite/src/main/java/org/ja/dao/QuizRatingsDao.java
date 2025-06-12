@@ -28,8 +28,10 @@ public class QuizRatingsDao {
     }
 
     public void insertQuizRating(QuizRating qr){
-        String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) VALUES (?,?,?,?)";
-        try(Connection c = dataSource.getConnection();
+        String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) VALUES (?,?,?,?)" +
+                "ON DUPLICATE KEY UPDATE rating = VALUES(rating), review = VALUES(review)";
+
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, qr.getQuizId());
@@ -60,15 +62,17 @@ public class QuizRatingsDao {
     public ArrayList<QuizRating> getQuizRatingsByUserId(long userId){
         ArrayList<QuizRating> quizRatings = new ArrayList<>();
 
-        String sql = "SELECT * FROM quiz_rating WHERE user_id=" + userId;
+        String sql = "SELECT * FROM quiz_rating WHERE user_id = ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, userId);
 
-            while(rs.next())
-                quizRatings.add(retrieveQuizRating(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    quizRatings.add(retrieveQuizRating(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz rating by user id from database", e);
@@ -80,15 +84,17 @@ public class QuizRatingsDao {
     public ArrayList<QuizRating> getQuizRatingsByQuizId(long quizId){
         ArrayList<QuizRating> quizRatings = new ArrayList<>();
 
-        String sql="SELECT * FROM quiz_rating WHERE quiz_id=" + quizId;
+        String sql = "SELECT * FROM quiz_rating WHERE quiz_id = ?";
 
-        try(Connection c= dataSource.getConnection();
+        try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, quizId);
 
-            while (rs.next())
-                quizRatings.add(retrieveQuizRating(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    quizRatings.add(retrieveQuizRating(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz rating by quiz id from database", e);

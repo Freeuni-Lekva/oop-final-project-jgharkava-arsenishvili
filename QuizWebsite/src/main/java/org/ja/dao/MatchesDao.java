@@ -28,8 +28,8 @@ public class MatchesDao {
 
     public void insertMatch(Match match) {
         String sql = "insert into matches values(?,?,?,?)";
-        try(Connection c=dataSource.getConnection();
-            PreparedStatement ps=c.prepareStatement(sql)){
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, match.getMatchId());
             ps.setLong(2, match.getQuestionId());
@@ -43,7 +43,7 @@ public class MatchesDao {
     }
 
     public void removeMatch(long matchId) {
-        String sql = "delete from matches where match_id=?";
+        String sql = "delete from matches where match_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -58,18 +58,17 @@ public class MatchesDao {
     public ArrayList<Match>getQuestionMatches(long questionId) {
         ArrayList<Match> matches = new ArrayList<>();
 
-        String sql="select * from matches where question_id=?";
-        try(Connection c = dataSource.getConnection();
+        String sql = "select * from matches where question_id = ?";
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, questionId);
 
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next())
-                matches.add(retrieveMatch(rs));
-
-        } catch(SQLException e){
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    matches.add(retrieveMatch(rs));
+            }
+        } catch (SQLException e){
             throw new RuntimeException("Error querying Matches of a question from database", e);
         }
 

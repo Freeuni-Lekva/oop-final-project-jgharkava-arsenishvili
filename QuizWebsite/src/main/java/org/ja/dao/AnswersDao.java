@@ -50,20 +50,22 @@ public class AnswersDao {
     }
 
     public void removeAnswer(long answerId) {
-        String sql = "DELETE FROM answers WHERE answer_id=?";
+        String sql = "DELETE FROM answers WHERE answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, answerId);
+
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error removing answer from database", e);
         }
     }
 
+    // TO DELETE
     public Answer getAnswerById(int id) {
-        String sql = "SELECT * FROM answers where answer_id=?";
+        String sql = "SELECT * FROM answers where answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -77,11 +79,12 @@ public class AnswersDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error querying answer by id from database", e);
         }
+
         return null;
     }
 
     public ArrayList<Answer> getQuestionAnswers(long questionId) {
-        String sql = "SELECT * FROM answers WHERE question_id=?";
+        String sql = "SELECT * FROM answers WHERE question_id = ?";
 
         ArrayList<Answer> answers = new ArrayList<>();
 

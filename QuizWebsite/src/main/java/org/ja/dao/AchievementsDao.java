@@ -39,38 +39,43 @@ public class AchievementsDao {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next())
                     achievement.setAchievementId(rs.getLong(1));
-
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting achievement into database", e);
         }
     }
 
     public void removeAchievement(long id){
-        String sql = "DELETE FROM achievements WHERE achievement_id=" + id;
+        String sql = "DELETE FROM achievements WHERE achievement_id = ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
+            ps.setLong(1, id);
+
             ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing Achievement from database", e);
         }
     }
 
     public Achievement getAchievement(long id){
-        String sql = "SELECT * FROM achievements WHERE achievement_id=" + id;
+        String sql = "SELECT * FROM achievements WHERE achievement_id = ?";
 
-        try(Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()){
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
 
-            if (rs.next())
-                return retrieveAchievement(rs);
+            ps.setLong(1, id);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    return retrieveAchievement(rs);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying achievement from database", e);
         }
+
         return null;
     }
 

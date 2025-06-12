@@ -31,7 +31,8 @@ public class QuestionDao {
     public void insertQuestion(Question question) {
         String sql = "INSERT INTO questions ( quiz_id, question, image_url, " +
                 "question_type, num_answers, order_status,) VALUES (?,?, ?, ?, ?, ?);";
-        try(Connection c = dataSource.getConnection();
+
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             ps.setLong(1, question.getQuizId());
@@ -43,7 +44,7 @@ public class QuestionDao {
 
             ps.executeUpdate();
 
-            try(ResultSet rs = ps.getGeneratedKeys()){
+            try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next())
                     question.setQuestionId(rs.getLong(1));
             }
@@ -52,55 +53,75 @@ public class QuestionDao {
             throw new RuntimeException("Error inserting Questions into database", e);
         }
     }
+
     public void removeQuestion(long questionId) {
-        String sql = "DELETE FROM questions WHERE quiz_id=?";
+        String sql = "DELETE FROM questions WHERE quiz_id = ?";
 
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, questionId);
+
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error removing question from database", e);
         }
     }
 
-    public Question getQuestionById(long id) {
-        String sql = "SELECT * FROM questions WHERE quiz_id=?";
+    public Question getQuestionById(long questionId) {
+        String sql = "SELECT * FROM questions WHERE question_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, questionId);
 
-            if (rs.next()){
-                return retrieveQuestion(rs);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    return retrieveQuestion(rs);
+                }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error querying question from database", e);
+            throw new RuntimeException("Error querying question by id from database", e);
         }
 
         return null;
     }
 
     public ArrayList<Question> getQuizQuestions(long quizId) {
-        ArrayList<Question> questions=new ArrayList<>();
+        ArrayList<Question> questions = new ArrayList<>();
 
-        String sql = "SELECT * FROM questions WHERE quiz_id="+quizId;
+        String sql = "SELECT * FROM questions WHERE quiz_id = ?";
 
-        try(Connection c = dataSource.getConnection();
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, quizId);
 
-            while(rs.next())
-                questions.add(retrieveQuestion(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    questions.add(retrieveQuestion(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz questions from database", e);
         }
 
         return questions;
+    }
+
+    public void updateQuestion(Question question){
+        String sql = "UPDATE questions SET question_text = ? WHERE question_id = ?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setString(1, question.getQuestionText());
+            ps.setLong(2, question.getQuestionId());
+
+           ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating question into database", e);
+        }
     }
 
     private Question retrieveQuestion(ResultSet rs) throws SQLException {

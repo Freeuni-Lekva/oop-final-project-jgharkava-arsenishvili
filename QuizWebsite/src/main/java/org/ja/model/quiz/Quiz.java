@@ -32,7 +32,7 @@ public class Quiz {
     private long id;
     private String name;
     private String description;
-    private float avgRating;
+    private double avgRating;
     private long participantCount;
     private Timestamp creationDate;
     private int timeInMinutes;
@@ -44,7 +44,7 @@ public class Quiz {
     public Quiz(){
 
     }
-    public Quiz(long id, String name, String description, float avgRating, long participantCount,
+    public Quiz(long id, String name, String description, double avgRating, long participantCount,
                 Timestamp creationDate, int timeInMinutes,
                 long categoryId, long creatorId, String questionOrder,
                 String questionPlacement, String questionCorrection) {
@@ -79,7 +79,7 @@ public class Quiz {
     public void setDescription(String description) {
         this.description = description;
     }
-    public float getAvgRating() {
+    public double getAvgRating() {
         return avgRating;
     }
     public void setAvgRating(float avgRating) {

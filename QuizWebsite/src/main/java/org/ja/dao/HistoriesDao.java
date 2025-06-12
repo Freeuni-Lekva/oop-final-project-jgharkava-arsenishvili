@@ -30,8 +30,9 @@ public class HistoriesDao {
 
     public void insertHistory(History history){
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time, completion_date) VALUES (?,?,?,?,?)";
-        try(Connection c=dataSource.getConnection();
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+
             ps.setLong(1, history.getUserId());
             ps.setLong(2, history.getQuizId());
             ps.setDouble(3, history.getScore());
@@ -49,9 +50,11 @@ public class HistoriesDao {
     }
 
     public void removeHistory(long historyId){
-        String sql = "DELETE FROM history WHERE history_id=" + historyId;
+        String sql = "DELETE FROM history WHERE history_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, historyId);
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -62,15 +65,17 @@ public class HistoriesDao {
     public ArrayList<History> getHistoriesByUserIdSortedByDate(long userId){
         ArrayList<History> histories = new ArrayList<>();
 
-        String sql="SELECT * FROM history WHERE user_id=" + userId + " ORDER BY completion_date DESC";
+        String sql = "SELECT * FROM history WHERE user_id = ? ORDER BY completion_date DESC";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, userId);
 
-            while(rs.next())
-                histories.add(retrieveHistory(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    histories.add(retrieveHistory(rs));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving histories by user_id from database", e);
         }
@@ -81,15 +86,17 @@ public class HistoriesDao {
     public ArrayList<History> getHistoriesByQuizIdSortedByDate(long quizId){
         ArrayList<History> histories = new ArrayList<>();
 
-        String sql = "SELECT * FROM history WHERE quiz_id=" + quizId + " ORDER BY completion_date DESC";
+        String sql = "SELECT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC";
 
-        try (Connection c= dataSource.getConnection();
+        try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, quizId);
 
-            while(rs.next())
-                histories.add(retrieveHistory(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    histories.add(retrieveHistory(rs));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving histories by quiz_id from database", e);
         }

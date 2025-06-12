@@ -138,13 +138,13 @@ create table quiz_tag(
 
 
 -- Friendships table.
--- Shows the relationship between two users. It may be a pending friend request (from the first to the second user) or
+-- Shows the relationship between two users. It may be a ng friend request (from the first to the second user) or
 -- a two-sided friendship.
 create table friendships(
     first_user_id bigint not null,
     second_user_id bigint not null,
     friendship_date timestamp default current_timestamp,
-    friendship_status enum('pending', 'friends'),
+    friendship_status enum('pending', 'friends') default 'pending',
 
     primary key (first_user_id, second_user_id),
     foreign key (first_user_id) references users(user_id) on delete cascade,

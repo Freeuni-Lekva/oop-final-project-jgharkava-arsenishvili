@@ -23,7 +23,7 @@ public class QuizTagsDao {
     }
 
     public void insertQuizTag(QuizTag quizTag) {
-        String sql = "insert into quiz_tag values(?,?)";
+        String sql = "insert into quiz_tag values (?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -37,7 +37,7 @@ public class QuizTagsDao {
     }
 
     public void removeQuizTag(long qid, long tid) {
-        String sql = "DELETE FROM quiz_tag WHERE quiz_id=? AND tag_id=?";
+        String sql = "DELETE FROM quiz_tag WHERE quiz_id = ? AND tag_id = ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -54,16 +54,16 @@ public class QuizTagsDao {
     public ArrayList<QuizTag> getQuizTagsByQuizId(long quizId) {
         ArrayList<QuizTag> quizTags = new ArrayList<>();
 
-        String sql = "select * from quiz_tag where quiz_id=?";
+        String sql = "select * from quiz_tag where quiz_id = ?";
         try (Connection c = dataSource.getConnection()){
             PreparedStatement ps = c.prepareStatement(sql);
 
             ps.setLong(1, quizId);
 
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next())
-                quizTags.add(retrieveQuizTag(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    quizTags.add(retrieveQuizTag(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz tags by quiz id from database", e);

@@ -18,9 +18,9 @@ public class UsersDao {
     }
 
     public void insertUser(User user) throws SQLException {
-        String sql = "INSERT INTO users ( password_hashed, username, registration_date, user_photo, user_status) " +
+        String sql = "INSERT INTO users (password_hashed, username, registration_date, user_photo, user_status) " +
                 "VALUES (?,?, ?, ?, ?);";
-        try (Connection c=dataSource.getConnection();
+        try (Connection c = dataSource.getConnection();
             PreparedStatement preparedStatement =
                     c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
@@ -32,10 +32,11 @@ public class UsersDao {
 
             preparedStatement.executeUpdate();
 
-            ResultSet keys = preparedStatement.getGeneratedKeys();
-            if (keys.next()) {
-                long newId = keys.getLong(1);
-                user.setId(newId); // if you want to store it in your object
+            try (ResultSet keys = preparedStatement.getGeneratedKeys()){
+                if (keys.next()) {
+                    long newId = keys.getLong(1);
+                    user.setId(newId); // if you want to store it in your object
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting user into database", e);
@@ -43,7 +44,8 @@ public class UsersDao {
     }
 
     public void removeUserById(long id) {
-        String sql = "DELETE FROM users WHERE user_id=?";
+        String sql = "DELETE FROM users WHERE user_id = ?";
+
         try (Connection c = dataSource.getConnection();
              PreparedStatement preparedStatement = c.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
@@ -55,7 +57,7 @@ public class UsersDao {
     }
 
     public void removeUserByName(String name) {
-        String sql = "DELETE FROM users WHERE user_name=?";
+        String sql = "DELETE FROM users WHERE username = ?";
 
         try(Connection c=dataSource.getConnection();
             PreparedStatement preparedStatement = c.prepareStatement(sql)){
@@ -69,16 +71,18 @@ public class UsersDao {
     }
 
     public User getUserById(int id) {
-        String sql = "SELECT * FROM users WHERE user_id=?";
+        String sql = "SELECT * FROM users WHERE user_id = ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement st = c.prepareStatement(sql)){
 
             st.setLong(1, id);
-            ResultSet rs = st.executeQuery();
 
-            if(rs.next())
-                return retrieveUser(rs);
+            try (ResultSet rs = st.executeQuery()){
+                if (rs.next())
+                    return retrieveUser(rs);
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException("Error querying user by id from database", e);
         }
@@ -91,10 +95,12 @@ public class UsersDao {
             PreparedStatement st=c.prepareStatement(sql)){
 
             st.setString(1, username);
-            ResultSet rs = st.executeQuery();
 
-            if(rs.next())
-                return retrieveUser(rs);
+            try (ResultSet rs = st.executeQuery()){
+                if (rs.next())
+                    return retrieveUser(rs);
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException("Error querying user by username from database", e);
         }
@@ -109,9 +115,10 @@ public class UsersDao {
         try (Connection c=dataSource.getConnection();
             PreparedStatement st=c.prepareStatement(sql)){
 
-            ResultSet rs = st.executeQuery();
-            while(rs.next())
-                users.add(retrieveUser(rs));
+            try (ResultSet rs = st.executeQuery()){
+                while (rs.next())
+                    users.add(retrieveUser(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying user by filter from database", e);

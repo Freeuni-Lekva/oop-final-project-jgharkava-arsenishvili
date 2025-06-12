@@ -29,6 +29,7 @@ public class MessageDao {
 
     public void insertMessage(Message message) {
         String sql = "INSERT INTO messages (sender_user_id, recipient_user_id, message_text, message_send_date) VALUES (?,?,?,?)";
+
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
@@ -50,10 +51,12 @@ public class MessageDao {
         }
 
     }
-    public void removeMessage(long id) {
-        String sql = "DELETE FROM messages WHERE message_id = "+id;
+    public void removeMessage(long messageId) {
+        String sql = "DELETE FROM messages WHERE message_id = ?";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps=c.prepareStatement(sql)){
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, messageId);
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -61,20 +64,26 @@ public class MessageDao {
         }
     }
 
-    public ArrayList<Message> getMutualMessagesSorted(long fromUserId, long toUserId){
+    public ArrayList<Message> getMutualMessagesSorted(long senderId, long recipientId){
         ArrayList<Message> mutualMessages = new ArrayList<>();
 
-        String sql = "SELECT * FROM messages WHERE sender_user_id ="+
-                fromUserId+" AND recipient_user_id ="+toUserId+" ORDER BY message_send_date";
+        String sql = "SELECT * FROM messages " +
+                "WHERE (sender_user_id = ? AND recipient_user_id = ?) " +
+                "OR (sender_user_id = ? AND recipient_user_id = ?) " +
+                "ORDER BY message_send_date DESC";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, senderId);
+            ps.setLong(2, recipientId);
+            ps.setLong(3, recipientId);
+            ps.setLong(4, senderId);
 
-            while (rs.next())
-                mutualMessages.add(retrieveMessage(rs));
-
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    mutualMessages.add(retrieveMessage(rs));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error querying Messages for users from database", e);
         }
@@ -85,16 +94,17 @@ public class MessageDao {
     public ArrayList<Message> getMessagesForUserSorted(long userId){
         ArrayList<Message> messages = new ArrayList<>();
 
-        String sql = "SELECT * FROM messages WHERE recipient_user_id =" +
-                userId + " ORDER BY message_send_date";
+        String sql = "SELECT * FROM messages WHERE recipient_user_id = ? ORDER BY message_send_date";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, userId);
 
-            while(rs.next())
-                messages.add(retrieveMessage(rs));
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    messages.add(retrieveMessage(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying Messages for user from database", e);
