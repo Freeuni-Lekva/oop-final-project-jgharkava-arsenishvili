@@ -79,7 +79,7 @@ public class UsersDao {
         }
         return null;
     }
-    User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         String sql="SELECT * FROM users WHERE username=?";
         try (Connection c=dataSource.getConnection()){
             PreparedStatement st=c.prepareStatement(sql);
