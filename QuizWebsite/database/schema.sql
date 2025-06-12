@@ -1,9 +1,7 @@
 use ja_project_db;
 
-/*
- Users table with basic information, including id, password, username, registration date, photo (might be null)
- and status: one may be an administrator or a basic user.
- */
+-- Users table with basic information, including id, password, username, registration date, photo (might be null)
+-- and status: one may be an administrator or a basic user.
 create table users (
     user_id bigint primary key auto_increment,
     password_hashed varchar(256) not null,
@@ -14,37 +12,31 @@ create table users (
 );
 
 
-/*
- Categories table.
- Might include categories like history, geography etc.
- */
+-- Categories table.
+-- Might include categories like history, geography etc.
 create table categories(
     category_id bigint primary key auto_increment,
     category_name varchar(64) unique not null
 );
 
 
-/*
- Tags table.
- Might include tags like easy, fun, beginner, timed etc.
- */
+-- Tags table.
+-- Might include tags like easy, fun, beginner, timed etc.
 create table tags(
     tag_id bigint primary key auto_increment,
     tag_name varchar(64) unique not null
 );
 
 
-/*
- Quizzes table.
- Includes main information on quiz including its name, id, description (if any),
- average rating (contestants might leave ratings and this is their aggregated value),
- creation date, time limit (represented in minutes, if 0 means no limit), category, creator
- and question-specific information:
- Whether the questions appear ordered (as of creation) or randomized, so-called shuffled;
- Whether the questions should be presented on a single-page or one question per page;
- Whether (in case of multiple pages) the answers should be corrected immediately or together at once
- (check constraint is provided so that immediate correction is available only in case of multiple-page option)
- */
+-- Quizzes table.
+-- Includes main information on quiz including its name, id, description (if any),
+-- average rating (contestants might leave ratings and this is their aggregated value),
+-- creation date, time limit (represented in minutes, if 0 means no limit), category, creator
+-- and question-specific information:
+-- Whether the questions appear ordered (as of creation) or randomized, so-called shuffled;
+-- Whether the questions should be presented on a single-page or one question per page;
+-- Whether (in case of multiple pages) the answers should be corrected immediately or together at once
+-- (check constraint is provided so that immediate correction is available only in case of multiple-page option)
 create table quizzes(
     quiz_id bigint primary key auto_increment,
     quiz_name varchar(64) unique not null,
@@ -70,15 +62,13 @@ create table quizzes(
 );
 
 
-/*
- Questions table.
- Includes basic information like question id, quiz id where this question is present,
- question itself as a text or as an image_url (for picture-response questions only),
- question type (we support 7 types of questions) and type-specific details:
- Whether there are 1 or more answers for a question (In case of multi-answer, for example, one has several answers).
- If the question is not of type multi-answer or matching, no more than 1 answer is possible;
- Whether the answers should be presented ordered or unordered. this feature is only available for multi-answer questions.
- */
+-- Questions table.
+-- Includes basic information like question id, quiz id where this question is present,
+-- question itself as a text or as an image_url (for picture-response questions only),
+-- question type (we support 7 types of questions) and type-specific details:
+-- Whether there are 1 or more answers for a question (In case of multi-answer, for example, one has several answers).
+-- If the question is not of type multi-answer or matching, no more than 1 answer is possible;
+-- Whether the answers should be presented ordered or unordered. this feature is only available for multi-answer questions.
 create table questions(
     question_id bigint primary key auto_increment,
     quiz_id bigint not null,
@@ -109,11 +99,9 @@ create table questions(
 );
 
 
-/*
- Answers table.
- Includes answer id, question id, answer text, answer order which is important for ordered multi-answers questions,
- answer validity boolean which is necessary for choice type of questions (to know whether this particular answer is true).
- */
+-- Answers table.
+-- Includes answer id, question id, answer text, answer order which is important for ordered multi-answers questions,
+-- answer validity boolean which is necessary for choice type of questions (to know whether this particular answer is true).
 create table answers(
     answer_id bigint primary key auto_increment,
     question_id bigint not null,
@@ -125,10 +113,8 @@ create table answers(
 );
 
 
-/*
- Matches table.
- Specifically for matching questions. includes question id and answers to match.
- */
+-- Matches table.
+-- Specifically for matching questions. includes question id and answers to match.
 create table matches(
     match_id bigint primary key auto_increment,
     question_id bigint not null,
@@ -139,10 +125,8 @@ create table matches(
 );
 
 
-/*
- Quiz Tag table.
- Associates tags to quizzes.
- */
+-- Quiz Tag table.
+-- Associates tags to quizzes.
 create table quiz_tag(
     quiz_id bigint not null,
     tag_id bigint not null,
@@ -153,11 +137,9 @@ create table quiz_tag(
 );
 
 
-/*
- Friendships table.
- Shows the relationship between two users. It may be a pending friend request (from the first to the second user) or
- a two-sided friendship.
- */
+-- Friendships table.
+-- Shows the relationship between two users. It may be a pending friend request (from the first to the second user) or
+-- a two-sided friendship.
 create table friendships(
     first_user_id bigint not null,
     second_user_id bigint not null,
@@ -170,10 +152,8 @@ create table friendships(
 );
 
 
-/*
- Achievements table.
- Stores information about achievements. Includes description on each achievement and includes an appropriate image for it.
- */
+-- Achievements table.
+-- Stores information about achievements. Includes description on each achievement and includes an appropriate image for it.
 create table achievements(
     achievement_id bigint primary key auto_increment,
     achievement_name varchar(64) unique not null,
@@ -182,10 +162,8 @@ create table achievements(
 );
 
 
-/*
- User Achievements table.
- Stores information on the users' achievements.
- */
+-- User Achievements table.
+-- Stores information on the users' achievements.
 create table user_achievement(
     user_id bigint not null,
     achievement_id bigint not null,
@@ -196,11 +174,9 @@ create table user_achievement(
     foreign key (achievement_id) references achievements(achievement_id) on delete cascade
 );
 
-/*
- Messages table.
- Stores information about the messages sent from sender to recipient.
- It includes the message text and send date.
- */
+-- Messages table.
+-- Stores information about the messages sent from sender to recipient.
+-- It includes the message text and send date.
 create table messages(
     message_id bigint primary key auto_increment,
     sender_user_id bigint not null,
@@ -212,11 +188,9 @@ create table messages(
     foreign key (recipient_user_id) references users(user_id)
 );
 
-/*
- Challenges table.
- Stores information about the challenges sent from sender to recipient.
- Includes the quiz id that the participant has been challenged to complete.
- */
+-- Challenges table.
+-- Stores information about the challenges sent from sender to recipient.
+-- Includes the quiz id that the participant has been challenged to complete.
 create table challenges(
     challenge_id bigint primary key auto_increment,
     sender_user_id bigint not null,
@@ -228,10 +202,8 @@ create table challenges(
     foreign key (quiz_id) references quizzes(quiz_id)
 );
 
-/*
- History table.
- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
- */
+-- History table.
+-- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
 create table history(
     history_id bigint primary key auto_increment,
     user_id bigint not null,
@@ -244,10 +216,8 @@ create table history(
     foreign key (user_id) references users(user_id) on delete cascade
 );
 
-/*
- Quiz Rating table.
- Stores the information on the rating user gave to a certain quiz. Might include a review as well (as a text).
- */
+-- Quiz Rating table.
+-- Stores the information on the rating user gave to a certain quiz. Might include a review as well (as a text).
 create table quiz_rating(
     quiz_id bigint not null,
     user_id bigint not null,
