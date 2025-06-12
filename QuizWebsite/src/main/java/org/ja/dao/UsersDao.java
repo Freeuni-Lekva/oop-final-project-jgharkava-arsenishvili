@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class UsersDao {
     private BasicDataSource dataSource;
+    private long cnt=0;
     public UsersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -31,6 +32,7 @@ public class UsersDao {
             if (keys.next()) {
                 long newId = keys.getLong(1);
                 user.setId(newId); // if you want to store it in your object
+                cnt++;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -43,6 +45,7 @@ public class UsersDao {
             preparedStatement.setLong(1, id);
 
             preparedStatement.execute();
+            cnt--;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -54,11 +57,12 @@ public class UsersDao {
             preparedStatement.setString(1, name);
 
             preparedStatement.execute();
+            cnt--;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    User getUserById(int id) {
+    public User getUserById(int id) {
         String sql="SELECT * FROM users WHERE user_id=?";
         try (Connection c=dataSource.getConnection()){
             PreparedStatement st=c.prepareStatement(sql);
@@ -79,7 +83,7 @@ public class UsersDao {
         }
         return null;
     }
-    User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         String sql="SELECT * FROM users WHERE username=?";
         try (Connection c=dataSource.getConnection()){
             PreparedStatement st=c.prepareStatement(sql);
@@ -100,7 +104,7 @@ public class UsersDao {
         }
         return null;
     }
-    ArrayList<User> getUsersByFilter(Filter filter) {
+    public ArrayList<User> getUsersByFilter(Filter filter) {
         String sql="SELECT * FROM users WHERE "+filter.toString();
         ArrayList<User> ans=new ArrayList<>();
         try (Connection c=dataSource.getConnection()){
@@ -120,5 +124,8 @@ public class UsersDao {
             throw new RuntimeException(e);
         }
         return ans;
+    }
+    public long getCount(){
+        return cnt;
     }
 }
