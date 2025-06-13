@@ -1,6 +1,5 @@
 package org.ja.model.Filters;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryFilter extends Filter {

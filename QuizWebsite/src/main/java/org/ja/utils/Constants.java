@@ -12,8 +12,7 @@ public class Constants {
     public static class ContextAttributes {
         public static final String USER_DAO = "userDao";
         public static final String QUIZZES_DAO = "quizzesDao";
-        public static final String CATEGORY_DAO = "categoryDao";
+        public static final String HISTORY_DAO = "historyDao";
         // Add others as needed
     }
-
 }

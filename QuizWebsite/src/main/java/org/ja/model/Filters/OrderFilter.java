@@ -8,6 +8,8 @@ public class OrderFilter extends Filter {
     private final int orderMonotonicity;
 
     public OrderFilter(String orderClause, int orderMonotonicity) {
+        if(orderMonotonicity != INCREASING && orderMonotonicity != DECREASING)
+            throw new IllegalArgumentException("Invalid order monotonicity");
         this.orderMonotonicity = orderMonotonicity;
         this.orderClause = orderClause;
     }

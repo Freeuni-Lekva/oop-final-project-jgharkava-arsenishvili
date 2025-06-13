@@ -6,17 +6,20 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 public class FilterBuilder {
+    private static final String[] PARAMETER_NAMES = {Constants.FilterFields.USERNAME,
+                                                     Constants.FilterFields.QUIZ_NAME,
+                                                     Constants.FilterFields.CATEGORY,
+                                                     Constants.FilterFields.TAG,
+                                                     Constants.FilterFields.ORDER};
 
     public static Filter build(HttpServletRequest request) {
-        Enumeration<String> parameterNames = request.getParameterNames();
-
         OrFilter orFilter = new OrFilter();
         AndFilter andFilter = new AndFilter();
 
-        while (parameterNames.hasMoreElements()) {
-            String parameterName = parameterNames.nextElement();
-
+        for (String parameterName : PARAMETER_NAMES) {
             String[] values = request.getParameterValues(parameterName);
+
+            if(values == null || values.length == 0) continue;
 
             switch (parameterName) {
                 case Constants.FilterFields.USERNAME -> {

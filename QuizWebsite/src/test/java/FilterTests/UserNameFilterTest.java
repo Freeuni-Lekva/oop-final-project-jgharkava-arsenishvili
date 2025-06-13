@@ -18,8 +18,12 @@ public class UserNameFilterTest {
 
     @Test
     public void testBuildWhereClause() {
-        String clause = filter.buildWhereClause();
-        assertEquals("username like ?", clause);
+        assertEquals("username like ?", filter.buildWhereClause());
+    }
+
+    @Test
+    public void testGetOrderByClause() {
+        assertEquals("true", filter.buildOrderByClause());
     }
 
     @Test
@@ -28,13 +32,6 @@ public class UserNameFilterTest {
 
         assertEquals(1, parameters.size());
         assertEquals("Liza%", parameters.get(0));
-    }
-
-    @Test
-    public void testGetOrderByClause() {
-        String clause = filter.buildOrderByClause();
-
-        assertEquals("true", clause);
     }
 
 }

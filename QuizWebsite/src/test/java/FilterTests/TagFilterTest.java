@@ -18,14 +18,12 @@ public class TagFilterTest {
 
     @Test
     public void testBuildWhereClause() {
-        String clause = filter.buildWhereClause();
-        assertEquals("tag_name = ?", clause);
+        assertEquals("tag_name = ?", filter.buildWhereClause());
     }
 
     @Test
     public void testBuildOrderByClause() {
-        String clause = filter.buildOrderByClause();
-        assertEquals("true", clause);
+        assertEquals("true", filter.buildOrderByClause());
     }
 
     @Test

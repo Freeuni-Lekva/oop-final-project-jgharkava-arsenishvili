@@ -18,14 +18,12 @@ public class QuizNameFilterTest {
 
     @Test
     public void testBuildWhereClause() {
-        String clause = filter.buildWhereClause();
-        assertEquals("quiz_name like ?", clause);
+        assertEquals("quiz_name like ?", filter.buildWhereClause());
     }
 
     @Test
     public void testBuildOrderByClause() {
-        String clause = filter.buildOrderByClause();
-        assertEquals("true", clause);
+        assertEquals("true", filter.buildOrderByClause());
     }
 
     @Test
