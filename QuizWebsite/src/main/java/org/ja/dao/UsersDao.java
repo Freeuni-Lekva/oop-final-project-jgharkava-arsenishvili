@@ -88,12 +88,10 @@ public class UsersDao {
         }
         return null;
     }
-
-    private User getUserByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username=?";
-        try (Connection c=dataSource.getConnection();
-            PreparedStatement st=c.prepareStatement(sql)){
-
+    public User getUserByUsername(String username) {
+        String sql="SELECT * FROM users WHERE username=?";
+        try (Connection c=dataSource.getConnection()){
+            PreparedStatement st=c.prepareStatement(sql);
             st.setString(1, username);
 
             try (ResultSet rs = st.executeQuery()){

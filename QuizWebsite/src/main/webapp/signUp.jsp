@@ -1,13 +1,13 @@
 <%
-    String err = (String) request.getAttribute("error");
-    if(err != null){ %>
+  String err = (String) request.getAttribute("error");
+  if(err != null){ %>
 <div style="color:red;"><%=err%></div>
 <%  } %>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jgharkava-Arsenishvili</title>
+  <title>Jgharkava-Arsenishvili</title>
 </head>
 
 <body>
@@ -15,13 +15,13 @@
 <h3>log in to your account or sign up if you don't have one</h3>
 
 <form action="login" method="post">
-    Username: <label>
-    <input type="text" name="username" required/>
+  Username: <label>
+  <input type="text" name="username" required/>
 </label><br /><br />
-    Password: <label>
-    <input type="password" name="password" required/>
+  Password: <label>
+  <input type="password" name="password" required/>
 </label>
-    <input type="submit" value="Login" />
+  <input type="submit" value="Login" />
 </form>
 <p><a href="signUp.jsp">Sign Up Here</a></p>
 
