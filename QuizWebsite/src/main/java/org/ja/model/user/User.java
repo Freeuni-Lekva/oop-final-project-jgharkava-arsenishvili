@@ -1,17 +1,22 @@
 package org.ja.model.user;
 
+import java.sql.Timestamp;
+
 public class User {
     private long id;
-    private String userName;
+    private String salt;
+    private String username;
     private String passwordHashed;
-    private String registrDate;
+    private Timestamp registrationDate;
     private String photo;
     private String status;
-    public User(long id, String userName, String passwordHashed, String registrDate, String photo, String status) {
+
+    public User(long id, String username, String passwordHashed, String salt, Timestamp registrationDate, String photo, String status) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.passwordHashed = passwordHashed;
-        this.registrDate = registrDate;
+        this.salt = salt;
+        this.registrationDate = registrationDate;
         this.photo = photo;
         this.status = status;
     }
@@ -21,19 +26,24 @@ public class User {
     public void setId(long id) {
         this.id = id;
     }
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
+    public void setUsername(String username){this.username = username;}
     public String getPasswordHashed() {
         return passwordHashed;
     }
-    public String getRegistrDate() {
-        return registrDate;
-    }
+    public void setPasswordHashed(String passwordHashed){this.passwordHashed = passwordHashed;}
+    public Timestamp getRegistrationDate() {return registrationDate;}
+    public void setRegistrationDate(Timestamp registrationDate){this.registrationDate = registrationDate;}
     public String getPhoto() {
         return photo;
     }
+    public void setPhoto(String photo){this.photo = photo;}
     public String getStatus() {
         return status;
     }
+    public void setStatus(String status){this.status = status;}
+    public String getSalt(){return salt;}
+    public void setSalt(String salt){this.salt = salt;}
 }

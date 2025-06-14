@@ -18,17 +18,17 @@ public class UsersDao {
     }
 
     public void insertUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (password_hashed, username, registration_date, user_photo, user_status) " +
-                "VALUES (?,?, ?, ?, ?);";
+        String sql = "INSERT INTO users (password_hashed, username, user_photo, user_status, salt) " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
         try (Connection c = dataSource.getConnection();
             PreparedStatement preparedStatement =
                     c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             preparedStatement.setString(1, user.getPasswordHashed());
-            preparedStatement.setString(2, user.getUserName());
-            preparedStatement.setString(3, user.getRegistrDate());
-            preparedStatement.setString(4, user.getPhoto());
-            preparedStatement.setString(5, user.getStatus());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPhoto());
+            preparedStatement.setString(4, user.getStatus());
+            preparedStatement.setString(5, user.getSalt());
 
             preparedStatement.executeUpdate();
 
@@ -129,7 +129,8 @@ public class UsersDao {
 
     private User retrieveUser(ResultSet rs) throws SQLException {
         return new User(rs.getLong("user_id"), rs.getString("username"),
-                rs.getString("registration_date"), rs.getString("user_photo"),
-                rs.getString("user_status"), rs.getString("password_hashed"));
+                rs.getString("password_hashed"), rs.getString("salt"),
+                rs.getTimestamp("registration_date"), rs.getString("user_photo"),
+                rs.getString("user_status"));
     }
 }
