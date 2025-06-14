@@ -40,7 +40,7 @@ public class QuizzesDao {
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, average_rating, " +
                 "participant_count, creation_date, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
-                "question_correction_status) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "question_correction_status, quiz_score) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -56,6 +56,7 @@ public class QuizzesDao {
             ps.setString(9,quiz.getQuestionOrder());
             ps.setString(10, quiz.getQuestionPlacement());
             ps.setString(11, quiz.getQuestionCorrection());
+            ps.setInt(12, quiz.getScore());
 
             ps.executeUpdate();
 
@@ -102,7 +103,7 @@ public class QuizzesDao {
                 "average_rating=?, participant_count=?, creation_date=?, " +
                 "time_limit_in_minutes=?, category_id=?, creator_id=?," +
                 "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=? WHERE id = ?";
+                "question_correction_status=?, quiz_score = ? WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -118,7 +119,8 @@ public class QuizzesDao {
             stmt.setString(9, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
             stmt.setString(10, quiz.getQuestionPlacement());
             stmt.setString(11, quiz.getQuestionCorrection());
-            stmt.setLong(12, quiz.getId());
+            stmt.setInt(12, quiz.getScore());
+            stmt.setLong(13, quiz.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -132,7 +134,7 @@ public class QuizzesDao {
                 "average_rating=?, participant_count=?, creation_date=?, " +
                 "time_limit_in_minutes=?, category_id=?, creator_id=?," +
                 "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=? WHERE id = ?";
+                "question_correction_status=?, quiz_score = ? WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -148,7 +150,8 @@ public class QuizzesDao {
             stmt.setString(9, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
             stmt.setString(10, quiz.getQuestionPlacement());
             stmt.setString(11, quiz.getQuestionCorrection());
-            stmt.setLong(12, id);
+            stmt.setInt(12, quiz.getScore());
+            stmt.setLong(13, id);
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -162,7 +165,7 @@ public class QuizzesDao {
                 "average_rating=?, participant_count=?, creation_date=?, " +
                 "time_limit_in_minutes=?, category_id=?, creator_id=?," +
                 "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=? WHERE quiz_name = ?";
+                "question_correction_status=?, quiz_score = ? WHERE quiz_name = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -178,7 +181,8 @@ public class QuizzesDao {
             stmt.setString(9, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
             stmt.setString(10, quiz.getQuestionPlacement());
             stmt.setString(11, quiz.getQuestionCorrection());
-            stmt.setString(12, name);
+            stmt.setInt(12, quiz.getScore());
+            stmt.setString(13, name);
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -317,7 +321,8 @@ public class QuizzesDao {
 
     private Quiz retrieveQuiz(ResultSet rs) throws SQLException {
         return new Quiz(rs.getLong("quiz_id"), rs.getString("quiz_name"),
-                rs.getString("quiz_description"), rs.getDouble("average_rating"),
+                rs.getString("quiz_description"), rs.getInt("quiz_score"),
+                rs.getDouble("average_rating"),
                 rs.getLong("participant_count"), rs.getTimestamp("creation_date"),
                 rs.getInt("time_limit_in_minutes"), rs.getLong("category_id"),
                 rs.getLong("creator_id"), rs.getString("question_order_status"),

@@ -104,6 +104,64 @@ public class HistoriesDao {
         return histories;
     }
 
+    public ArrayList<History> getUserHistoryByQuiz(long userId, long quizId){
+        ArrayList<History> historyList = new ArrayList<>();
+
+        String sql = "SELECT * FROM history WHERE user_id = ? AND quizId = ?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, userId);
+            ps.setLong(2, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    historyList.add(retrieveHistory(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving histories by quiz_id and user_id from database", e);
+        }
+
+        return historyList;
+    }
+
+    public ArrayList<History> getUserFriendsHistoryByQuiz(long userId, long quizId){
+        ArrayList<History> historyList = new ArrayList<>();
+
+        String sql = "SELECT h.* " +
+                "FROM history h " +
+                "JOIN (" +
+                "    SELECT " +
+                "        CASE " +
+                "            WHEN first_user_id = ? THEN second_user_id " +
+                "            ELSE first_user_id " +
+                "        END AS friend_id " +
+                "    FROM friendships " +
+                "    WHERE (first_user_id = ? OR second_user_id = ?) " +
+                "      AND friendship_status = 'friends' " +
+                ") f ON h.user_id = f.friend_id " +
+                "WHERE h.quiz_id = ?;";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, userId);
+            ps.setLong(2, userId);
+            ps.setLong(3, userId);
+            ps.setLong(4, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    historyList.add(retrieveHistory(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving histories for friends by quiz_id and user_id from database", e);
+        }
+
+        return historyList;
+    }
+
     private History retrieveHistory(ResultSet rs) throws SQLException {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
                 rs.getLong("quiz_id"), rs.getDouble("score"),

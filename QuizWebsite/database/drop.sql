@@ -13,4 +13,5 @@ drop table if exists messages;
 drop table if exists challenges;
 drop table if exists history;
 drop table if exists quiz_rating;
+drop table if exists announcements;
 

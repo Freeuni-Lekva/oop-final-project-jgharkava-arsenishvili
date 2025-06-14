@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class CategoriesDao {
     private final BasicDataSource dataSource;
@@ -68,6 +69,27 @@ public class CategoriesDao {
         }
         return null;
     }
+
+    public ArrayList<Category> getAllCategories(){
+        ArrayList<Category> categories = new ArrayList<>();
+
+        String sql = "SELECT * FROM categories";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    categories.add(retrieveCategory(rs));
+            }
+
+        } catch (SQLException e){
+            throw new RuntimeException("Error querying categories  from database", e);
+        }
+
+        return categories;
+    }
+
 
     // TO DELETE
     public Category getCategoryByName(String categoryName) {

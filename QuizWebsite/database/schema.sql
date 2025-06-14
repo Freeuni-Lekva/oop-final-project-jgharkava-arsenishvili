@@ -41,6 +41,7 @@ create table quizzes(
     quiz_id bigint primary key auto_increment,
     quiz_name varchar(64) unique not null,
     quiz_description text,
+    quiz_score int not null,
     average_rating double not null default 0,
     participant_count bigint not null default 0,
     creation_date timestamp default current_timestamp,
@@ -227,7 +228,19 @@ create table quiz_rating(
     primary key (quiz_id, user_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (user_id) references users(user_id) on delete cascade
-)
+);
+
+-- Announcements table.
+-- Stores the information of announcements including id, the id of an administrator,
+-- announcement text and the date when the announcement has been posted.
+create table announcements(
+    announcement_id bigint primary key auto_increment,
+    administrator_id bigint,
+    announcement_text text not null,
+    creation_date timestamp default current_timestamp,
+
+    foreign key (administrator_id) references users(user_id) on delete cascade
+);
 
 
 
