@@ -7,8 +7,7 @@ public class Achievement {
     private String achievementPhoto;
 
     // Empty constructor
-    public Achievement() {
-    }
+    public Achievement() {}
 
     // Constructor with all parameters
     public Achievement(long achievementId, String achievementName, String achievementDescription, String achievementPhoto) {

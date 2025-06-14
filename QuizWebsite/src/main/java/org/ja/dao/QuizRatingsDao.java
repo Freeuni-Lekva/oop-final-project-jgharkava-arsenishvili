@@ -6,6 +6,7 @@ import org.ja.model.OtherObjects.QuizRating;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 /*
 create table quiz_rating(
@@ -20,69 +21,90 @@ create table quiz_rating(
 )
  */
 public class QuizRatingsDao {
-    private BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
+
     public QuizRatingsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
+
     public void insertQuizRating(QuizRating qr){
-        String sql="INSERT INTO quiz_rating (quiz_id, user_id, rating, review) VALUES (?,?,?,?)";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement ps = c.prepareStatement(sql);
+        String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) VALUES (?,?,?,?)" +
+                "ON DUPLICATE KEY UPDATE rating = VALUES(rating), review = VALUES(review)";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
             ps.setLong(1, qr.getQuizId());
             ps.setLong(2, qr.getUserId());
-            ps.setDouble(3, qr.getRating());
+            ps.setInt(3, qr.getRating());
             ps.setString(4, qr.getReview());
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting quiz rating into database", e);
         }
     }
+
     public void removeQuizRating(long quizId, long userId){
-        String sql="DELETE FROM quiz_rating WHERE quiz_id="+quizId+" AND user_id="+userId;
-        try(Connection c= dataSource.getConnection()){
-            PreparedStatement ps = c.prepareStatement(sql);
+        String sql = "DELETE FROM quiz_rating WHERE quiz_id = ? AND user_id = ?";
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, quizId);
+            ps.setLong(2, userId);
+
             ps.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing quiz rating from database", e);
         }
     }
+
     public ArrayList<QuizRating> getQuizRatingsByUserId(long userId){
-        String sql="SELECT * FROM quiz_rating WHERE user_id="+userId;
-        try(Connection c= dataSource.getConnection()){
-            PreparedStatement ps = c.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            ArrayList<QuizRating> quizRatings = new ArrayList<>();
-            while(rs.next()){
-                QuizRating quizRating = new QuizRating();
-                quizRating.setQuizId(rs.getLong("quiz_id"));
-                quizRating.setUserId(rs.getLong("user_id"));
-                quizRating.setRating(rs.getInt("rating"));
-                quizRating.setReview(rs.getString("review"));
-                quizRatings.add(quizRating);
+        ArrayList<QuizRating> quizRatings = new ArrayList<>();
+
+        String sql = "SELECT * FROM quiz_rating WHERE user_id = ?";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next())
+                    quizRatings.add(retrieveQuizRating(rs));
             }
-            return quizRatings;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quiz rating by user id from database", e);
         }
+
+        return quizRatings;
     }
+
     public ArrayList<QuizRating> getQuizRatingsByQuizId(long quizId){
-        String sql="SELECT * FROM quiz_rating WHERE quiz_id="+quizId;
-        try(Connection c= dataSource.getConnection()){
-            PreparedStatement ps = c.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            ArrayList<QuizRating> quizRatings = new ArrayList<>();
-            while(rs.next()){
-                QuizRating quizRating = new QuizRating();
-                quizRating.setQuizId(rs.getLong("quiz_id"));
-                quizRating.setUserId(rs.getLong("user_id"));
-                quizRating.setRating(rs.getInt("rating"));
-                quizRating.setReview(rs.getString("review"));
-                quizRatings.add(quizRating);
+        ArrayList<QuizRating> quizRatings = new ArrayList<>();
+
+        String sql = "SELECT * FROM quiz_rating WHERE quiz_id = ?";
+
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    quizRatings.add(retrieveQuizRating(rs));
             }
-            return quizRatings;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quiz rating by quiz id from database", e);
         }
+
+        return quizRatings;
+    }
+
+    private QuizRating retrieveQuizRating(ResultSet rs) throws SQLException {
+        return new QuizRating(rs.getLong("quiz_id"), rs.getLong("user_id"),
+                rs.getInt("rating"), rs.getString("review"));
     }
 }

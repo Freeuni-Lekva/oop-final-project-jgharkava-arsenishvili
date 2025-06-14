@@ -65,9 +65,7 @@ public class Question {
     public void setQuizId(long quizId){
         this.quizId=quizId;
     }
-    public String getQuestionText(){
-        return questionText;
-    }
+    public String getQuestionText(){return questionText;}
     public void setQuestionText(String questionText){
         this.questionText=questionText;
     }

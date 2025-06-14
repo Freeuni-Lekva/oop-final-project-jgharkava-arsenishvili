@@ -1,9 +1,14 @@
 package org.ja.model.quiz;
+
+import java.sql.Time;
+import java.sql.Timestamp;
+
 /*
 create table quizzes(
     quiz_id bigint primary key auto_increment,
     quiz_name varchar(64) unique not null,
     quiz_description text,
+    quiz_score int not null,
     average_rating double not null default 0,
     participant_count bigint not null default 0,
     creation_date timestamp default current_timestamp,
@@ -28,9 +33,10 @@ public class Quiz {
     private long id;
     private String name;
     private String description;
-    private float avgRating;
+    private double avgRating;
+    private int quizScore;
     private long participantCount;
-    private String creationDate;
+    private Timestamp creationDate;
     private int timeInMinutes;
     private long categoryId;
     private long creatorId;
@@ -40,13 +46,14 @@ public class Quiz {
     public Quiz(){
 
     }
-    public Quiz(long id, String name, String description, float avgRating, long participantCount,
-                String creationDate, int timeInMinutes,
+    public Quiz(long id, String name, String description, int quizScore, double avgRating,
+                long participantCount, Timestamp creationDate, int timeInMinutes,
                 long categoryId, long creatorId, String questionOrder,
                 String questionPlacement, String questionCorrection) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.quizScore = quizScore;
         this.avgRating = avgRating;
         this.participantCount = participantCount;
         this.creationDate = creationDate;
@@ -66,16 +73,18 @@ public class Quiz {
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String name) {this.name = name;}
+    public int getScore() {
+        return quizScore;
     }
+    public void setScore(int quizScore) {this.quizScore = quizScore;}
     public String getDescription() {
         return description;
     }
     public void setDescription(String description) {
         this.description = description;
     }
-    public float getAvgRating() {
+    public double getAvgRating() {
         return avgRating;
     }
     public void setAvgRating(float avgRating) {
@@ -87,10 +96,10 @@ public class Quiz {
     public void setParticipantCount(long participantCount) {
         this.participantCount = participantCount;
     }
-    public String getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
     public int getTimeInMinutes() {
