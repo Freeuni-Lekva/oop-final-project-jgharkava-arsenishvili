@@ -1,4 +1,4 @@
 package org.ja.model.quiz.question;
 
-public class MultipleChoiceQuestion extends Question {
+public class MultipleChoiceQuestion {
 }

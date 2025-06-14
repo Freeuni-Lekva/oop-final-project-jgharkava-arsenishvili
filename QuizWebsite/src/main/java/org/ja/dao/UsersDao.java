@@ -38,7 +38,30 @@ public class UsersDao {
             throw new RuntimeException(e);
         }
     }
+    public boolean containsUser(String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+
+
     public void removeUserById(long id) {
+        if(id>cnt||id<0){
+            return;
+        }
         String sql = "DELETE FROM users WHERE user_id=?";
         try(Connection c=dataSource.getConnection()){
             PreparedStatement preparedStatement = c.prepareStatement(sql);
@@ -51,6 +74,9 @@ public class UsersDao {
         }
     }
     public void removeUserByName(String name) {
+        if(!containsUser(name)){
+            return;
+        }
         String sql = "DELETE FROM users WHERE user_name=?";
         try(Connection c=dataSource.getConnection()){
             PreparedStatement preparedStatement = c.prepareStatement(sql);
