@@ -22,7 +22,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class UserAchievementsDao {
-    private BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
 
     public UserAchievementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
@@ -30,15 +30,14 @@ public class UserAchievementsDao {
 
     // Grants the given achievement to a user
     public void insertAchievement(UserAchievement ua) {
-        String sql = "INSERT INTO user_achievement (user_id, achievement_id, achievement_date) VALUES (?, ?)";
+        String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, ua.getUserId());
             ps.setLong(2, ua.getAchievementId());
-            ps.setTimestamp(3, ua.getAchievementDate());
-            ps.executeUpdate();
 
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to insert user achievement", e);
         }
@@ -46,11 +45,15 @@ public class UserAchievementsDao {
 
     // Removes the specified achievement from a user
     public void removeAchievement(long userId, long achievementId) {
-        String sql = "DELETE FROM user_achievement WHERE user_id = "+userId+" AND achievement_id = "+achievementId;
+        String sql = "DELETE FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.executeUpdate();
 
+            ps.setLong(1, userId);
+            ps.setLong(2, achievementId);
+
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to remove user achievement", e);
         }
@@ -59,26 +62,26 @@ public class UserAchievementsDao {
     // Returns all user_achievement rows for a user
     public ArrayList<UserAchievement> getUserAchievements(long userId) {
         ArrayList<UserAchievement> achievements = new ArrayList<>();
+
         String sql = "SELECT * FROM user_achievement WHERE user_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                UserAchievement ua = new UserAchievement();
-                ua.setUserId(rs.getLong("user_id"));
-                ua.setAchievementId(rs.getLong("achievement_id"));
-                ua.setAchievementDate(rs.getTimestamp("achievement_date"));
-                achievements.add(ua);
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    achievements.add(retrieveUserAchievement(rs));
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve user achievements", e);
         }
 
         return achievements;
+    }
+
+    private UserAchievement retrieveUserAchievement(ResultSet rs) throws SQLException {
+        return new UserAchievement(rs.getLong("user_id"), rs.getLong("achievement_id"),
+                rs.getTimestamp("achievement_date"));
     }
 }

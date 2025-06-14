@@ -7,7 +7,7 @@ create table users (
     password_hashed varchar(256) not null,
     username varchar(64) unique not null,
     registration_date timestamp default current_timestamp,
-    user_photo mediumblob,
+    user_photo varchar(256),
     user_status enum('administrator', 'user') not null default 'user'
 );
 
@@ -41,6 +41,7 @@ create table quizzes(
     quiz_id bigint primary key auto_increment,
     quiz_name varchar(64) unique not null,
     quiz_description text,
+    quiz_score int not null,
     average_rating double not null default 0,
     participant_count bigint not null default 0,
     creation_date timestamp default current_timestamp,
@@ -138,13 +139,13 @@ create table quiz_tag(
 
 
 -- Friendships table.
--- Shows the relationship between two users. It may be a pending friend request (from the first to the second user) or
+-- Shows the relationship between two users. It may be a ng friend request (from the first to the second user) or
 -- a two-sided friendship.
 create table friendships(
     first_user_id bigint not null,
     second_user_id bigint not null,
     friendship_date timestamp default current_timestamp,
-    friendship_status enum('pending', 'friends'),
+    friendship_status enum('pending', 'friends') default 'pending',
 
     primary key (first_user_id, second_user_id),
     foreign key (first_user_id) references users(user_id) on delete cascade,
@@ -158,7 +159,7 @@ create table achievements(
     achievement_id bigint primary key auto_increment,
     achievement_name varchar(64) unique not null,
     achievement_description text not null,
-    achievement_photo mediumblob
+    achievement_photo varchar(256)
 );
 
 
@@ -227,7 +228,19 @@ create table quiz_rating(
     primary key (quiz_id, user_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (user_id) references users(user_id) on delete cascade
-)
+);
+
+-- Announcements table.
+-- Stores the information of announcements including id, the id of an administrator,
+-- announcement text and the date when the announcement has been posted.
+create table announcements(
+    announcement_id bigint primary key auto_increment,
+    administrator_id bigint,
+    announcement_text text not null,
+    creation_date timestamp default current_timestamp,
+
+    foreign key (administrator_id) references users(user_id) on delete cascade
+);
 
 
 
