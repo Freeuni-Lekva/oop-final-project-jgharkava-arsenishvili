@@ -11,12 +11,15 @@ import java.util.ArrayList;
 
 public class CategoriesDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public CategoriesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void addCategory(Category category) {
+    public void insertCategory(Category category) {
+        if(containsCategory(category.getCategoryName())){
+            return;
+        }
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
@@ -28,6 +31,7 @@ public class CategoriesDao {
 
             try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
                 if (keys.next()) {
+                    cnt++;
                     long newId = keys.getLong(1);
                     category.setCategoryId(newId); // if you want to store it in your object
                 }
@@ -38,6 +42,9 @@ public class CategoriesDao {
     }
 
     public void removeCategory(Category category) {
+        if(!containsCategory(category.getCategoryName())){
+            return;
+        }
         String sql = "DELETE FROM categories WHERE category_id = ?";
 
         try(Connection c = dataSource.getConnection();
@@ -46,6 +53,7 @@ public class CategoriesDao {
             preparedStatement.setLong(1, category.getCategoryId());
 
             preparedStatement.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing category from database", e);
         }
@@ -110,8 +118,47 @@ public class CategoriesDao {
         return null;
     }
 
+    public boolean containsCategory(long id) {
+        String sql = "SELECT COUNT(*) FROM categories WHERE category_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public boolean containsCategory(String name) {
+        String sql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
     private Category retrieveCategory(ResultSet rs) throws SQLException {
         return new Category(rs.getLong("category_id"), rs.getString("category_name"));
+    }
+    public long getCount(){
+        return cnt;
     }
 
 }

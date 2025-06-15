@@ -50,4 +50,10 @@ public class Achievement {
     public void setAchievementPhoto(String achievementPhoto) {
         this.achievementPhoto = achievementPhoto;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return achievementName==((Achievement) o).achievementName;
+    }
 }

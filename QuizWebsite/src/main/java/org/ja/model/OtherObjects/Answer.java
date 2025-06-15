@@ -68,4 +68,11 @@ public class Answer {
     public void setAnswerValidity(boolean answerValidity) {
         this.answerValidity = answerValidity;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return getQuestionId() == ((Answer) o).getQuestionId()&&answerText==((Answer) o).getAnswerText();
+    }
 }

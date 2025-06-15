@@ -22,13 +22,19 @@ create table messages(
  */
 public class MessageDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public MessageDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertMessage(Message message) {
-        String sql = "INSERT INTO messages (sender_user_id, recipient_user_id, message_text, message_send_date) VALUES (?,?,?,?)";
+        if(message==null){
+            return;
+        }
+        if(contains(message)){
+            return;
+        }
+        String sql = "INSERT INTO messages (sender_user_id, recipient_user_id, message_text) VALUES (?,?,?)";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -36,13 +42,14 @@ public class MessageDao {
             ps.setLong(1, message.getSenderUserId());
             ps.setLong(2, message.getRecipientUserId());
             ps.setString(3, message.getMessageText());
-            ps.setTimestamp(4, message.getMessageSendDate());
 
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
+                    cnt++;
                     message.setMessageId(rs.getLong(1));
+                    message.setMessageSendDate(rs.getTimestamp("message_send_date"));
                 }
             }
 
@@ -52,6 +59,9 @@ public class MessageDao {
 
     }
     public void removeMessage(long messageId) {
+        if(!contains(messageId)){
+            return;
+        }
         String sql = "DELETE FROM messages WHERE message_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -59,6 +69,7 @@ public class MessageDao {
             ps.setLong(1, messageId);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing Message from database", e);
         }
@@ -112,7 +123,56 @@ public class MessageDao {
 
         return messages;
     }
+    public boolean contains(Message m){
+        if(m==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM messages WHERE message_id = ? AND sender_user_id=?" +
+                "AND recipient_user_id=? AND message_text=? AND message_send_date=?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, m.getMessageId());
+            ps.setLong(2, m.getSenderUserId());
+            ps.setLong(3, m.getRecipientUserId());
+            ps.setString(4, m.getMessageText());
+            ps.setTimestamp(5, m.getMessageSendDate());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public boolean contains(long mid){
+        if(mid<0||mid>cnt){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM messages WHERE message_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, mid);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private Message retrieveMessage(ResultSet rs) throws SQLException {
         return new Message(rs.getLong("message_id"), rs.getLong("sender_user_id"),
                 rs.getLong("recipient_user_id"), rs.getString("message_text"),

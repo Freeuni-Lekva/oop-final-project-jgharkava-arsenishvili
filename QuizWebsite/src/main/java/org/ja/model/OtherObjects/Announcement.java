@@ -24,4 +24,11 @@ public class Announcement {
     public void setAnnouncementText(String announcementText){this.announcementText = announcementText;};
     public Timestamp getCreationDate(){return creationDate;};
     public void setCreationDate(Timestamp creationDate){this.creationDate = creationDate;};
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+        return announcementId==((Announcement) o).getAnnouncementId()&&administratorId==((Announcement) o).getAdministratorId()
+                &&announcementText.equals(((Announcement) o).getAnnouncementText())&&creationDate.equals(((Announcement) o).getCreationDate());
+    }
 }

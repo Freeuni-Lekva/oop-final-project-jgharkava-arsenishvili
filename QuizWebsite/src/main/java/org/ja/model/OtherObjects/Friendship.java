@@ -53,4 +53,11 @@ public class Friendship {
     public void setFriendshipStatus(String friendshipStatus) {
         this.friendshipStatus = friendshipStatus;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return firstUserId==((Friendship) o).getFirstUserId()&&secondUserId==((Friendship) o).getSecondUserId()
+                &&friendshipStatus.equals(((Friendship) o).getFriendshipStatus());
+    }
 }

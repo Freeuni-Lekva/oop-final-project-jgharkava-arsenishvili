@@ -51,4 +51,12 @@ public class Challenge {
     public void setQuizId(long quizId) {
         this.quizId = quizId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return challengeId == ((Challenge) o).getChallengeId()&&senderUserId==((Challenge) o).getSenderUserId()
+                &&recipientUserId==((Challenge) o).getRecipientUserId()&&quizId==((Challenge) o).getQuizId();
+    }
 }

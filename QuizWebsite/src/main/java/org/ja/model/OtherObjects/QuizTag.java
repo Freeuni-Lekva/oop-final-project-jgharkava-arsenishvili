@@ -31,4 +31,13 @@ public class QuizTag {
     public void setTagId(long tagId) {
         this.tagId = tagId;
     }
+    public boolean equals(Object o) {
+        if(this==o){
+            return true;
+        }
+        if(getClass()!=o.getClass()){
+            return false;
+        }
+        return quizId==((QuizTag) o).getQuizId()&&tagId==((QuizTag) o).getTagId();
+    }
 }
