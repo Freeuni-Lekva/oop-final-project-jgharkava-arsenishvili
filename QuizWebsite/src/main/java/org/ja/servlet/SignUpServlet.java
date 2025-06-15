@@ -24,7 +24,7 @@ public class SignUpServlet extends HttpServlet {
             request.setAttribute("error", "Account with that username already exists");
             request.getRequestDispatcher("/signUp.jsp").forward(request, response);
         }else{
-            User user = new User(0, username, password, "", "", "");
+            User user = new User(0, username, password, "", null, "", "");
             try {
                 dao.insertUser(user);
                 request.getSession().setAttribute("username", username);

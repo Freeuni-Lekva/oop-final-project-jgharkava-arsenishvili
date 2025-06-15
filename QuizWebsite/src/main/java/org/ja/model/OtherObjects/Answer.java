@@ -1,5 +1,7 @@
 package org.ja.model.OtherObjects;
 
+import java.util.Arrays;
+
 public class Answer {
     /*
     create table answers(
@@ -67,5 +69,10 @@ public class Answer {
 
     public void setAnswerValidity(boolean answerValidity) {
         this.answerValidity = answerValidity;
+    }
+
+    public boolean containsAnswer(String answer){
+        return Arrays.stream(answerText.split("/"))
+                .anyMatch(part -> part.equalsIgnoreCase(answer));
     }
 }
