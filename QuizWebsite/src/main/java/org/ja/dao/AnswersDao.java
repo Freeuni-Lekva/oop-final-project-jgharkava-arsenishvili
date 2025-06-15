@@ -22,12 +22,15 @@ create table answers(
  */
 public class AnswersDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public AnswersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertAnswer(Answer answer) {
+        if(contains(answer)) {
+            return;
+        }
         String sql = "INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
@@ -41,8 +44,11 @@ public class AnswersDao {
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()){
-                if (rs.next())
+                if (rs.next()){
+                    cnt++;
                     answer.setAnswerId(rs.getLong(1));
+                }
+
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting answer into database", e);
@@ -50,6 +56,9 @@ public class AnswersDao {
     }
 
     public void removeAnswer(long answerId) {
+        if(getAnswerById(answerId)==null){
+            return;
+        }
         String sql = "DELETE FROM answers WHERE answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -58,13 +67,14 @@ public class AnswersDao {
             ps.setLong(1, answerId);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing answer from database", e);
         }
     }
 
     // TO DELETE
-    public Answer getAnswerById(int id) {
+    public Answer getAnswerById(long id) {
         String sql = "SELECT * FROM answers where answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -103,7 +113,36 @@ public class AnswersDao {
 
         return answers;
     }
+    public boolean contains(Answer answer) {
+        if(answer==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=?" +
+                "AND answer_text=? AND answer_order = ?" +
+                " AND answer_validity = ?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, answer.getAnswerId());
+            ps.setLong(2, answer.getQuestionId());
+            ps.setString(3, answer.getAnswerText());
+            ps.setInt(4, answer.getAnswerOrder());
+            ps.setBoolean(5, answer.getAnswerValidity());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private Answer retrieveAnswer(ResultSet rs) throws SQLException {
         return new Answer(rs.getLong("answer_id"), rs.getLong("question_id"),
                 rs.getString("answer_text"), rs.getInt("answer_order"),

@@ -18,12 +18,15 @@ create table achievements(
  */
 public class AchievementsDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public AchievementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertAchievement(Achievement achievement){
+        if(contains(achievement)){
+            return;
+        }
         String sql = "INSERT INTO achievements (achievement_name, " +
                 "achievement_description, achievement_photo) VALUES (?,?,?)";
 
@@ -37,8 +40,10 @@ public class AchievementsDao {
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next())
+                if (rs.next()){
+                    cnt++;
                     achievement.setAchievementId(rs.getLong(1));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting achievement into database", e);
@@ -46,6 +51,9 @@ public class AchievementsDao {
     }
 
     public void removeAchievement(long id){
+        if(getAchievement(id)==null){
+            return;
+        }
         String sql = "DELETE FROM achievements WHERE achievement_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -54,6 +62,7 @@ public class AchievementsDao {
             ps.setLong(1, id);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing Achievement from database", e);
         }
@@ -78,7 +87,34 @@ public class AchievementsDao {
 
         return null;
     }
+    public boolean contains(Achievement a){
+        if(a==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM achievements WHERE achievement_id = ? AND achievement_name=?" +
+                "AND achievement_description=? AND achievement_photo = ?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, a.getAchievementId());
+            ps.setString(2, a.getAchievementName());
+            ps.setString(3, a.getAchievementDescription());
+            ps.setString(4, a.getAchievementPhoto());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private Achievement retrieveAchievement(ResultSet rs) throws SQLException {
         return new Achievement(rs.getLong("achievement_id"), rs.getString("achievement_name"),
                 rs.getString("achievement_description"), rs.getString("achievement_photo"));

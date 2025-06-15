@@ -61,4 +61,11 @@ public class Match {
     public void setRightMatch(String rightMatch) {
         this.rightMatch = rightMatch;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return questionId==((Match) o).getQuestionId()
+                &&leftMatch.equals(((Match) o).getLeftMatch())&&rightMatch.equals(((Match) o).getRightMatch());
+    }
 }

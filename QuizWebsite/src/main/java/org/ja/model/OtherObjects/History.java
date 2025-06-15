@@ -72,4 +72,11 @@ public class History {
     public void setCompletionDate(Timestamp completionDate) {
         this.completionDate = completionDate;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return historyId == ((History) o).getHistoryId()&&userId==((History) o).getUserId()
+                &&quizId==((History) o).getQuizId()&&score==((History) o).getScore()&&completionTime==((History) o).getCompletionTime();
+    }
 }

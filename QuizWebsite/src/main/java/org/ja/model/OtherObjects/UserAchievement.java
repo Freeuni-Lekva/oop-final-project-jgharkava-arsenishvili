@@ -43,5 +43,12 @@ public class UserAchievement {
     public void setAchievementDate(Timestamp achievementDate) {
         this.achievementDate = achievementDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return userId == ((UserAchievement) o).userId&&achievementId==((UserAchievement) o).achievementId;
+    }
 }
 
