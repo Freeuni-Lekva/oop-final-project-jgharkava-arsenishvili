@@ -24,7 +24,7 @@ public class MultiChoiceMultiAnswersQuestion extends Question{
                 boolean isCorrect = false;
 
                 for (int j = 0; j < correctAnswers.size(); j++){
-                    if (correctAnswers.get(i).containsAnswer(currResponse)) {
+                    if (correctAnswers.get(j).containsAnswer(currResponse)) {
                         grade++;
                         isCorrect = true;
                         break;

@@ -4,6 +4,7 @@ import org.ja.model.OtherObjects.Answer;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -27,6 +28,7 @@ public class MultiAnswerQuestion extends Question{
                         .count();
             } else {
                 Boolean[] unorderedCorrectAnswers = new Boolean[correctAnswers.size()];
+                Arrays.fill(unorderedCorrectAnswers, false);
 
                 for (int i = 0; i < response.size(); i++) {
                     String currResponse = response.getAnswer(i);
@@ -34,6 +36,7 @@ public class MultiAnswerQuestion extends Question{
                         if (correctAnswers.get(j).containsAnswer(currResponse) && !unorderedCorrectAnswers[j]) {
                             unorderedCorrectAnswers[i] = true;
                             grade++;
+                            break;
                         }
                     }
                 }

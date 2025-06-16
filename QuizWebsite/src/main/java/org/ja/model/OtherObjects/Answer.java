@@ -31,6 +31,11 @@ public class Answer {
         this.answerValidity = answerValidity;
     }
 
+    //for testing
+    public Answer(String answerText){
+        this.answerText = answerText;
+    }
+
     public long getAnswerId() {
         return answerId;
     }
@@ -73,6 +78,6 @@ public class Answer {
 
     public boolean containsAnswer(String answer){
         return Arrays.stream(answerText.split("/"))
-                .anyMatch(part -> part.equalsIgnoreCase(answer));
+                .anyMatch(part -> part.equalsIgnoreCase(answer.trim()));
     }
 }

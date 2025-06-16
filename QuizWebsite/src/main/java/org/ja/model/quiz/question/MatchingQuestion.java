@@ -5,9 +5,9 @@ import org.ja.model.quiz.response.Response;
 
 import java.util.List;
 
-public class Matching extends Question {
+public class MatchingQuestion extends Question {
 
-    public Matching(long questionId, long quizId, String questionText,
+    public MatchingQuestion(long questionId, long quizId, String questionText,
                     String imageUrl, String questionType, int numAnswers, String orderStatus) {
         super(questionId, quizId, questionText, imageUrl, questionType, numAnswers, orderStatus);
     }
@@ -24,7 +24,6 @@ public class Matching extends Question {
                 Match currResponse = response.getMatch(i);
 
                 if (correctMatches.contains(currResponse)) grade++;
-                else grade--;
             }
         }
 

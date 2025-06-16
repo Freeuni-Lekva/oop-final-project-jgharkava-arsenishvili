@@ -44,13 +44,13 @@ public class ResponseBuilder {
             int questionIndex = extractMiddleNumber(currParameter);
             String suffix = extractSuffix(currParameter);
 
-            if (questionIndex >= responses.size())
+            if (questionIndex > responses.size())
                 responses.add(new Response());
 
             if (isNumeric(suffix))
-                responses.getLast().addAnswer(request.getParameter(currParameter));
+                responses.get(responses.size() - 1).addAnswer(request.getParameter(currParameter));
             else
-                responses.getLast().addMatch(new Match(suffix, request.getParameter(currParameter)));
+                responses.get(responses.size() - 1).addMatch(new Match(suffix, request.getParameter(currParameter)));
         }
 
 
