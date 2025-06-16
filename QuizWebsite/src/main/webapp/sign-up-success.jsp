@@ -15,6 +15,6 @@
 </head>
 <body>
 <h1>You have signed up successfully!</h1>
-<p><a href="userPage.jsp">Go To Your Page</a></p>
+<p><a href="user-page.jsp">Go To Your Page</a></p>
 </body>
 </html>
