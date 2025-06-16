@@ -10,7 +10,7 @@ create table matches(
 );
 
  */
-public class Match{
+public class Match {
     private long matchId;
     private long questionId;
     private String leftMatch;
@@ -65,13 +65,11 @@ public class Match{
     public void setRightMatch(String rightMatch) {
         this.rightMatch = rightMatch;
     }
-
     @Override
-    public boolean equals(Object obj){
-        if (this == obj) return true;
-        if (!(obj instanceof Match match)) return false;
-
-        return match.getLeftMatch().equals(this.leftMatch) && match.getRightMatch().equals(this.rightMatch);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return questionId==((Match) o).getQuestionId()
+                &&leftMatch.equals(((Match) o).getLeftMatch())&&rightMatch.equals(((Match) o).getRightMatch());
     }
-
 }

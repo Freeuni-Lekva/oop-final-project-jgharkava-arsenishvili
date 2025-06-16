@@ -4,9 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
 import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.OtherObjects.Achievement;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.Friendship;
+import org.ja.model.OtherObjects.*;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.user.User;
@@ -26,11 +24,12 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class AchievementDaoTest {
+public class AnnouncementsDaoTest {
 
     private BasicDataSource basicDataSource;
-    private AchievementsDao dao;
-
+    private AnnouncementsDao dao;
+    private UsersDao usersDao;
+    private CategoriesDao categoriesDao;
     @BeforeEach
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
@@ -80,42 +79,65 @@ public class AchievementDaoTest {
                 }
             }
 
-            dao=new AchievementsDao(basicDataSource);
+            dao=new AnnouncementsDao(basicDataSource);
+            finishSetup();
         }
     }
-    private Achievement a1;
-    private Achievement a2;
-    private Achievement a3;
-    private Achievement a4;
+    private void finishSetup() throws SQLException {
+        usersDao=new UsersDao(basicDataSource);
+        User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        usersDao.insertUser(sandro);
+        User tornike=new User(2, "Tornike", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        usersDao.insertUser(tornike);
+        User liza=new User(3, "Liza", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        usersDao.insertUser(liza);
+        User nini=new User(4, "Nini", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        usersDao.insertUser(nini);
+
+    }
+    private Announcement a1;
+    private Announcement a2;
+    private Announcement a3;
+    private Announcement a4;
+    private Announcement a5;
+    private Announcement a6;
+
     @Test
     public void testInsert() {
-        a1=new Achievement(2, "master", "master", "master.jpg");
-        a2=new Achievement(2, "beginner", "beginner", "beginner.jpg");
-        a3=new Achievement(2, "grandMaster", "grandMaster", "grandMaster.jpg");
-        dao.insertAchievement(a1);
-        assertEquals(1, a1.getAchievementId());
-        dao.insertAchievement(a2);
-        assertEquals(2, a2.getAchievementId());
+        a1=new Announcement(-1, 1,"t1", null);
+        a2=new Announcement(-1, 2,"t2", null);
+        a3=new Announcement(-1, 3,"t3", null);
+        a4=new Announcement(-1, 4,"t4", null);
+        dao.insertAnnouncement(a1);
+        assertEquals(1, a1.getAnnouncementId());
         assertTrue(dao.contains(a1));
-        dao.insertAchievement(a3);
-        assertEquals(3, a3.getAchievementId());
-        assertEquals(3, dao.getCount());
-        dao.insertAchievement(a3);
-        assertEquals(3, dao.getCount());
-
+        assertFalse(dao.contains(a2));
+        dao.insertAnnouncement(a2);
+        dao.insertAnnouncement(a3);
+        dao.insertAnnouncement(a4);
+        assertEquals(4, dao.getCount());
+        dao.insertAnnouncement(a4);
+        assertEquals(4, dao.getCount());
     }
     @Test
     public void testRemove() {
         testInsert();
-        dao.removeAchievement(1);
-        assertEquals(2, dao.getCount());
+        dao.removeAnnouncement(1);
         assertFalse(dao.contains(a1));
-        dao.removeAchievement(1);
-        assertEquals(2, dao.getCount());
-        assertEquals(dao.getAchievement(2), a2);
+        assertEquals(3, dao.getCount());
+        dao.removeAnnouncement(6);
+        assertEquals(3, dao.getCount());
     }
-
-
-
-
+    @Test
+    public void testGetAll() {
+        testInsert();
+        ArrayList<Announcement> arr=dao.getAllAnnouncements();
+        assertEquals(4, arr.size());
+        System.out.println(arr.get(0).getAnnouncementId()+" "+arr.get(0).getAdministratorId()+
+                "s"+arr.get(0).getAnnouncementText()+"aa"+arr.get(0).getCreationDate().toString());
+        assertTrue(arr.contains(a1));
+        assertTrue(arr.contains(a3));
+        assertTrue(arr.contains(a2));
+        assertTrue(arr.contains(a4));
+    }
 }

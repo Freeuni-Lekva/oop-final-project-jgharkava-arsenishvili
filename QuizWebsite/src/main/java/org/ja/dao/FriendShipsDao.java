@@ -23,60 +23,107 @@ create table friendships(
  */
 public class FriendShipsDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public FriendShipsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     //TO DELETE
     public void insertFriendShip(Friendship friendship) {
+        if(contains(friendship)) {
+            return;
+        }
         String sql = "INSERT INTO friendships (first_user_id, second_user_id, friendship_status) VALUES (?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setLong(1, friendship.getFirstUserId());
             ps.setLong(2, friendship.getSecondUserId());
             ps.setString(3, friendship.getFriendshipStatus());
-
             ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                cnt++;
+                friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting friendship into database", e);
         }
     }
 
     public void insertFriendRequest(Friendship friendship){
+        if(contains(friendship)){
+            return;
+        }
+        if(contains(friendship.getFirstUserId(), friendship.getSecondUserId())) {
+            acceptFriendRequest(friendship);
+        }
         String sql = "INSERT INTO friendships (first_user_id, second_user_id) VALUES (?, ?)";
 
         try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setLong(1, friendship.getFirstUserId());
             ps.setLong(2, friendship.getSecondUserId());
 
             ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+                friendship.setFriendshipStatus("pending");
+                cnt++;
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting friendship into database", e);
         }
     }
 
     public void acceptFriendRequest(Friendship friendship){
+
         String sql = "UPDATE friendships SET friendship_status = 'friends' WHERE first_user_id = ? and second_user_id = ?";
 
         try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             ps.setLong(1, friendship.getFirstUserId());
             ps.setLong(2, friendship.getSecondUserId());
 
             ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                friendship.setFriendshipStatus("friends");
+                friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error accepting friendship request in database", e);
         }
     }
 
+    public void removeFriendShip(Friendship f) {
+        if(!contains(f)) {
+            return;
+        }
 
+        String sql = "DELETE FROM friendships WHERE first_user_id = ? AND second_user_id = ?" +
+                "AND friendship_status = ?";
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, f.getFirstUserId());
+            ps.setLong(2, f.getSecondUserId());
+            ps.setString(3, f.getFriendshipStatus());
+            ps.executeUpdate();
+            cnt--;
+        } catch (SQLException e){
+            throw new RuntimeException("Error removing friendship from database", e);
+        }
+    }
     public void removeFriendShip(long first_id, long second_id) {
+        if(!contains(first_id, second_id)) {
+            return;
+        }
+
         String sql = "DELETE FROM friendships WHERE first_user_id = ? AND second_user_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -85,6 +132,7 @@ public class FriendShipsDao {
             ps.setLong(2, second_id);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e){
             throw new RuntimeException("Error removing friendship from database", e);
         }
@@ -103,8 +151,9 @@ public class FriendShipsDao {
             ps.setLong(2, userId);
 
             try (ResultSet rs = ps.executeQuery()){
-                while (rs.next())
+                while (rs.next()){
                     friendships.add(retrieveFriendship(rs));
+                }
             }
 
         } catch (SQLException e) {
@@ -137,7 +186,48 @@ public class FriendShipsDao {
 
         return friendships;
     }
+    public boolean contains(Friendship f){
+        if(f==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM friendships WHERE first_user_id = ? AND second_user_id = ?" +
+                "AND friendship_status=? ";
+        try(Connection c= dataSource.getConnection();
+        PreparedStatement ps=c.prepareStatement(sql)){
+            ps.setLong(1, f.getFirstUserId());
+            ps.setLong(2, f.getSecondUserId());
+            ps.setString(3, f.getFriendshipStatus());
+            ResultSet rs = ps.executeQuery();
 
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public boolean contains(long first_id, long second_id) {
+        String sql = "SELECT COUNT(*) FROM friendships WHERE first_user_id = ? AND second_user_id = ?";
+        try(Connection c= dataSource.getConnection();
+            PreparedStatement ps=c.prepareStatement(sql)){
+            ps.setLong(1, first_id);
+            ps.setLong(2, second_id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private Friendship retrieveFriendship(ResultSet rs) throws SQLException {
         return new Friendship(rs.getLong("first_user_id"), rs.getLong("second_user_id"),
                 rs.getTimestamp("friendship_date"), rs.getString("friendship_status"));

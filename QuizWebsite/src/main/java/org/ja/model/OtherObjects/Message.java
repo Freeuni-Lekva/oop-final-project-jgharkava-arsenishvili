@@ -63,4 +63,14 @@ public class Message {
     public void setMessageSendDate(Timestamp messageSendDate) {
         this.messageSendDate = messageSendDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return messageId == ((Message) o).messageId
+                &&senderUserId==((Message) o).senderUserId
+                &&recipientUserId==((Message) o).recipientUserId&&messageText.equals(((Message) o).messageText)
+                &&messageSendDate.equals(((Message) o).messageSendDate);
+    }
 }

@@ -76,6 +76,13 @@ public class Answer {
         this.answerValidity = answerValidity;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return getQuestionId() == ((Answer) o).getQuestionId()&&answerText==((Answer) o).getAnswerText();
+    }
+
     public boolean containsAnswer(String answer){
         return Arrays.stream(answerText.split("/"))
                 .anyMatch(part -> part.equalsIgnoreCase(answer.trim()));

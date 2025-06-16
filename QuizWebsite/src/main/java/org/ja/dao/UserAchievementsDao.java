@@ -17,20 +17,48 @@ create table user_achievement(
  */
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.UserAchievement;
+import org.ja.model.user.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class UserAchievementsDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public UserAchievementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     // Grants the given achievement to a user
     public void insertAchievement(UserAchievement ua) {
+        if(contains(ua)){
+            return;
+        }
         String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setLong(1, ua.getUserId());
+            ps.setLong(2, ua.getAchievementId());
+
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                cnt++;
+                ua.setAchievementDate(rs.getTimestamp(3));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to insert user achievement", e);
+        }
+    }
+
+    // Removes the specified achievement from a user
+    public void removeAchievement(UserAchievement ua) {
+        if(!contains(ua)){
+            return;
+        }
+        String sql = "DELETE FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -38,22 +66,7 @@ public class UserAchievementsDao {
             ps.setLong(2, ua.getAchievementId());
 
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to insert user achievement", e);
-        }
-    }
-
-    // Removes the specified achievement from a user
-    public void removeAchievement(long userId, long achievementId) {
-        String sql = "DELETE FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setLong(1, userId);
-            ps.setLong(2, achievementId);
-
-            ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to remove user achievement", e);
         }
@@ -79,7 +92,33 @@ public class UserAchievementsDao {
 
         return achievements;
     }
+    public boolean contains(UserAchievement ua) {
+        if(ua==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM user_achievement WHERE user_id = ? AND achievement_id=?" +
+                "AND achievement_date=?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, ua.getUserId());
+            ps.setLong(2, ua.getAchievementId());
+            ps.setTimestamp(3, ua.getAchievementDate());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return  cnt;
+    }
     private UserAchievement retrieveUserAchievement(ResultSet rs) throws SQLException {
         return new UserAchievement(rs.getLong("user_id"), rs.getLong("achievement_id"),
                 rs.getTimestamp("achievement_date"));

@@ -107,4 +107,11 @@ public class Question {
     public void setOrderStatus(String orderStatus){
         this.orderStatus = orderStatus;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return questionId == ((Question) o).questionId&&quizId==((Question) o).quizId
+                &&questionText==((Question) o).questionText&&imageUrl==((Question) o).imageUrl;
+    }
 }

@@ -23,14 +23,17 @@ public class QuestionDao {
     order_status enum('unordered', 'ordered') not null default 'ordered',
      */
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public QuestionDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertQuestion(Question question) {
+        if(contains(question)) {
+            return;
+        }
         String sql = "INSERT INTO questions ( quiz_id, question, image_url, " +
-                "question_type, num_answers, order_status,) VALUES (?,?, ?, ?, ?, ?);";
+                "question_type, num_answers, order_status) VALUES (?,?, ?, ?, ?, ?);";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -45,8 +48,10 @@ public class QuestionDao {
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()){
-                if (rs.next())
+                if (rs.next()){
+                    cnt++;
                     question.setQuestionId(rs.getLong(1));
+                }
             }
 
         } catch (SQLException e) {
@@ -55,6 +60,9 @@ public class QuestionDao {
     }
 
     public void removeQuestion(long questionId) {
+        if(getQuestionById(questionId)==null){
+            return;
+        }
         String sql = "DELETE FROM questions WHERE quiz_id = ?";
 
         try(Connection c = dataSource.getConnection();
@@ -63,6 +71,7 @@ public class QuestionDao {
             ps.setLong(1, questionId);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing question from database", e);
         }
@@ -110,20 +119,54 @@ public class QuestionDao {
     }
 
     public void updateQuestion(Question question){
-        String sql = "UPDATE questions SET question_text = ? WHERE question_id = ?";
+        String sql = "UPDATE questions SET quiz_Id=?, question = ?," +
+                "image_url=?, question_type=?, num_answers=?," +
+                "order_status=? WHERE question_id = ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setString(1, question.getQuestionText());
-            ps.setLong(2, question.getQuestionId());
+            ps.setLong(1, question.getQuizId());
+            ps.setString(2, question.getQuestionText());
+            ps.setString(3, question.getImageUrl());
+            ps.setString(4, question.getQuestionType());
+            ps.setInt(5, question.getNumAnswers());
+            ps.setString(6, question.getOrderStatus());
+            ps.setLong(7, question.getQuestionId());
 
            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error updating question into database", e);
         }
     }
+    public boolean contains(Question question){
+        String sql = "SELECT COUNT(*) FROM questions WHERE quiz_id = ? AND question=?" +
+                "AND image_url=? AND question_type = ?" +
+                " AND num_answers = ? AND order_status = ?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, question.getQuizId());
+            ps.setString(2, question.getQuestionText());
+            ps.setString(3, question.getImageUrl());
+            ps.setString(4, question.getQuestionType());
+            ps.setInt(5, question.getNumAnswers());
+            ps.setString(6, question.getOrderStatus());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private Question retrieveQuestion(ResultSet rs) throws SQLException {
         return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
                 rs.getString("question"), rs.getString("image_url"),

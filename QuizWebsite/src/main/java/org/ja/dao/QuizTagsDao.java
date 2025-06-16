@@ -17,12 +17,15 @@ create table quiz_tag(
  */
 public class QuizTagsDao {
     private final BasicDataSource dataSource;
-
+    private long cnt=0;
     public QuizTagsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertQuizTag(QuizTag quizTag) {
+        if(contains(quizTag)||quizTag==null){
+            return;
+        }
         String sql = "insert into quiz_tag values (?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -31,12 +34,16 @@ public class QuizTagsDao {
             ps.setLong(2, quizTag.getTagId());
 
             ps.executeUpdate();
+            cnt++;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting quiz tag into database", e);
         }
     }
 
     public void removeQuizTag(long qid, long tid) {
+        if(!contains(new QuizTag(qid,tid))){
+            return;
+        }
         String sql = "DELETE FROM quiz_tag WHERE quiz_id = ? AND tag_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -46,6 +53,7 @@ public class QuizTagsDao {
             ps.setLong(2, tid);
 
             ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz tag from database", e);
         }
@@ -71,7 +79,31 @@ public class QuizTagsDao {
 
         return quizTags;
     }
+    public boolean contains(QuizTag qt){
+        if(qt==null){
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM quiz_tag WHERE quiz_id = ? AND tag_id=?";
 
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, qt.getQuizId());
+            ps.setLong(2, qt.getTagId());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error checking user existence", e);
+        }
+    }
+    public long getCount(){
+        return cnt;
+    }
     private QuizTag retrieveQuizTag(ResultSet rs) throws SQLException {
         return new QuizTag(rs.getLong("quiz_id"), rs.getLong("tag_id"));
     }
