@@ -28,13 +28,29 @@ public class Constants {
         public static final String USER_ACHIEVEMENTS_DAO = "userAchievementsDao";
     }
 
+    public static class QuestionTypes {
+        public static final String RESPONSE_QUESTION = "question-response";
+        public static final String FILL_IN_THE_BLANK_QUESTION = "fill-in-the-blank";
+        public static final String MULTIPLE_CHOICE_QUESTION = "multiple-choice";
+        public static final String PICTURE_RESPONSE_QUESTION = "picture-response";
+        public static final String MULTI_ANSWER_QUESTION = "multi-answer";
+        public static final String MULTI_CHOICE_MULTI_ANSWER_QUESTION = "multi-choice-multi-answers";
+        public static final String MATCHING_QUESTION = "matching";
+    }
+
+    public static class OrderTypes {
+        public static final String ORDERED = "ordered";
+        public static final String UNORDERED = "unordered";
+    }
+
+    public static class ResponseFields {
+
+    }
+
     public static class SessionAttributes {
         public static final String USER = "current-user";
         public static final String QUIZ = "current-quiz";
         public static final String RESPONSES = "current-responses";
         public static final String ANSWERS = "answers";
     }
-
-
-
 }
