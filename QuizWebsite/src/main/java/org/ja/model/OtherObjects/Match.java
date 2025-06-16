@@ -17,7 +17,11 @@ public class Match {
     private String rightMatch;
 
     // Empty constructor
-    public Match() {
+    public Match() {}
+
+    public Match(String leftMatch, String rightMatch){
+        this.leftMatch = leftMatch;
+        this.rightMatch = rightMatch;
     }
 
     // Constructor with all parameters

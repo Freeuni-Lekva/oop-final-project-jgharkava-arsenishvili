@@ -7,7 +7,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jgharkava-Arsenishvili</title>
+    <title>Quiz Website</title>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
 </label>
     <input type="submit" value="Login" />
 </form>
-<p><a href="signUp.jsp">Sign Up Here</a></p>
+<p><a href="sign-up.jsp">Sign Up Here</a></p>
 
 </body>
 </html>

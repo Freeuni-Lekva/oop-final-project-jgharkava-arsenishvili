@@ -1,8 +1,8 @@
 package org.ja.servlet;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
+import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,17 +18,17 @@ public class SignUpServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        UsersDao dao = (UsersDao)getServletContext().getAttribute("dao");
+        UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         User check = dao.getUserByUsername(username);
         if(check != null){
             request.setAttribute("error", "Account with that username already exists");
-            request.getRequestDispatcher("/signUp.jsp").forward(request, response);
+            request.getRequestDispatcher("/sign-up.jsp").forward(request, response);
         }else{
-            User user = new User(0, username, password, "", null,"", "");
+            User user = new User(0, username, password, "", null, "", "");
             try {
                 dao.insertUser(user);
                 request.getSession().setAttribute("username", username);
-                request.getRequestDispatcher("/signUpSuccess.jsp").forward(request, response);
+                request.getRequestDispatcher("/sign-up-success.jsp").forward(request, response);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

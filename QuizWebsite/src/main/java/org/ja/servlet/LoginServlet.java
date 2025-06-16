@@ -3,6 +3,7 @@ package org.ja.servlet;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
+import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,14 +18,14 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        UsersDao dao = (UsersDao)getServletContext().getAttribute("dao");
-        User user = dao.getUserByUsername(username);  //made getUserByUsername public
+        UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
+        User user = dao.getUserByUsername(username);
         if(user == null || !user.getPasswordHashed().equals(password)) {
             request.setAttribute("error", "Invalid username or password");
             request.getRequestDispatcher("/index.jsp").forward(request, resp);
         }else{
-            request.getSession().setAttribute("user", user);
-            request.getRequestDispatcher("/userPage.jsp").forward(request, resp);
+            request.getSession().setAttribute(Constants.SessionAttributes.USER, user);
+            request.getRequestDispatcher("/user-page.jsp").forward(request, resp);
         }
     }
 }
