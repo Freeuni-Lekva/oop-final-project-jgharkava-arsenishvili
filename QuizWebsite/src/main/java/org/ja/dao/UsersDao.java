@@ -11,33 +11,40 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class UsersDao {
-    private BasicDataSource dataSource;
-    private long cnt=0;
+    private final BasicDataSource dataSource;
+    private long cnt = 0;
+
     public UsersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
-    public void insertUser(User user) throws SQLException {
-        String sql="INSERT INTO users ( password_hashed, username, registration_date, user_photo, user_status) VALUES (?,?, ?, ?, ?);";
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement preparedStatement =
-                    c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, user.getPasswordHashed());
-            preparedStatement.setString(2, user.getUserName());
-            preparedStatement.setString(3, user.getRegistrDate());
-            preparedStatement.setString(4, user.getPhoto());
-            preparedStatement.setString(5, user.getStatus());
 
-            preparedStatement.execute();
-            ResultSet keys = preparedStatement.getGeneratedKeys();
-            if (keys.next()) {
-                long newId = keys.getLong(1);
-                user.setId(newId); // if you want to store it in your object
-                cnt++;
+    public void insertUser(User user) throws SQLException {
+        String sql = "INSERT INTO users (password_hashed, username, user_photo, user_status, salt) " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement preparedStatement =
+                    c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+
+            preparedStatement.setString(1, user.getPasswordHashed());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPhoto());
+            preparedStatement.setString(4, user.getStatus());
+            preparedStatement.setString(5, user.getSalt());
+
+            preparedStatement.executeUpdate();
+
+            try (ResultSet keys = preparedStatement.getGeneratedKeys()){
+                if (keys.next()) {
+                    long newId = keys.getLong(1);
+                    user.setId(newId); // if you want to store it in your object
+                    cnt++;
+                }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error inserting user into database", e);
         }
     }
+
     public boolean containsUser(String username) {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
 
@@ -59,98 +66,105 @@ public class UsersDao {
 
 
     public void removeUserById(long id) {
-        if(id>cnt||id<0){
+        if(id > cnt || id < 0){
             return;
         }
-        String sql = "DELETE FROM users WHERE user_id=?";
-        try(Connection c=dataSource.getConnection()){
+
+        String sql = "DELETE FROM users WHERE user_id = ?";
+
+        try(Connection c = dataSource.getConnection()){
             PreparedStatement preparedStatement = c.prepareStatement(sql);
             preparedStatement.setLong(1, id);
 
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
             cnt--;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing user by id from database", e);
         }
     }
+
     public void removeUserByName(String name) {
         if(!containsUser(name)){
             return;
         }
+
         String sql = "DELETE FROM users WHERE user_name=?";
-        try(Connection c=dataSource.getConnection()){
+
+        try(Connection c = dataSource.getConnection()){
             PreparedStatement preparedStatement = c.prepareStatement(sql);
             preparedStatement.setString(1, name);
 
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
             cnt--;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing user by name from database", e);
         }
     }
+
     public User getUserById(int id) {
-        String sql="SELECT * FROM users WHERE user_id=?";
-        try (Connection c=dataSource.getConnection()){
-            PreparedStatement st=c.prepareStatement(sql);
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement st = c.prepareStatement(sql)){
+
             st.setLong(1, id);
-            ResultSet rs=st.executeQuery();
-            if(rs.next()){
-                long nid=rs.getLong("user_id");
-                String nUserName=rs.getString("username");
-                String nRegistrDate=rs.getString("registration_date");
-                String nPhoto=rs.getString("user_photo");
-                String nStatus=rs.getString("user_status");
-                String nPasswordHashed=rs.getString("password_hashed");
-                User res=new User(nid, nUserName,nPasswordHashed, nRegistrDate, nPhoto, nStatus);
-                return res;
+
+            try (ResultSet rs = st.executeQuery()){
+                if (rs.next())
+                    return retrieveUser(rs);
             }
-        }catch(Exception e){
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying user by id from database", e);
         }
         return null;
     }
     public User getUserByUsername(String username) {
         String sql="SELECT * FROM users WHERE username=?";
-        try (Connection c=dataSource.getConnection()){
-            PreparedStatement st=c.prepareStatement(sql);
+
+        try (Connection c = dataSource.getConnection()){
+            PreparedStatement st = c.prepareStatement(sql);
+
             st.setString(1, username);
-            ResultSet rs=st.executeQuery();
-            if(rs.next()){
-                long nid=rs.getLong("user_id");
-                String nUserName=rs.getString("username");
-                String nRegistrDate=rs.getString("registration_date");
-                String nPhoto=rs.getString("user_photo");
-                String nStatus=rs.getString("user_status");
-                String nPasswordHashed=rs.getString("password_hashed");
-                User res=new User(nid, nUserName,nPasswordHashed, nRegistrDate, nPhoto, nStatus);
-                return res;
+
+            try (ResultSet rs = st.executeQuery()){
+                if (rs.next())
+                    return retrieveUser(rs);
             }
-        }catch(Exception e){
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying user by username from database", e);
         }
         return null;
     }
-    public ArrayList<User> getUsersByFilter(Filter filter) {
-        String sql="SELECT * FROM users WHERE "+filter.toString();
-        ArrayList<User> ans=new ArrayList<>();
-        try (Connection c=dataSource.getConnection()){
-            PreparedStatement st=c.prepareStatement(sql);
-            ResultSet rs=st.executeQuery();
-            while(rs.next()){
-                long nid=rs.getLong("user_id");
-                String nUserName=rs.getString("username");
-                String nRegistrDate=rs.getString("registration_date");
-                String nPhoto=rs.getString("user_photo");
-                String nStatus=rs.getString("user_status");
-                String nPasswordHashed=rs.getString("password_hashed");
-                User user=new User(nid, nUserName,nPasswordHashed, nRegistrDate, nPhoto, nStatus);
-                ans.add(user);
+
+    private ArrayList<User> getUsersByFilter(Filter filter) {
+        String sql = "SELECT * FROM users WHERE " + filter.buildWhereClause();
+
+        ArrayList<User> users = new ArrayList<>();
+
+        try (Connection c = dataSource.getConnection();
+            PreparedStatement st=c.prepareStatement(sql)){
+
+            try (ResultSet rs = st.executeQuery()){
+                while (rs.next())
+                    users.add(retrieveUser(rs));
             }
-        }catch(Exception e){
-            throw new RuntimeException(e);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying user by filter from database", e);
         }
-        return ans;
+
+        return users;
     }
+
+    private User retrieveUser(ResultSet rs) throws SQLException {
+        return new User(rs.getLong("user_id"), rs.getString("username"),
+                rs.getString("password_hashed"), rs.getString("salt"),
+                rs.getTimestamp("registration_date"), rs.getString("user_photo"),
+                rs.getString("user_status"));
+    }
+
     public long getCount(){
         return cnt;
     }

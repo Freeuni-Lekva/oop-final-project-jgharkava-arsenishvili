@@ -10,14 +10,18 @@ create table matches(
 );
 
  */
-public class Match {
+public class Match{
     private long matchId;
     private long questionId;
     private String leftMatch;
     private String rightMatch;
 
     // Empty constructor
-    public Match() {
+    public Match() {}
+
+    public Match(String leftMatch, String rightMatch){
+        this.leftMatch = leftMatch;
+        this.rightMatch = rightMatch;
     }
 
     // Constructor with all parameters
@@ -61,4 +65,13 @@ public class Match {
     public void setRightMatch(String rightMatch) {
         this.rightMatch = rightMatch;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) return true;
+        if (!(obj instanceof Match match)) return false;
+
+        return match.getLeftMatch().equals(this.leftMatch) && match.getRightMatch().equals(this.rightMatch);
+    }
+
 }
