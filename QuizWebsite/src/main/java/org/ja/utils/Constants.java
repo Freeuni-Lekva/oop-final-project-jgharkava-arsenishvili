@@ -52,5 +52,7 @@ public class Constants {
         public static final String QUIZ = "current-quiz";
         public static final String RESPONSES = "current-responses";
         public static final String ANSWERS = "answers";
+        public static final String QUESTIONS = "questions";
+        public static final String QUESTION_ITERATOR = "question-iterator";
     }
 }
