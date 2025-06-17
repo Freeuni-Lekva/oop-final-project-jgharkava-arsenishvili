@@ -52,7 +52,7 @@ public class MessagesDaotest {
             // Split and execute SQL commands (if there are multiple)
             String[] sqlStatements = sqlBuilder.toString().split(";");
             for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty()) {
+                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
                     statement.execute(sql.trim());
                 }
             }

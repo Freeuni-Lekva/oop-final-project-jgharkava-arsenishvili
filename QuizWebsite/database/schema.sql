@@ -74,13 +74,17 @@ create table quizzes(
 create table questions(
     question_id bigint primary key auto_increment,
     quiz_id bigint not null,
-    question text not null,
+    question text,
     image_url varchar(256) default null,
     question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
        'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
 
     num_answers int not null default 1,
     order_status enum('unordered', 'ordered') not null default 'ordered',
+
+    check (
+        question is not null or image_url is not null
+    ),
 
     check (
         question_type != 'picture-response'
@@ -93,8 +97,8 @@ create table questions(
     ),
 
     check (
-        question_type != 'multi-answer'
-        or order_status = 'unordered'
+        order_status != 'unordered'
+        or question_type = 'multi-answer'
     ),
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
@@ -210,8 +214,8 @@ create table history(
     history_id bigint primary key auto_increment,
     user_id bigint not null,
     quiz_id bigint not null,
-    score double not null default 0,
-    completion_time bigint not null,
+    score bigint not null default 0,
+    completion_time double not null,
     completion_date timestamp default current_timestamp,
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,

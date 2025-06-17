@@ -5,8 +5,8 @@ public class History {
     private long historyId;
     private long userId;
     private long quizId;
-    private double score;
-    private long completionTime; // in milliseconds or seconds depending on usage
+    private long score;
+    private double completionTime; // in minutes
     private Timestamp completionDate;
 
     // Empty constructor
@@ -14,7 +14,7 @@ public class History {
     }
 
     // Constructor with all parameters
-    public History(long historyId, long userId, long quizId, double score, long completionTime, Timestamp completionDate) {
+    public History(long historyId, long userId, long quizId, long score, double completionTime, Timestamp completionDate) {
         this.historyId = historyId;
         this.userId = userId;
         this.quizId = quizId;
@@ -49,19 +49,19 @@ public class History {
         this.quizId = quizId;
     }
 
-    public double getScore() {
+    public long getScore() {
         return score;
     }
 
-    public void setScore(double score) {
+    public void setScore(long score) {
         this.score = score;
     }
 
-    public long getCompletionTime() {
+    public double getCompletionTime() {
         return completionTime;
     }
 
-    public void setCompletionTime(long completionTime) {
+    public void setCompletionTime(double completionTime) {
         this.completionTime = completionTime;
     }
 
