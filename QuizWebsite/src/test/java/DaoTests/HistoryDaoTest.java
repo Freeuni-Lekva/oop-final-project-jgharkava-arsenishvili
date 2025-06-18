@@ -54,7 +54,7 @@ public class HistoryDaoTest {
             // Split and execute SQL commands (if there are multiple)
             String[] sqlStatements = sqlBuilder.toString().split(";");
             for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty()) {
+                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
                     statement.execute(sql.trim());
                 }
             }
@@ -137,10 +137,10 @@ public class HistoryDaoTest {
 
     @Test
     public void testInsert() {
-        h1=new History(-1, 1, 1,7.4,56,null);
-        h2=new History(-1, 1, 2,8.4,60,null);
-        h3=new History(-1, 2, 3,7.4,56,null);
-        h4=new History(-1, 2, 4,7.4,56,null);
+        h1=new History(-1, 1, 1,7,56,null);
+        h2=new History(-1, 1, 2,8,60,null);
+        h3=new History(-1, 2, 3,7,56,null);
+        h4=new History(-1, 2, 4,7,56,null);
         dao.insertHistory(h1);
         assertTrue(dao.contains(h1));
         assertFalse(dao.contains(h2));
@@ -174,7 +174,7 @@ public class HistoryDaoTest {
     @Test
     public void testGetUserHistoriesByQuizId(){
         testInsert();
-        h4=new History(-1, 1, 1,9.4,56,null);
+        h4=new History(-1, 1, 1,9,56,null);
         h5=new History(-1, 1, 1,10,56,null);
         dao.insertHistory(h4);
         dao.insertHistory(h5);
@@ -185,7 +185,7 @@ public class HistoryDaoTest {
     @Test
     public void testGetHistoriesByQuizId(){
         testInsert();
-        h4=new History(-1, 1, 2,9.4,56,null);
+        h4=new History(-1, 1, 2,9,56,null);
         h5=new History(-1, 1, 1,10,56,null);
         dao.insertHistory(h4);
         dao.insertHistory(h5);

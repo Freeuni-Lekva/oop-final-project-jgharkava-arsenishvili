@@ -39,8 +39,8 @@ public class HistoriesDao {
 
             ps.setLong(1, history.getUserId());
             ps.setLong(2, history.getQuizId());
-            ps.setDouble(3, history.getScore());
-            ps.setLong(4, history.getCompletionTime());
+            ps.setLong(3, history.getScore());
+            ps.setDouble(4, history.getCompletionTime());
 
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()){
@@ -184,7 +184,7 @@ public class HistoriesDao {
             ps.setLong(1, h.getUserId());
             ps.setLong(2, h.getQuizId());
             ps.setDouble(3, h.getScore());
-            ps.setLong(4, h.getCompletionTime());
+            ps.setDouble(4, h.getCompletionTime());
             ps.setTimestamp(5, h.getCompletionDate());
             ResultSet rs = ps.executeQuery();
 
@@ -223,7 +223,7 @@ public class HistoriesDao {
     }
     private History retrieveHistory(ResultSet rs) throws SQLException {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
-                rs.getLong("quiz_id"), rs.getDouble("score"),
-                rs.getLong("completion_time"), rs.getTimestamp("completion_date"));
+                rs.getLong("quiz_id"), rs.getLong("score"),
+                rs.getDouble("completion_time"), rs.getTimestamp("completion_date"));
     }
 }

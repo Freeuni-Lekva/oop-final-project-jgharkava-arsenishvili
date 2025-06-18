@@ -56,7 +56,7 @@ public class QuestionsDaoTest {
             // Split and execute SQL commands (if there are multiple)
             String[] sqlStatements = sqlBuilder.toString().split(";");
             for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty()) {
+                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
                     statement.execute(sql.trim());
                 }
             }
@@ -132,11 +132,11 @@ public class QuestionsDaoTest {
     @Test
     public void testInsert() {
         qu11=new Question(1, 1, "historyQuizQuestion1", "sth.jpg",
-                "question-response", 50,"unordered");
+                "question-response", 50,"ordered");
         qu12=new Question(42, 1, "historyQuizQuestion2", "sth2.jpg",
-                "question-response", 2,"unordered");
+                "question-response", 2,"ordered");
         qu13=new Question(1, 1, "historyQuizQuestion3", "null",
-                "question-response", 50,"unordered");
+                "question-response", 50,"ordered");
         dao.insertQuestion(qu11);
         assertEquals(1, dao.getCount());
         assertEquals(1, qu11.getQuestionId());
@@ -167,7 +167,7 @@ public class QuestionsDaoTest {
     public void testQuizQuestions(){
         testInsert();
         Question qu21=new Question(1, 2, "historyQuizQuestion3", "null",
-                "question-response", 50,"unordered");
+                "question-response", 50,"ordered");
         dao.insertQuestion(qu21);
         ArrayList<Question> arr=dao.getQuizQuestions(1);
         assertEquals(3, arr.size());

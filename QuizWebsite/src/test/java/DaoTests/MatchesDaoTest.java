@@ -59,7 +59,7 @@ public class MatchesDaoTest {
             // Split and execute SQL commands (if there are multiple)
             String[] sqlStatements = sqlBuilder.toString().split(";");
             for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty()) {
+                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
                     statement.execute(sql.trim());
                 }
             }
@@ -131,13 +131,13 @@ public class MatchesDaoTest {
             quizzesDao.insertQuiz(q3);
             quizzesDao.insertQuiz(q4);
             qu11=new Question(1, 1, "Which of these wasn't a president", "sth.jpg",
-                    "question-response", 50,"unordered");
+                    "question-response", 50,"ordered");
             qu12=new Question(42, 1, "historyQuizQuestion2", "sth2.jpg",
-                    "question-response", 2,"unordered");
+                    "question-response", 2,"ordered");
             qu13=new Question(1, 1, "historyQuizQuestion3", "null",
-                    "question-response", 50,"unordered");
+                    "question-response", 50,"ordered");
             Question qu21=new Question(1, 2, "historyQuizQuestion3", "null",
-                    "question-response", 50,"unordered");
+                    "question-response", 50,"ordered");
             questionsDao.insertQuestion(qu11);
             questionsDao.insertQuestion(qu12);
             questionsDao.insertQuestion(qu13);
