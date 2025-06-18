@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -72,7 +73,7 @@ public class UsersDaoTest{
         }
     }
     @Test
-    public void testInsert() throws SQLException {
+    public void testInsert() throws SQLException, NoSuchAlgorithmException {
         assertEquals(0,dao.getCount());
         User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
         dao.insertUser(sandro);
@@ -85,7 +86,7 @@ public class UsersDaoTest{
 
     }
     @Test
-    public void testGetUser() throws SQLException {
+    public void testGetUser() throws SQLException, NoSuchAlgorithmException {
         testInsert();
         assertEquals("Sandro", dao.getUserById(1).getUsername());
         assertEquals("Tornike", dao.getUserById(2).getUsername());
@@ -94,7 +95,7 @@ public class UsersDaoTest{
         assertTrue(dao.containsUser("Tornike"));
     }
     @Test
-    public void testRemoveUser() throws SQLException {
+    public void testRemoveUser() throws SQLException, NoSuchAlgorithmException {
         testGetUser();
         dao.removeUserById(1);
         dao.removeUserById(4);
