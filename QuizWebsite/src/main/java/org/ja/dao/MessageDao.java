@@ -138,10 +138,11 @@ public class MessageDao {
             ps.setLong(3, m.getRecipientUserId());
             ps.setString(4, m.getMessageText());
             ps.setTimestamp(5, m.getMessageSendDate());
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;
@@ -159,10 +160,11 @@ public class MessageDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, mid);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;

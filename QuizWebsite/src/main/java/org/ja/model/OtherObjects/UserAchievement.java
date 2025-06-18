@@ -47,8 +47,11 @@ public class UserAchievement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return userId == ((UserAchievement) o).userId&&achievementId==((UserAchievement) o).achievementId;
+        if (!(o instanceof UserAchievement)) return false;
+
+        return userId == ((UserAchievement) o).userId &&
+                achievementId == ((UserAchievement) o).achievementId &&
+                achievementDate.equals(((UserAchievement) o).getAchievementDate());
     }
 }
 

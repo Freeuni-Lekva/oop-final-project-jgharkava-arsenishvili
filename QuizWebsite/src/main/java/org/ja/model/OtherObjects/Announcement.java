@@ -27,8 +27,11 @@ public class Announcement {
     @Override
     public boolean equals(Object o){
         if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
-        return announcementId==((Announcement) o).getAnnouncementId()&&administratorId==((Announcement) o).getAdministratorId()
-                &&announcementText.equals(((Announcement) o).getAnnouncementText())&&creationDate.equals(((Announcement) o).getCreationDate());
+        if (!(o instanceof  Announcement)) return false;
+
+        return announcementId == ((Announcement) o).getAnnouncementId() &&
+                administratorId == ((Announcement) o).getAdministratorId() &&
+                announcementText.equals(((Announcement) o).getAnnouncementText()) &&
+                creationDate.equals(((Announcement) o).getCreationDate());
     }
 }

@@ -21,4 +21,12 @@ public class Category {
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
+
+    public boolean equals(Object o){
+        if (this == o) return true;
+        if (!(o instanceof Category)) return false;
+
+        return categoryId == ((Category) o).getCategoryId() &&
+                categoryName.equals(((Category) o).getCategoryName());
+    }
 }

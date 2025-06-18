@@ -55,8 +55,11 @@ public class Challenge {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return challengeId == ((Challenge) o).getChallengeId()&&senderUserId==((Challenge) o).getSenderUserId()
-                &&recipientUserId==((Challenge) o).getRecipientUserId()&&quizId==((Challenge) o).getQuizId();
+        if (!(o instanceof Challenge)) return false;
+
+        return challengeId == ((Challenge) o).getChallengeId() &&
+                senderUserId == ((Challenge) o).getSenderUserId() &&
+                recipientUserId == ((Challenge) o).getRecipientUserId() &&
+                quizId == ((Challenge) o).getQuizId();
     }
 }

@@ -1,10 +1,7 @@
 package org.ja.dao;
 
-
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.Filters.Filter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -104,17 +101,19 @@ public class TagsDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;
         } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
+            throw new RuntimeException("Error whilst checking if table contains Tag", e);
         }
     }
+
     public boolean containsTag(long id) {
         String sql = "SELECT COUNT(*) FROM tags WHERE tag_id = ?";
 
@@ -122,15 +121,15 @@ public class TagsDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;
         } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
+            throw new RuntimeException("Error whilst checking if table contains Tag", e);
         }
     }
     public long getCount() {
@@ -153,6 +152,26 @@ public class TagsDao {
         }
         return tags;
     }*/
+
+    public ArrayList<Tag> getAllTags(){
+        ArrayList<Tag> tags = new ArrayList<>();
+
+        String sql = "SELECT * FROM TAGS";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                tags.add(retrieveTag(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying all tags", e);
+        }
+
+        return tags;
+    }
 
     private Tag retrieveTag(ResultSet rs) throws SQLException {
         return new Tag(rs.getLong("tag_id"), rs.getString("tag_name"));

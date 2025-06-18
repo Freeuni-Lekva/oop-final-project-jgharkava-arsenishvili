@@ -42,11 +42,14 @@ public class FriendShipsDao {
             ps.setLong(2, friendship.getSecondUserId());
             ps.setString(3, friendship.getFriendshipStatus());
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                cnt++;
-                friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+
+            try (ResultSet rs = ps.getGeneratedKeys()){
+                if (rs.next()) {
+                    cnt++;
+                    friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+                }
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting friendship into database", e);
         }
