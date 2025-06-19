@@ -13,11 +13,11 @@ public class User {
     private String photo;
     private String status;
 
-    public User(long id, String username, String password, String salt, Timestamp registrationDate, String photo, String status) throws NoSuchAlgorithmException {
+    public User(long id, String username, String passwordHashed, String salt, Timestamp registrationDate, String photo, String status) throws NoSuchAlgorithmException {
         this.id = id;
         this.username = username;
         this.salt = salt;
-        passwordHashed = PasswordHasher.hashPassword(password, salt);
+        this.passwordHashed = passwordHashed;
         this.registrationDate = registrationDate;
         this.photo = photo;
         this.status = status;
@@ -40,7 +40,10 @@ public class User {
     public void setUsername(String username){this.username = username;}
 
     public String getPasswordHashed() {return passwordHashed;}
+    public void setPasswordHashed(String passwordHashed){this.passwordHashed = passwordHashed;}
+
     public String getSalt(){return salt;}
+    public void setSalt(String salt){this.salt = salt;}
 
     public Timestamp getRegistrationDate() {return registrationDate;}
     public void setRegistrationDate(Timestamp registrationDate){this.registrationDate = registrationDate;}

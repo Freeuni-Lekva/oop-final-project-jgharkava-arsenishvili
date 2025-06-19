@@ -28,7 +28,9 @@ public class SignUpServlet extends HttpServlet {
         }else{
             User user = null;
             try {
-                user = new User(0, username, password, PasswordHasher.getSalt(), null, "", "user");
+                String salt = PasswordHasher.getSalt();
+                String hashedPassword = PasswordHasher.hashPassword(password, salt);
+                user = new User(0, username, hashedPassword, salt, null, "", "user");
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
