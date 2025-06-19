@@ -7,23 +7,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Quiz Website</title>
+  <title>Sign-Up</title>
 </head>
 
 <body>
-<h1>Welcome to the Quiz Website!</h1>
-<h3>log in to your account or sign up if you don't have one</h3>
+<h1>Create a New Account</h1>
 
-<form action="login" method="post">
+<form action="signUp" method="post">
   Username: <label>
   <input type="text" name="username" required/>
 </label><br /><br />
   Password: <label>
   <input type="password" name="password" required/>
 </label>
-  <input type="submit" value="Login" />
+  <input type="submit" value="Sign Up" />
 </form>
-<p><a href="sign-up.jsp">Sign Up Here</a></p>
-
+<p><a href="index.jsp">Back To Log In</a></p>
 </body>
 </html>

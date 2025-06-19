@@ -1,6 +1,4 @@
 package org.ja.model.quiz;
-
-import java.sql.Time;
 import java.sql.Timestamp;
 
 /*
@@ -137,6 +135,25 @@ public class Quiz {
     }
     public void setQuestionCorrection(String questionCorrection) {
         this.questionCorrection = questionCorrection;
+    }
+
+    public boolean equals(Object o){
+        if (this == o) return true;
+        if (!(o instanceof Quiz)) return false;
+
+        return id == ((Quiz) o).getId() &&
+                name.equals(((Quiz) o).getName()) &&
+                description.equals(((Quiz) o).getDescription()) &&
+                avgRating == ((Quiz) o).getAvgRating() &&
+                quizScore == ((Quiz) o).getScore() &&
+                participantCount == ((Quiz) o).getParticipantCount() &&
+                creationDate.equals(((Quiz) o).getCreationDate()) &&
+                timeInMinutes == ((Quiz) o).getTimeInMinutes() &&
+                categoryId == ((Quiz) o).getCategoryId() &&
+                creatorId == ((Quiz) o).getCreatorId() &&
+                questionOrder.equals(((Quiz) o).getQuestionOrder()) &&
+                questionPlacement.equals(((Quiz) o).getQuestionPlacement()) &&
+                questionCorrection.equals(((Quiz) o).getQuestionCorrection());
     }
 
 }

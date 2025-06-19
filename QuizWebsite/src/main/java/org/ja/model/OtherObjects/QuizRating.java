@@ -57,7 +57,11 @@ public class QuizRating {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return quizId==((QuizRating) o).getQuizId() && userId==((QuizRating) o).getUserId()&&rating==((QuizRating) o).getRating();
+        if (!(o instanceof QuizRating)) return false;
+
+        return quizId == ((QuizRating) o).getQuizId() &&
+                userId == ((QuizRating) o).getUserId() &&
+                rating == ((QuizRating) o).getRating() &&
+                review.equals(((QuizRating) o).getReview());
     }
 }

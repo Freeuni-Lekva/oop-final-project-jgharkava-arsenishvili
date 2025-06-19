@@ -53,7 +53,8 @@ public class Achievement {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return achievementName==((Achievement) o).achievementName;
+        if (!(o instanceof Achievement)) return false;
+
+        return achievementName.equals(((Achievement) o).getAchievementName());
     }
 }

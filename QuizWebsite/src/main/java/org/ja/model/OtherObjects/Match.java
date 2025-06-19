@@ -68,8 +68,11 @@ public class Match {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return questionId==((Match) o).getQuestionId()
-                &&leftMatch.equals(((Match) o).getLeftMatch())&&rightMatch.equals(((Match) o).getRightMatch());
+        if (!(o instanceof Match)) return false;
+
+        return matchId == ((Match) o).getMatchId() &&
+                questionId == ((Match) o).getQuestionId() &&
+                leftMatch.equals(((Match) o).getLeftMatch()) &&
+                rightMatch.equals(((Match) o).getRightMatch());
     }
 }

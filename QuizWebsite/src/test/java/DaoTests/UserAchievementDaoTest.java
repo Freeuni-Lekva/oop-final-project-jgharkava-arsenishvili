@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -90,7 +91,7 @@ public class UserAchievementDaoTest {
             finishSetup();
         }
     }
-    private void finishSetup() throws SQLException {
+    private void finishSetup() throws SQLException, NoSuchAlgorithmException {
         usersDao=new UsersDao(basicDataSource);
         achievementsDao=new AchievementsDao(basicDataSource);
         User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");

@@ -1,4 +1,4 @@
-<%
+  <%
     String err = (String) request.getAttribute("error");
     if(err != null){ %>
 <div style="color:red;"><%=err%></div>
