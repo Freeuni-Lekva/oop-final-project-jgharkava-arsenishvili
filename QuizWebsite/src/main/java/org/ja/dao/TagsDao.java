@@ -45,6 +45,26 @@ public class TagsDao {
         }
     }
 
+    public ArrayList<Tag> getAllTags(){
+        ArrayList<Tag> tags = new ArrayList<>();
+
+        String sql = "SELECT * FROM tags";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    tags.add(retrieveTag(rs));
+            }
+
+        } catch (SQLException e){
+            throw new RuntimeException("Error querying categories  from database", e);
+        }
+
+        return tags;
+    }
+
     public void removeTag(Tag tag) {
         if(!containsTag(tag.getTagName())) {
             return;

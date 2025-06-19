@@ -25,5 +25,7 @@
 </form>
 <p><a href="sign-up.jsp">Sign Up Here</a></p>
 
+<a href = "create-quiz.jsp">Jump to creation</a>
+
 </body>
 </html>
