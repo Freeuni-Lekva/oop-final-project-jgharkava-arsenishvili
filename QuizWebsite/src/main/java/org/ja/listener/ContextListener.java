@@ -1,9 +1,7 @@
 package org.ja.listener;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.dao.CategoriesDao;
-import org.ja.dao.TagsDao;
-import org.ja.dao.UsersDao;
+import org.ja.dao.*;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletContextEvent;
@@ -23,6 +21,8 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(Constants.ContextAttributes.USERS_DAO, new UsersDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.CATEGORIES_DAO, new CategoriesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.TAGS_DAO, new TagsDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.QUIZZES_DAO, new QuizzesDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO, new QuizTagsDao(ds));
 
     }
 

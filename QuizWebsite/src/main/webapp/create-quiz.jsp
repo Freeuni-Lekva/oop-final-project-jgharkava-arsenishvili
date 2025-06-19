@@ -28,19 +28,19 @@
 </head>
 
 <%
-    //if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
+    if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
 %>
 
-<%--<body>--%>
-<%--    <div class = "access-denied">--%>
-<%--        <h1>Access Denied</h1>--%>
-<%--        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>--%>
-<%--    </div>--%>
-<%--</body>--%>
+<body>
+    <div class = "access-denied">
+        <h1>Access Denied</h1>
+        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>
+    </div>
+</body>
 
 <%
-    //} else {
-        // clear previous session data
+        } else {
+        //clear previous session data!!!
         session.setAttribute(Constants.SessionAttributes.QUIZ, null);
 %>
 
@@ -58,45 +58,54 @@
             <div class = "select-row">
                 <div class = "select-group">
                     <label for = "category">Select Category</label>
-                    <select name = "category" id = "category" class = "scrollable-select" size = 1>
+                    <select name = "category" id = "category" class = "scrollable-select" size = "1">
                         <% for (Category category: categories){ %>
-                        <option value = "<%= category.getCategoryId()%>"><%= category.getCategoryName()%></option>
+                            <option value = "<%= category.getCategoryId()%>"><%= category.getCategoryName()%></option>
                         <% } %>
                     </select>
-                </div>
 
+                    <label>Select Tags</label>
 
-                <div class = "select-group">
-                    <label for = "tag">Select Tag</label>
-                    <select name = "tag" id = "tag" class = "scrollable-select" size = 1>
+                    <div class = "checkbox-scroll-pane">
+                        <div class="checkbox-wrapper other-wrapper">
+                            <input type="checkbox" id="tag_other" name="tags" value="" onclick="toggleOtherInput(this)">
+                            <label class="checkbox-button" for="tag_other">Other</label>
+                            <input type="text" id="otherTagInput" name="otherTag" placeholder="Enter your tag" oninput="updateOtherValue()">
+                        </div>
+
                         <% for (Tag tag: tags){ %>
-                        <option value = "<%= tag.getTagId()%>"><%= tag.getTagName()%></option>
+                            <div class = "checkbox-label">
+                                <input type = "checkbox" id = "tag_<%= tag.getTagId()%>" name = "tags" value = "<%= tag.getTagId()%>">
+                                <label class = "checkbox-button" for = "tag_<%= tag.getTagId()%>"><%= tag.getTagName()%></label>
+                            </div>
                         <% } %>
-                    </select>
+                    </div>
+
                 </div>
             </div>
 
-            <label for = "quizDuration">Time limit</label>
-            <input type = "text" name = "quizDuration" id = "quizDuration" placeholder = "10">
+            <div class = "select-group">
+                <label for = "quizDuration">Time limit</label>
+                <input type = "text" name = "quizDuration" id = "quizDuration" placeholder = "10" required>
+            </div>
 
             <label>Question Order:</label>
             <div class = "radio-group">
                 <label class = "radio-option"><input type = "radio" name = "orderType" value = "ordered" required checked><span>Ordered</span></label>
-                <label class = "radio-option"><input type = "radio" name = "orderType" value = "random"><span>Random</span></label>
+                <label class = "radio-option"><input type = "radio" name = "orderType" value = "randomized"><span>Random</span></label>
             </div>
 
             <label>Questions Placement:</label>
             <div class = "radio-group">
-                <label class = "radio-option"><input type = "radio" name = "placementType" value = "onePage" required checked>One Page</label>
-                <label class = "radio-option"><input type = "radio" name = "placementType" value = "multiplePage">Multiple Page</label>
+                <label class = "radio-option"><input type = "radio" name = "placementType" value = "one-page" required checked>One Page</label>
+                <label class = "radio-option"><input type = "radio" name = "placementType" value = "multiple-page">Multiple Page</label>
             </div>
 
             <label>Question Correction:</label>
             <div class = "radio-group">
-                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "finalFeedback" required checked>Final Feedback</label>
-                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "immediateCorrection">Immediate Correction</label>
+                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "final-correction" required checked>Final Feedback</label>
+                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "immediate-correction">Immediate Correction</label>
             </div>
-
 
             <button type = "submit" name = "action" value = "createQuiz" class = "btn">
                 Add questions
@@ -107,6 +116,29 @@
 </body>
 
 <%
-    //}
+    }
 %>
 </html>
+
+<script>
+    function toggleOtherInput(checkbox) {
+        const input = document.getElementById("otherTagInput");
+
+        if (checkbox.checked) {
+            input.style.display = "inline-block";
+            input.focus();
+        } else {
+            input.style.display = "none";
+            input.value = "";
+            checkbox.value = ""; // Clear the checkbox value
+        }
+    }
+
+    function updateOtherValue() {
+        const input = document.getElementById("otherTagInput");
+        const checkbox = document.getElementById("tag_other");
+
+        checkbox.value = input.value;
+    }
+
+</script>

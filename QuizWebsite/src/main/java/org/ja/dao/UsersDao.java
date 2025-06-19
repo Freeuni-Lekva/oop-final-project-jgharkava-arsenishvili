@@ -41,8 +41,8 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-                    user.setId(keys.getLong("user_id")); 
-                    user.setRegistrationDate(keys.getTimestamp("registration_date"));
+                    user.setId(keys.getLong(1));
+                    //user.setRegistrationDate(keys.getTimestamp("registration_date"));
                 }
             }
         } catch (SQLException e) {

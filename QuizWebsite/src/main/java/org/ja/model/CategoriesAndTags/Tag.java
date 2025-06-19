@@ -4,6 +4,8 @@ public class Tag {
     private String tagName;
     private long tagId;
 
+    public Tag(){}
+
     public Tag(long tagId,String tagName) {
         this.tagId = tagId;
         this.tagName = tagName;
