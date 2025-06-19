@@ -79,8 +79,10 @@ public class Answer {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return getQuestionId() == ((Answer) o).getQuestionId()&&answerText==((Answer) o).getAnswerText();
+        if (!(o instanceof Answer)) return false;
+
+        return getQuestionId() == ((Answer) o).getQuestionId() &&
+                answerText.equals(((Answer) o).getAnswerText());
     }
 
     public boolean containsAnswer(String answer){

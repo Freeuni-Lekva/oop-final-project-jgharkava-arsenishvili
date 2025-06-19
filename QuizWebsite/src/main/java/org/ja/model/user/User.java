@@ -3,6 +3,7 @@ package org.ja.model.user;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import org.ja.utils.PasswordHasher;
+import java.util.Objects;
 
 public class User {
     private long id;
@@ -57,4 +58,22 @@ public class User {
         return status;
     }
     public void setStatus(String status){this.status = status;}
+
+    public String getSalt(){return salt;}
+    public void setSalt(String salt){this.salt = salt;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        return id == ((User) o).getId() &&
+                username.equals(((User) o).getUsername()) &&
+                passwordHashed.equals(((User) o).getPasswordHashed()) &&
+                registrationDate.equals(((User) o).getRegistrationDate()) &&
+                Objects.equals(photo, ((User) o).getPhoto()) &&
+                status.equals(((User) o).getStatus()) &&
+                salt.equals(((User) o).getSalt());
+    }
+
 }

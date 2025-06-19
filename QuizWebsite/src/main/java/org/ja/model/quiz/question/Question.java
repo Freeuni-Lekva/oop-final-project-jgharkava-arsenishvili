@@ -1,9 +1,12 @@
 package org.ja.model.quiz.question;
 
 import org.ja.model.OtherObjects.Answer;
+import org.ja.model.OtherObjects.QuizTag;
 import org.ja.model.quiz.response.Response;
 
 import java.util.List;
+import java.util.Objects;
+
 /*
 create table questions(
     question_id bigint primary key auto_increment,
@@ -110,8 +113,18 @@ public class Question {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return questionId == ((Question) o).questionId&&quizId==((Question) o).quizId
-                &&questionText==((Question) o).questionText&&imageUrl==((Question) o).imageUrl;
+        if (!(o instanceof Question)) return false;
+
+        if (!Objects.equals(questionText, ((Question) o).getQuestionText()) ||
+                !Objects.equals(imageUrl, ((Question) o).getImageUrl())) {
+            return false;
+        }
+
+        return questionId == ((Question) o).questionId &&
+                quizId == ((Question) o).quizId &&
+                questionType.equals(((Question) o).getQuestionType()) &&
+                numAnswers == ((Question) o).getNumAnswers() &&
+                orderStatus.equals(((Question) o).getOrderStatus());
+
     }
 }

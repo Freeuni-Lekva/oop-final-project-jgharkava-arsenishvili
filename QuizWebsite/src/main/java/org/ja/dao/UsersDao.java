@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 
 public class UsersDao {
@@ -39,8 +41,8 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-                    long newId = keys.getLong(1);
-                    user.setId(newId); // if you want to store it in your object
+                    user.setId(keys.getLong("user_id")); 
+                    user.setRegistrationDate(keys.getTimestamp("registration_date"));
                 }
             }
         } catch (SQLException e) {

@@ -39,11 +39,13 @@ public class MatchesDao {
             ps.setString(3, match.getRightMatch());
 
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if(rs.next()) {
-                cnt++;
-                match.setMatchId(rs.getLong(1));
+            try (ResultSet rs = ps.getGeneratedKeys()){
+                if(rs.next()) {
+                    cnt++;
+                    match.setMatchId(rs.getLong(1));
+                }
             }
+
 
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting Match to database", e);
