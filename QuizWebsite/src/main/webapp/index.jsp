@@ -25,5 +25,9 @@
 </form>
 <p><a href="sign-up.jsp">Sign Up Here</a></p>
 
+
+
+<a href="quiz-search.jsp">Jump to Quiz Search</a>
+
 </body>
 </html>

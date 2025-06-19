@@ -7,6 +7,7 @@ public class Constants {
         public static final String CATEGORY = "category-filter";
         public static final String TAG = "tag-filter";
         public static final String ORDER = "order-filter";
+        public static final String ORDER_PLACEHOLDER = "order-placeholder";
     }
 
     public static class ContextAttributes {
@@ -54,5 +55,10 @@ public class Constants {
         public static final String ANSWERS = "answers";
         public static final String QUESTIONS = "questions";
         public static final String QUESTION_ITERATOR = "question-iterator";
+    }
+
+    public static class RequestParameters {
+        public static final String QUIZ_ID = "current-quiz-id";
+        public static final String USER_ID = "current-quiz-id";
     }
 }

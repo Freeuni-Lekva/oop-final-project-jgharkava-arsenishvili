@@ -4,7 +4,6 @@
 <%@ page import="org.ja.model.CategoriesAndTags.Category" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.ja.model.CategoriesAndTags.Tag" %>
-<%@ page import="java.util.concurrent.CompletionService" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.QuizzesDao" %><%--
   Created by IntelliJ IDEA.
@@ -29,7 +28,7 @@
   </head>
   <body>
 
-    <form action="search-quiz" method="get">
+    <form action="quiz-search" method="get">
       <input type="text" name="<%=Constants.FilterFields.QUIZ_NAME%>">
 
       <%
@@ -49,9 +48,10 @@
       %>
 
       <label>
-        <select>
-          <option name="<%=Constants.FilterFields.ORDER%>" value="average_rating">Rating</option>
-          <option name="<%=Constants.FilterFields.ORDER%>" value="creation_date">Creation Date</option>
+        <select name="<%=Constants.FilterFields.ORDER%>">
+          <option value="<%=Constants.FilterFields.ORDER_PLACEHOLDER%>">Select</option>
+          <option value="average_rating">Rating</option>
+          <option value="creation_date">Creation Date</option>
         </select>
       </label>
 
@@ -59,12 +59,29 @@
     </form>
 
     <%
-      List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
 
-      for(Quiz quiz : quizzes) {%>
-        <h5>Name - <%=quiz.getName()%> Rating - <%=quiz.getAvgRating()%></h5>
+      if(request.getAttribute("quizzes") == null) {
+        List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
+
+        for(Quiz quiz : quizzes) {%>
+          <form action="quiz-overview.jsp" method="get">
+            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%></button>
+          </form>
+
+          <%--<h5>Name - <%=quiz.getName()%> Rating - <%=quiz.getAvgRating()%></h5>--%>
+      <%
+        }
+      } else {
+        List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
+
+        for(Quiz quiz : quizzes) {%>
+          <form action="quiz-overview.jsp" method="get">
+            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%></button>
+          </form>
     <%
-
+        }
       }
     %>
 
