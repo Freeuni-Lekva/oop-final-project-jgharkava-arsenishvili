@@ -4,6 +4,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.Filters.Filter;
 import org.ja.model.user.User;
 
+import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -92,7 +98,7 @@ public class UsersDao {
                     return retrieveUser(rs);
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Error querying user by id from database", e);
         }
         return null;
@@ -106,6 +112,8 @@ public class UsersDao {
             try (ResultSet rs = st.executeQuery()){
                 if (rs.next())
                     return retrieveUser(rs);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
             }
 
         } catch (SQLException e) {
@@ -127,7 +135,7 @@ public class UsersDao {
                     users.add(retrieveUser(rs));
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException | NoSuchAlgorithmException e) {
             throw new RuntimeException("Error querying user by filter from database", e);
         }
 
@@ -173,7 +181,7 @@ public class UsersDao {
     public long getCount(){
         return cnt;
     }
-    private User retrieveUser(ResultSet rs) throws SQLException {
+    private User retrieveUser(ResultSet rs) throws SQLException, NoSuchAlgorithmException {
         return new User(rs.getLong("user_id"), rs.getString("username"),
                 rs.getString("password_hashed"), rs.getString("salt"),
                 rs.getTimestamp("registration_date"), rs.getString("user_photo"),
