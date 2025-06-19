@@ -56,8 +56,11 @@ public class Friendship {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return firstUserId==((Friendship) o).getFirstUserId()&&secondUserId==((Friendship) o).getSecondUserId()
-                &&friendshipStatus.equals(((Friendship) o).getFriendshipStatus());
+        if (!(o instanceof Friendship)) return false;
+
+        return firstUserId == ((Friendship) o).getFirstUserId() &&
+                secondUserId == ((Friendship) o).getSecondUserId() &&
+                friendshipStatus.equals(((Friendship) o).getFriendshipStatus()) &&
+                friendshipDate.equals(((Friendship) o).getFriendshipDate());
     }
 }
