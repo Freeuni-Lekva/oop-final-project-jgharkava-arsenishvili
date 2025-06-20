@@ -36,29 +36,25 @@ public class FriendShipsDao {
         String sql = "INSERT INTO friendships (first_user_id, second_user_id, friendship_status) VALUES (?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setLong(1, friendship.getFirstUserId());
             ps.setLong(2, friendship.getSecondUserId());
             ps.setString(3, friendship.getFriendshipStatus());
             ps.executeUpdate();
 
-            try (ResultSet rs = ps.getGeneratedKeys()){
-                if (rs.next()) {
-                    cnt++;
+            cnt++;
 
-                    String s = "SELECT friendship_date FROM friendships " +
-                            "where first_user_id = ? AND second_user_id = ?";
+            String s = "SELECT friendship_date FROM friendships " +
+                    "where first_user_id = ? AND second_user_id = ?";
 
-                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
-                        preparedStatement.setLong(1, friendship.getFirstUserId());
-                        preparedStatement.setLong(2, friendship.getSecondUserId());
+            try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                preparedStatement.setLong(1, friendship.getFirstUserId());
+                preparedStatement.setLong(2, friendship.getSecondUserId());
 
-                        try (ResultSet r = preparedStatement.executeQuery()) {
-                            if (r.next())
-                                friendship.setFriendshipDate(r.getTimestamp("friendship_date"));
-                        }
-                    }
+                try (ResultSet r = preparedStatement.executeQuery()) {
+                    if (r.next())
+                        friendship.setFriendshipDate(r.getTimestamp("friendship_date"));
                 }
             }
 

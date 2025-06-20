@@ -87,7 +87,7 @@ public class CategoriesDao {
              PreparedStatement ps = c.prepareStatement(sql)){
 
             try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()) {
+                while (rs.next()) {
                     categories.add(retrieveCategory(rs));
                 }
             }
