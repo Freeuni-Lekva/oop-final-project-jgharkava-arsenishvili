@@ -41,8 +41,21 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-                    user.setId(keys.getLong("user_id")); 
-                    user.setRegistrationDate(keys.getTimestamp("registration_date"));
+
+                    long userId = keys.getLong("user_id");
+                    user.setId(userId);
+
+                    String s = "SELECT registration_date FROM users where user_id = ?";
+
+                    try (PreparedStatement ps = c.prepareStatement(s)){
+                        ps.setLong(1, userId);
+
+                        try (ResultSet r = ps.executeQuery()) {
+                            if (r.next()) {
+                                user.setRegistrationDate(r.getTimestamp("registration_date"));
+                            }
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {

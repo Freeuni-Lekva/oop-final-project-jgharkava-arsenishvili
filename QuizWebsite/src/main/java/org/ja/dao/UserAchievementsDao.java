@@ -35,6 +35,7 @@ public class UserAchievementsDao {
             return;
         }
         String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
@@ -43,9 +44,23 @@ public class UserAchievementsDao {
 
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
+
             if (rs.next()) {
                 cnt++;
-                ua.setAchievementDate(rs.getTimestamp(3));
+
+                String s = "SELECT achievement_date FROM user_achievement WHERE " +
+                        "user_id = ? AND achievement_id = ?";
+
+                try (PreparedStatement preparedStatement = conn.prepareStatement(s)){
+                    preparedStatement.setLong(1, ua.getUserId());
+                    preparedStatement.setLong(2, ua.getAchievementId());
+
+                    try (ResultSet r = preparedStatement.executeQuery()) {
+                        if (r.next()) {
+                            ua.setAchievementDate(r.getTimestamp("achievement_date"));
+                        }
+                    }
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to insert user achievement", e);

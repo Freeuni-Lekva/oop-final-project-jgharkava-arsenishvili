@@ -46,7 +46,19 @@ public class FriendShipsDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()) {
                     cnt++;
-                    friendship.setFriendshipDate(rs.getTimestamp("friendship_date"));
+
+                    String s = "SELECT friendship_date FROM friendships " +
+                            "where first_user_id = ? AND second_user_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, friendship.getFirstUserId());
+                        preparedStatement.setLong(2, friendship.getSecondUserId());
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next())
+                                friendship.setFriendshipDate(r.getTimestamp("friendship_date"));
+                        }
+                    }
                 }
             }
 
