@@ -56,5 +56,6 @@ public class Constants {
         public static final String QUESTION_ITERATOR = "question-iterator";
         public static final String TAGS_TO_ADD = "tags-to-add";
         public static final String TAG_TO_CREATE = "tag-to-create";
+
     }
 }

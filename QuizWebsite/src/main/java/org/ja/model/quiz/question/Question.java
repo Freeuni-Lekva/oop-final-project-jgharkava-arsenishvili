@@ -55,7 +55,6 @@ public class Question {
         this.numAnswers = numAnswers;
         this.orderStatus = orderStatus;
         this.quizId = quizId;
-
     }
 
     public int gradeResponse (List<?> correctAnswersList, Response response){

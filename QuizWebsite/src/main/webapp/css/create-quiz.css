@@ -80,27 +80,25 @@ h2 {
     background-color: white;
 }
 
-/* Hide the actual checkbox */
 input[type="checkbox"] {
     display: none;
 }
 
-/* Style the label to look like a button without rounded corners */
 .checkbox-button {
     display: inline-block;
     padding: 4px 10px;
     margin: 3px;
-    font-size: 14px;
-    border: 2px solid cornflowerblue;
+    font-size: 10px;
+    border: 2px solid lightsalmon;
     border-radius: 5px;
     cursor: pointer;
     user-select: none;
-    color: cornflowerblue;
+    color: lightsalmon;
     transition: background-color 0.3s, color 0.3s;
 }
 
 input[type="checkbox"]:checked + .checkbox-button {
-    background-color: cornflowerblue;
+    background-color: lightsalmon;
     color: white;
 }
 

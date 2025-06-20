@@ -4,7 +4,6 @@ import org.ja.dao.QuizTagsDao;
 import org.ja.dao.QuizzesDao;
 import org.ja.dao.TagsDao;
 import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.OtherObjects.QuizTag;
 import org.ja.model.quiz.Quiz;
 import org.ja.utils.Constants;
 
