@@ -46,8 +46,19 @@ public class HistoriesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    history.setHistoryId(rs.getLong(1));
-                    history.setCompletionDate(rs.getTimestamp("completion_date"));
+                    long historyId = rs.getLong("history_id");
+                    history.setHistoryId(historyId);
+
+                    String s = "SELECT completion_date FROM history where history_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, historyId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next())
+                                history.setCompletionDate(r.getTimestamp("completion_date"));
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {

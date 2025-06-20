@@ -50,7 +50,7 @@ public class QuestionDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    question.setQuestionId(rs.getLong(1));
+                    question.setQuestionId(rs.getLong("question_id"));
                 }
             }
 

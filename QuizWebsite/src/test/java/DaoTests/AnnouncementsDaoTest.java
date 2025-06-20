@@ -100,8 +100,6 @@ public class AnnouncementsDaoTest {
     private Announcement a2;
     private Announcement a3;
     private Announcement a4;
-    private Announcement a5;
-    private Announcement a6;
 
     @Test
     public void testInsert() {

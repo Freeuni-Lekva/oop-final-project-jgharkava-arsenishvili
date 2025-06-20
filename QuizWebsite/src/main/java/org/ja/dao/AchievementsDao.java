@@ -42,7 +42,7 @@ public class AchievementsDao {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()){
                     cnt++;
-                    achievement.setAchievementId(rs.getLong(1));
+                    achievement.setAchievementId(rs.getLong("achievement_id"));
                 }
             }
         } catch (SQLException e) {

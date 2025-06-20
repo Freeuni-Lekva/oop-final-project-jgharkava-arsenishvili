@@ -48,8 +48,21 @@ public class MessageDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    message.setMessageId(rs.getLong(1));
-                    message.setMessageSendDate(rs.getTimestamp("message_send_date"));
+
+                    long messageId = rs.getLong("message_id");
+                    message.setMessageId(messageId);
+
+                    String s = "SELECT message_send_date FROM messages where message_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, messageId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next()) {
+                                message.setMessageSendDate(r.getTimestamp("message_send_date"));
+                            }
+                        }
+                    }
                 }
             }
 
