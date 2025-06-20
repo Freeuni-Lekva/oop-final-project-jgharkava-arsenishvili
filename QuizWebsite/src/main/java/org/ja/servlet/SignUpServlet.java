@@ -36,7 +36,7 @@ public class SignUpServlet extends HttpServlet {
             }
             try {
                 dao.insertUser(user);
-                request.getSession().setAttribute("username", username);
+                request.getSession().setAttribute(Constants.SessionAttributes.USER, user);
                 request.getRequestDispatcher("/sign-up-success.jsp").forward(request, response);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
