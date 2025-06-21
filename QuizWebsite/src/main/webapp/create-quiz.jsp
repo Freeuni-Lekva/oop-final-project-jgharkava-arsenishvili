@@ -48,7 +48,7 @@
 <body>
     <div class = "container">
         <h2>Create a Quiz</h2>
-        <form action = "CreateQuizServlet" method = "post">
+        <form action = "create-quiz" method = "post">
 
             <label for = "quizTitle">Quiz Title</label>
             <input type = "text" name = "quizTitle" id = "quizTitle" required placeholder = "Enter quiz Title">
