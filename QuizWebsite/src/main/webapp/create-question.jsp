@@ -90,6 +90,29 @@
 
       <button type = "button" onclick = "addAnswerOption('fill-in-the-blank-answer-container')">Add another answer</button>
     </div>
+  </div>
+
+  <div id="<%=Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION%>-form" class="questionForm">
+    <h3><%=Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION%></h3>
+
+    <label>
+      <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
+    </label>
+
+    <!-- Option container -->
+    <div id="multiple-choice-answer-container">
+      <div class="option-block">
+        <label>Option 1:</label><br>
+        <textarea name="answer" placeholder="Type the option..." rows="2" required></textarea>
+
+        <!-- ✅ BOTH BUTTONS HERE IN SAME ROW -->
+        <div class="button-row">
+          <button type="button" class="mark-button">Mark as True</button>
+          <button type="button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
+        </div>
+      </div>
+    </div>
+
 
   </div>
 
