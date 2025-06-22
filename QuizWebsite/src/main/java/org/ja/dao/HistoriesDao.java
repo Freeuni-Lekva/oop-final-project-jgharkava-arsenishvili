@@ -50,6 +50,9 @@ public class HistoriesDao {
                     history.setCompletionDate(rs.getTimestamp("completion_date"));
                 }
             }
+
+
+
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting history into database", e);
         }

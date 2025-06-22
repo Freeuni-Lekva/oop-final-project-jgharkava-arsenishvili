@@ -29,7 +29,9 @@
   <body>
 
     <form action="quiz-search" method="get">
-      <input type="text" name="<%=Constants.FilterFields.QUIZ_NAME%>">
+      <label>
+        <input type="text" name="<%=Constants.FilterFields.QUIZ_NAME%>">
+      </label>
 
       <%
         for(Category category : categories) {%>
@@ -52,6 +54,7 @@
           <option value="<%=Constants.FilterFields.ORDER_PLACEHOLDER%>">Select</option>
           <option value="average_rating">Rating</option>
           <option value="creation_date">Creation Date</option>
+          <option value="participant_count">Participant Count</option>
         </select>
       </label>
 
@@ -68,9 +71,7 @@
             <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
             <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%></button>
           </form>
-
-          <%--<h5>Name - <%=quiz.getName()%> Rating - <%=quiz.getAvgRating()%></h5>--%>
-      <%
+     <%
         }
       } else {
         List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");

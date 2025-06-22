@@ -21,11 +21,6 @@ public class QuizSearchServlet extends HttpServlet {
         Filter filter = FilterBuilder.build(req);
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
 
-        System.out.println(filter.buildOrderByClause());
-        System.out.println(filter.buildWhereClause());
-        System.out.println(filter.getParameters());
-
-
         List<Quiz> quizzes = quizzesDao.filterQuizzes(filter);
 
         req.setAttribute("quizzes", quizzes);

@@ -3,9 +3,7 @@ package org.ja.dao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.Filters.Filter;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
 
-import java.security.spec.ECField;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -355,6 +353,7 @@ public class QuizzesDao {
             throw new RuntimeException("Error inserting number of participants into database", e);
         }
     }
+
     public boolean containsQuiz(String name) {
         String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_name = ?";
 
@@ -394,6 +393,7 @@ public class QuizzesDao {
     public long getCount(){
         return cnt;
     }
+
     public Quiz getQuizById(long id) {
         String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
         try (Connection connection = dataSource.getConnection();
