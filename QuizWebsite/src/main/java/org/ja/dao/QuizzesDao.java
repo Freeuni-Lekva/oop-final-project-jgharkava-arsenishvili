@@ -286,10 +286,12 @@ public class QuizzesDao {
              stmt.setLong(1, userId);
              stmt.setLong(2, userId);
              stmt.setLong(3, userId);
-             ResultSet rs = stmt.executeQuery();
-
-            while (rs.next())
-                quizzes.add(retrieveQuiz(rs));
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()){
+                    quizzes.add(retrieveQuiz(rs));
+                }
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quizzes by creation date", e);
@@ -453,10 +455,12 @@ public class QuizzesDao {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
              stmt.setLong(1, id);
-             ResultSet rs = stmt.executeQuery();
-
-            while (rs.next())
-                quizzes.add(retrieveQuiz(rs));
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quizzes.add(retrieveQuiz(rs));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quizzes by creator id", e);
         }
