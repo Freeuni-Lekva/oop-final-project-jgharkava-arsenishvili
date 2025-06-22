@@ -83,6 +83,25 @@ public class AnnouncementsDao {
         return announcements;
     }
 
+    public ArrayList<Announcement> getAnnouncementsSortedByCreationDate(){
+        ArrayList<Announcement> announcements = new ArrayList<>();
+
+        String sql = "SELECT * FROM announcements ORDER BY creation_date DESC";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()){
+
+            while(rs.next()) {
+                announcements.add(retrieveAnnouncement(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying announcements from database", e);
+        }
+
+        return announcements;
+    }
+
     public void removeAnnouncement(long announcementId){
         if(!contains(announcementId)){
             return;

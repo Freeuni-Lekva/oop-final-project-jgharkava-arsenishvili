@@ -56,8 +56,6 @@ public class User {
     }
     public void setStatus(String status){this.status = status;}
 
-    public String getSalt(){return salt;}
-    public void setSalt(String salt){this.salt = salt;}
 
     @Override
     public boolean equals(Object o) {

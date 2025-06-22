@@ -41,7 +41,6 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-
                     long userId = keys.getLong("user_id");
                     user.setId(userId);
 
@@ -98,7 +97,7 @@ public class UsersDao {
         }
     }
 
-    public User getUserById(int id) {
+    public User getUserById(long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
 
         try (Connection c = dataSource.getConnection();

@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         User user = dao.getUserByUsername(username);
         try {
-            if(user == null || !PasswordHasher.verifyPassword(password, user.getPasswordHashed(),user.getSalt())) {
+            if(user == null || !PasswordHasher.verifyPassword(password, user.getPasswordHashed(), user.getSalt())) {
                 request.setAttribute("error", "Invalid username or password");
                 request.getRequestDispatcher("/index.jsp").forward(request, resp);
             }else{
