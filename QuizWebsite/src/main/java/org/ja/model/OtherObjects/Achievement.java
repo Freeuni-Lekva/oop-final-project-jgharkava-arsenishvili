@@ -1,5 +1,7 @@
 package org.ja.model.OtherObjects;
 
+import java.util.Objects;
+
 public class Achievement {
     private long achievementId;
     private String achievementName;
@@ -55,6 +57,9 @@ public class Achievement {
         if (this == o) return true;
         if (!(o instanceof Achievement)) return false;
 
-        return achievementName.equals(((Achievement) o).getAchievementName());
+        return achievementName.equals(((Achievement) o).getAchievementName()) &&
+                achievementId == ((Achievement) o).getAchievementId() &&
+                achievementDescription.equals(((Achievement) o).getAchievementDescription()) &&
+                Objects.equals(achievementPhoto, ((Achievement) o).achievementPhoto);
     }
 }

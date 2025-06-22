@@ -32,7 +32,7 @@ public class CategoriesDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
                 if (keys.next()) {
                     cnt++;
-                    long newId = keys.getLong(1);
+                    long newId = keys.getLong("category_id");
                     category.setCategoryId(newId); // if you want to store it in your object
                 }
             }
@@ -87,8 +87,9 @@ public class CategoriesDao {
              PreparedStatement ps = c.prepareStatement(sql)){
 
             try (ResultSet rs = ps.executeQuery()){
-                while (rs.next())
+                while (rs.next()) {
                     categories.add(retrieveCategory(rs));
+                }
             }
 
         } catch (SQLException e){

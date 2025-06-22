@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /*
 create table achievements(
@@ -42,7 +43,7 @@ public class AchievementsDao {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()){
                     cnt++;
-                    achievement.setAchievementId(rs.getLong(1));
+                    achievement.setAchievementId(rs.getLong("achievement_id"));
                 }
             }
         } catch (SQLException e) {
@@ -87,6 +88,7 @@ public class AchievementsDao {
 
         return null;
     }
+
     public boolean contains(Achievement a){
         if(a==null){
             return false;

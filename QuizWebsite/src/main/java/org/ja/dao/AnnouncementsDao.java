@@ -5,10 +5,8 @@ import org.ja.model.OtherObjects.Announcement;
 import org.ja.model.OtherObjects.History;
 import org.ja.model.OtherObjects.QuizRating;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 
 /*
@@ -44,10 +42,21 @@ public class AnnouncementsDao {
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()){
-                if (rs.next()){
+                if (rs.next()) {
                     cnt++;
-                    announcement.setCreationDate(rs.getTimestamp("creation_date"));
-                    announcement.setAnnouncementId(rs.getLong(1));
+                    long announcementId = rs.getLong("announcement_id");
+                    announcement.setAnnouncementId(announcementId);
+
+                    String s = "SELECT creation_date FROM announcements where announcement_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, announcementId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next())
+                                announcement.setCreationDate(r.getTimestamp("creation_date"));
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -62,6 +71,25 @@ public class AnnouncementsDao {
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()){
+
+            while(rs.next()) {
+                announcements.add(retrieveAnnouncement(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying announcements from database", e);
+        }
+
+        return announcements;
+    }
+
+    public ArrayList<Announcement> getAnnouncementsSortedByCreationDate(){
+        ArrayList<Announcement> announcements = new ArrayList<>();
+
+        String sql = "SELECT * FROM announcements ORDER BY creation_date DESC";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
 
             while(rs.next()) {
