@@ -76,8 +76,21 @@ public class QuizzesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if(rs.next()) {
                     cnt++;
-                    quiz.setId(rs.getLong("quiz_id"));
-                    quiz.setCreationDate(rs.getTimestamp("creation_date"));
+
+                    long quizId = rs.getLong("quiz_id");
+                    quiz.setId(quizId);
+
+                    String s = "SELECT creation_date FROM quizzes where quiz_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, quizId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next()) {
+                                quiz.setCreationDate(r.getTimestamp("creation_date"));
+                            }
+                        }
+                    }
                 }
             }
 

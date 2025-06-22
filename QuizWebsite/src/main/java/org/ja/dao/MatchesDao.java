@@ -42,7 +42,7 @@ public class MatchesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if(rs.next()) {
                     cnt++;
-                    match.setMatchId(rs.getLong(1));
+                    match.setMatchId(rs.getLong("match_id"));
                 }
             }
 
