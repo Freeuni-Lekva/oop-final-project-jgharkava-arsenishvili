@@ -32,6 +32,8 @@
     <option value = "<%=Constants.QuestionTypes.MATCHING_QUESTION%>"><%=Constants.QuestionTypes.MATCHING_QUESTION%></option>
   </select>
 
+  <input type = "hidden" name = "questionType" id = "questionTypeHidden">
+
   <div id = "<%=Constants.QuestionTypes.RESPONSE_QUESTION%>-form" class = "questionForm">
     <h3><%=Constants.QuestionTypes.RESPONSE_QUESTION%></h3>
 
@@ -99,34 +101,64 @@
       <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
     </label>
 
-    <!-- Option container -->
     <div id="multiple-choice-answer-container">
       <div class="option-block">
         <label>Option 1:</label><br>
         <textarea name="answer" placeholder="Type the option..." rows="2" required></textarea>
 
-        <!-- ✅ BOTH BUTTONS HERE IN SAME ROW -->
+        <input type="hidden" name="isCorrect" value="false">
+
         <div class="button-row">
           <button type="button" class="mark-button">Mark as True</button>
           <button type="button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
         </div>
       </div>
     </div>
-
-
   </div>
 
+  <div id="<%=Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION%>-form" class="questionForm">
+    <h3><%=Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION%></h3>
+
+    <label>
+      <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
+    </label>
+
+    <div id="multi-choice-multi-answer-container">
+      <div class="option-block">
+        <label>Option 1:</label><br>
+        <textarea name="answer" placeholder="Type the option..." rows="2" required></textarea>
+
+        <input type="hidden" name="isCorrect" value="false">
+
+        <div class="button-row">
+          <button type="button" class="mark-button">Mark as True</button>
+          <button type="button" onclick="addAnswerOption('multi-choice-multi-answer-container')">Add another option</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="<%=Constants.QuestionTypes.MULTI_ANSWER_QUESTION%>-form" class="questionForm">
+    <h3><%=Constants.QuestionTypes.MULTI_ANSWER_QUESTION%></h3>
+
+    <label>
+      <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
+    </label>
+
+    <label>
+      <input type = "checkbox" name = "isOrdered" id = "isOrderedCheckbox">
+      Answers are ordered
+    </label>
+
+    <div id="multi-answer-container">
+
+    <button type = "button" onclick = "addAnswerGroup()">Add new answer</button>
+
+    </div>
+  </div>
 
   <div class = "save-question-button">
     <button type = "submit" id = "saveQuestionButton">Save Question</button>
-  </div>
-
-  <div class = "finish-quiz-creation">
-    <button type = "submit">Finish Quiz Creation</button>
-  </div>
-
-  <div class = "discard-changes">
-    <button type = "submit">Discard Changes</button>
   </div>
 </form>
 

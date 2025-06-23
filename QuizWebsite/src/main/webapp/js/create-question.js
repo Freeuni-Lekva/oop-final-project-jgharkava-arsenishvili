@@ -14,19 +14,32 @@ function showQuestionForm() {
     });
 
     if (selectedType) {
+        let hiddenInput = document.getElementById("questionTypeHidden");
+        hiddenInput.value = selectedType;
+
         selectElement.disabled = true;
+
         answerCount = 1;
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Hook up the first button
-    const firstMarkButton = document.querySelector("#multiple-choice-answer-container .mark-button");
-    if (firstMarkButton) {
-        firstMarkButton.addEventListener("click", () =>
-        handleMarkButtonClick(firstMarkButton, "multiple-choice-answer-container")
+    addAnswerGroup();
+
+    const firstMarkButtonMultiChoice = document.querySelector("#multiple-choice-answer-container .mark-button");
+    if (firstMarkButtonMultiChoice) {
+        const hiddenInput = firstMarkButtonMultiChoice.closest(".option-block").querySelector("input[name='isCorrect']");
+        firstMarkButtonMultiChoice.addEventListener("click", () =>
+        handleMarkButtonClick(firstMarkButtonMultiChoice, hiddenInput, "multiple-choice-answer-container")
     );
-}
+    }
+
+    const firstMarkButtonMultiChoiceMultiAnswer = document.querySelector("#multi-choice-multi-answer-container .mark-button");
+    if (firstMarkButtonMultiChoiceMultiAnswer){
+        const hiddenInput = firstMarkButtonMultiChoiceMultiAnswer.closest(".option-block").querySelector("input[name='isCorrect']");
+        firstMarkButtonMultiChoiceMultiAnswer.addEventListener("click", () =>
+            handleMarkButtonClick(firstMarkButtonMultiChoiceMultiAnswer, hiddenInput, "multi-choice-multi-answer-container"));
+    }
 });
 
 function addAnswerOption(containerId) {
@@ -34,8 +47,9 @@ function addAnswerOption(containerId) {
 
     const container = document.getElementById(containerId);
     const isMultipleChoice = containerId === "multiple-choice-answer-container";
-    const labelText = isMultipleChoice ? `Option ${answerCount}:` : `Answer ${answerCount}:`;
-    const placeholderText = isMultipleChoice ? "Type an option..." : "Type the correct answer...";
+    const isMultipleChoiceMultiAnswer = containerId === "multi-choice-multi-answer-container";
+    const labelText = (isMultipleChoice || isMultipleChoiceMultiAnswer) ? `Option ${answerCount}:` : `Answer ${answerCount}:`;
+    const placeholderText = (isMultipleChoice || isMultipleChoiceMultiAnswer) ? "Type an option..." : "Type the correct answer...";
 
     const optionBlock = document.createElement("div");
     optionBlock.className = "option-block";
@@ -49,56 +63,87 @@ function addAnswerOption(containerId) {
     textarea.required = true;
     textarea.rows = 2;
 
+    const hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "isCorrect";
+    hiddenInput.value = "false";
+
     const buttonRow = document.createElement("div");
     buttonRow.className = "button-row";
 
-    if (isMultipleChoice){
+    if (isMultipleChoice || isMultipleChoiceMultiAnswer) {
         const markButton = document.createElement("button");
         markButton.type = "button";
         markButton.className = "mark-button";
         markButton.textContent = "Mark as True";
 
-        // Disable the new button if something is already marked
-        const alreadyMarked = container.querySelector(".mark-button.marked");
-
-        if (alreadyMarked) {
-            markButton.disabled = true;
+        if (isMultipleChoice) {
+            const alreadyMarked = container.querySelector(".mark-button.marked");
+            if (alreadyMarked) {
+                markButton.disabled = true;
+            }
         }
 
         markButton.addEventListener("click", () =>
-            handleMarkButtonClick(markButton, containerId)
+            handleMarkButtonClick(markButton, hiddenInput, containerId)
         );
 
         buttonRow.appendChild(markButton);
     }
 
+    const addOptionButton = document.createElement("button");
+    addOptionButton.type = "button";
+    addOptionButton.textContent = (isMultipleChoice || isMultipleChoiceMultiAnswer) ?
+        "Add another option..." : "Add another answer...";
+    addOptionButton.onclick = function() { addAnswerOption(containerId); };
+    buttonRow.appendChild(addOptionButton);
+
     optionBlock.appendChild(label);
     optionBlock.appendChild(textarea);
+    optionBlock.appendChild(hiddenInput);
     optionBlock.appendChild(buttonRow);
 
     container.appendChild(optionBlock);
 }
 
-function handleMarkButtonClick(clickedButton, containerId) {
+function handleMarkButtonClick(clickedButton, hiddenInput, containerId) {
     const container = document.getElementById(containerId);
-    const allButtons = container.querySelectorAll(".mark-button");
+    const isMultipleChoice = containerId === "multiple-choice-answer-container";
 
-    if (clickedButton.classList.contains("marked")) {
-        clickedButton.classList.remove("marked");
-        clickedButton.textContent = "Mark as True";
-        allButtons.forEach(btn => btn.disabled = false);
+    if (isMultipleChoice) {
+        const alreadyMarked = clickedButton.classList.contains("marked");
+
+        if (alreadyMarked) {
+            clickedButton.classList.remove("marked");
+            clickedButton.textContent = "Mark as True";
+            hiddenInput.value = "false";
+
+            const allButtons = container.querySelectorAll(".mark-button");
+            allButtons.forEach(btn => btn.disabled = false);
+        } else {
+            const allButtons = container.querySelectorAll(".mark-button");
+            const allHiddenInputs = container.querySelectorAll("input[name='isCorrect']");
+
+            allButtons.forEach(btn => {
+                btn.classList.remove("marked");
+                btn.textContent = "Mark as True";
+                btn.disabled = true; // disable all first
+            });
+
+            allHiddenInputs.forEach(input => input.value = "false");
+
+            clickedButton.classList.add("marked");
+            clickedButton.textContent = "Marked as True";
+            hiddenInput.value = "true";
+            clickedButton.disabled = false;
+        }
+
     } else {
-        allButtons.forEach(btn => {
-        btn.classList.remove("marked");
-        btn.textContent = "Mark as True";
-        btn.disabled = true;
-    });
-        clickedButton.classList.add("marked");
-        clickedButton.textContent = "Marked as True";
-        clickedButton.disabled = false;
+        const marked = clickedButton.classList.toggle("marked");
+        clickedButton.textContent = marked ? "Marked as True" : "Mark as True";
+        hiddenInput.value = marked ? "true" : "false";
     }
 }
-
 
 let blankInserted = false;
 let selectedIndex = -1;
@@ -120,14 +165,12 @@ function renderQuestionWithBlanks() {
     container.innerHTML = "";
     const words = input.trim().split(/\s+/);
 
-    // not needed
-    //if (!blankInserted) {
-        const btn = document.createElement("button");
-        btn.textContent = "+";
-        btn.type = "button";
-        btn.onclick = () => insertBlank(-1);
-        container.appendChild(btn);
-    //}
+
+    const btn = document.createElement("button");
+    btn.textContent = "+";
+    btn.type = "button";
+    btn.onclick = () => insertBlank(-1);
+    container.appendChild(btn);
 
     words.forEach((word, index) => {
         const wordSpan = document.createElement("span");
@@ -245,4 +288,86 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
         }
     }
+
+    if (selectedType === "multi-choice-multi-answers") {
+        const container = document.getElementById("multi-choice-multi-answer-container");
+        const markedButtons = container.querySelectorAll(".mark-button.marked");
+
+        if (markedButtons.length === 0) {
+            e.preventDefault();
+
+            const firstTextarea = container.querySelector("textarea[name='answer']");
+            firstTextarea.setCustomValidity("You must mark at least one option as correct.");
+            firstTextarea.reportValidity();
+
+            setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+        }
+    }
 });
+
+let multiAnswerCount = 0;
+
+function addAnswerGroup(afterElement = null) {
+    const container = document.getElementById("multi-answer-container");
+    const groupId = multiAnswerCount++;
+
+    const group = document.createElement("div");
+    group.className = "answer-group";
+    group.dataset.groupId = groupId.toString();
+
+    group.innerHTML = `
+        <label>Answer Text:</label>
+        <textarea name="answerText-${groupId}" rows="2" required></textarea>
+
+        <div class = "options-container" id = "options-${groupId}"></div>
+
+        <button type="button" onclick="addOption(${groupId})">Add Option</button>
+        <button type="button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
+        <hr/>
+    `;
+
+    if (afterElement) {
+        afterElement.insertAdjacentElement("afterend", group);
+    } else {
+        container.appendChild(group);
+    }
+}
+
+function addOption(groupId) {
+    const container = document.getElementById(`options-${groupId}`);
+    const optionCount = container.querySelectorAll("input").length + 1;
+
+    const label = document.createElement("label");
+    label.textContent = `Option ${optionCount}:`;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = `option-${groupId}`;
+    input.required = true;
+
+    container.appendChild(label);
+    container.appendChild(input);
+}
+
+function insertAnswerBelow(button) {
+    const group = button.closest(".answer-group");
+    addAnswerGroup(group);
+}
+
+document.getElementById("create-question-form").addEventListener("submit", function (e) {
+    const container = document.getElementById("multi-answer-container");
+
+    if (!container) return;
+
+    const order = Array.from(container.querySelectorAll(".answer-group"))
+        .map(group => group.dataset.groupId); // collect order of groupIds
+
+    let hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "answerOrder";
+    hidden.id = "answerOrderInput";
+    hidden.value = order.join(",");
+
+    this.appendChild(hidden);
+});
+

@@ -109,6 +109,7 @@ public class Question {
     public void setOrderStatus(String orderStatus){
         this.orderStatus = orderStatus;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -126,4 +127,10 @@ public class Question {
                 orderStatus.equals(((Question) o).getOrderStatus());
 
     }
+
+    @Override
+    public int hashCode(){
+        return 1;
+    }
+
 }

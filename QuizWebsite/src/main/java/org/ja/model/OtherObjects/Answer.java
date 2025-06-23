@@ -31,9 +31,14 @@ public class Answer {
         this.answerValidity = answerValidity;
     }
 
-    //for testing
     public Answer(String answerText){
         this.answerText = answerText;
+    }
+
+    public Answer(String answerText, int answerOrder, boolean answerValidity){
+        this.answerText = answerText;
+        this.answerOrder = answerOrder;
+        this.answerValidity = answerValidity;
     }
 
     public long getAnswerId() {
@@ -88,5 +93,10 @@ public class Answer {
     public boolean containsAnswer(String answer){
         return Arrays.stream(answerText.split("/"))
                 .anyMatch(part -> part.equalsIgnoreCase(answer.trim()));
+    }
+
+    @Override
+    public String toString(){
+        return answerText;
     }
 }
