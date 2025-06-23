@@ -115,7 +115,8 @@ create table answers(
     answer_order int not null default 1,
     answer_validity boolean not null default true,
 
-    foreign key (question_id) references questions(question_id) on delete cascade
+    foreign key (question_id) references questions(question_id) on delete cascade,
+    unique (question_id, answer_order)
 );
 
 

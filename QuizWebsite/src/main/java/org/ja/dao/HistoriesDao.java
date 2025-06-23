@@ -24,15 +24,12 @@ create table history(
  */
 public class HistoriesDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+    private long cnt = 0;
     public HistoriesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void insertHistory(History history){
-        if(contains(history)){
-            return;
-        }
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -46,7 +43,7 @@ public class HistoriesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    long historyId = rs.getLong("history_id");
+                    long historyId = rs.getLong(1);
                     history.setHistoryId(historyId);
 
                     String s = "SELECT completion_date FROM history where history_id = ?";
@@ -67,17 +64,14 @@ public class HistoriesDao {
     }
 
     public void removeHistory(long historyId){
-        if(!contains(historyId)){
-            return;
-        }
         String sql = "DELETE FROM history WHERE history_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, historyId);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing history from database", e);
         }
@@ -233,41 +227,39 @@ public class HistoriesDao {
             ps.setDouble(3, h.getScore());
             ps.setDouble(4, h.getCompletionTime());
             ps.setTimestamp(5, h.getCompletionDate());
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public boolean contains(long hid){
-        if(hid<0||hid>cnt){
-            return false;
-        }
         String sql = "SELECT COUNT(*) FROM history WHERE history_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, hid);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private History retrieveHistory(ResultSet rs) throws SQLException {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
                 rs.getLong("quiz_id"), rs.getLong("score"),

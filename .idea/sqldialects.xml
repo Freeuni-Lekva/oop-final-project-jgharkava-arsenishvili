@@ -9,5 +9,7 @@
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/FriendShipsDao.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/MessageDao.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/UserAchievementsDao.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/QuizWebsite/src/test/java/DaoTests/AchievementDaoTest.java" dialect="GenericSQL" />
+    <file url="PROJECT" dialect="MySQL" />
   </component>
 </project>

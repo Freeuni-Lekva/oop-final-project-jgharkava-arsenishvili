@@ -31,9 +31,7 @@ public class MessageDao {
         if(message==null){
             return;
         }
-        if(contains(message)){
-            return;
-        }
+
         String sql = "INSERT INTO messages (sender_user_id, recipient_user_id, message_text) VALUES (?,?,?)";
 
         try (Connection c = dataSource.getConnection();
@@ -49,7 +47,7 @@ public class MessageDao {
                 if (rs.next()){
                     cnt++;
 
-                    long messageId = rs.getLong("message_id");
+                    long messageId = rs.getLong(1);
                     message.setMessageId(messageId);
 
                     String s = "SELECT message_send_date FROM messages where message_id = ?";
@@ -71,18 +69,16 @@ public class MessageDao {
         }
 
     }
+
     public void removeMessage(long messageId) {
-        if(!contains(messageId)){
-            return;
-        }
         String sql = "DELETE FROM messages WHERE message_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, messageId);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing Message from database", e);
         }
@@ -118,7 +114,7 @@ public class MessageDao {
     public ArrayList<Message> getMessagesForUserSorted(long userId){
         ArrayList<Message> messages = new ArrayList<>();
 
-        String sql = "SELECT * FROM messages WHERE recipient_user_id = ? ORDER BY message_send_date";
+        String sql = "SELECT * FROM messages WHERE recipient_user_id = ? ORDER BY message_send_date DESC";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){

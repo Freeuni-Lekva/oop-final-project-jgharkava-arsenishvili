@@ -10,9 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.sql.*;
 import java.util.ArrayList;
-
 public class UsersDao {
     private final BasicDataSource dataSource;
     private long cnt=0;
@@ -41,7 +39,7 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-                    long userId = keys.getLong("user_id");
+                    long userId = keys.getLong(1);
                     user.setId(userId);
 
                     String s = "SELECT registration_date FROM users where user_id = ?";

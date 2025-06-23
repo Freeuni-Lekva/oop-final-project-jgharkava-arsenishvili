@@ -25,8 +25,8 @@ public class UsersDaoTest{
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();

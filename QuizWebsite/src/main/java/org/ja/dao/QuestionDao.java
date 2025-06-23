@@ -29,9 +29,6 @@ public class QuestionDao {
     }
 
     public void insertQuestion(Question question) {
-        if(contains(question)) {
-            return;
-        }
         String sql = "INSERT INTO questions ( quiz_id, question, image_url, " +
                 "question_type, num_answers, order_status) VALUES (?,?, ?, ?, ?, ?);";
 
@@ -60,9 +57,6 @@ public class QuestionDao {
     }
 
     public void removeQuestion(long questionId) {
-        if(getQuestionById(questionId)==null){
-            return;
-        }
         String sql = "DELETE FROM questions WHERE quiz_id = ?";
 
         try(Connection c = dataSource.getConnection();
@@ -70,8 +64,8 @@ public class QuestionDao {
 
             ps.setLong(1, questionId);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing question from database", e);
         }
@@ -138,6 +132,7 @@ public class QuestionDao {
             throw new RuntimeException("Error updating question into database", e);
         }
     }
+
     public boolean contains(Question question){
         String sql = "SELECT COUNT(*) FROM questions WHERE quiz_id = ? AND question=?" +
                 "AND image_url=? AND question_type = ?" +
@@ -153,20 +148,21 @@ public class QuestionDao {
             ps.setInt(5, question.getNumAnswers());
             ps.setString(6, question.getOrderStatus());
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private Question retrieveQuestion(ResultSet rs) throws SQLException {
         return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
                 rs.getString("question"), rs.getString("image_url"),

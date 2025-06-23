@@ -3,41 +3,40 @@ package DaoTests;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
 import org.ja.model.CategoriesAndTags.Category;
-import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.OtherObjects.*;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.quiz.question.Question;
 import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class ChallengesDaoTest {
-
     private BasicDataSource basicDataSource;
     private ChallengesDao dao;
     private UsersDao usersDao;
     private QuizzesDao quizzesDao;
     private CategoriesDao categoriesDao;
+
+    private Challenge c1;
+    private Challenge c2;
+    private Challenge c3;
+    private Challenge c4;
+
     @BeforeEach
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -80,11 +79,12 @@ public class ChallengesDaoTest {
                     statement.execute(sql.trim());
                 }
             }
-
-            dao=new ChallengesDao(basicDataSource);
-            finishSetup();
         }
+
+        dao=new ChallengesDao(basicDataSource);
+        finishSetup();
     }
+
     private void finishSetup() throws SQLException, NoSuchAlgorithmException {
         usersDao=new UsersDao(basicDataSource);
         User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
@@ -128,20 +128,15 @@ public class ChallengesDaoTest {
         quizzesDao.insertQuiz(q3);
         quizzesDao.insertQuiz(q4);
 
-    }
-    private Challenge c1;
-    private Challenge c2;
-    private Challenge c3;
-    private Challenge c4;
-    private Challenge c5;
-    private Challenge c6;
-
-    @Test
-    public void testInsert() {
         c1=new Challenge(-1,1,2,1);
         c2=new Challenge(-1,2,1,2);
         c3=new Challenge(-1,3,2,1);
         c4=new Challenge(-1,4,2,1);
+
+    }
+
+    @Test
+    public void testInsert() {
         dao.insertChallenge(c1);
         assertTrue(dao.contains(c1));
         assertEquals(1, c1.getChallengeId());
@@ -150,11 +145,15 @@ public class ChallengesDaoTest {
         dao.insertChallenge(c3);
         dao.insertChallenge(c4);
         assertEquals(4, dao.getCount());
-
     }
+
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertChallenge(c1);
+        dao.insertChallenge(c2);
+        dao.insertChallenge(c3);
+        dao.insertChallenge(c4);
+
         dao.removeChallenge(1);
         assertFalse(dao.contains(c1));
         assertEquals(3, dao.getCount());
@@ -164,23 +163,30 @@ public class ChallengesDaoTest {
         dao.removeChallenge(1);
         assertEquals(2, dao.getCount());
     }
+
     @Test
     public void testChallengesAsSender(){
-        testInsert();
+        dao.insertChallenge(c1);
+        dao.insertChallenge(c2);
+        dao.insertChallenge(c3);
+        dao.insertChallenge(c4);
+
         ArrayList<Challenge> arr=dao.challengesAsSender(1);
         assertEquals(1, arr.size());
         assertTrue(arr.contains(c1));
     }
+
     @Test
     public void testChallengesAsReceiver(){
-        testInsert();
+        dao.insertChallenge(c1);
+        dao.insertChallenge(c2);
+        dao.insertChallenge(c3);
+        dao.insertChallenge(c4);
+
         ArrayList<Challenge> arr=dao.challengesAsReceiver(2);
         assertEquals(3, arr.size());
         assertTrue(arr.contains(c1));
         assertTrue(arr.contains(c3));
         assertTrue(arr.contains(c4));
     }
-
-
-
 }

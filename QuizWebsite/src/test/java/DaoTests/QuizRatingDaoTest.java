@@ -36,8 +36,8 @@ public class QuizRatingDaoTest {
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -85,6 +85,7 @@ public class QuizRatingDaoTest {
             finishSetup();
         }
     }
+
     private void finishSetup() throws SQLException, NoSuchAlgorithmException {
         usersDao=new UsersDao(basicDataSource);
         User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
@@ -128,33 +129,33 @@ public class QuizRatingDaoTest {
         quizzesDao.insertQuiz(q3);
         quizzesDao.insertQuiz(q4);
 
+        qr1=new QuizRating(1, 1, 2, "mid af");
+        qr2=new QuizRating(1, 2, 3, "pretty good ngl");
+        qr3=new QuizRating(2, 3, 5, "awesome");
+        qr4=new QuizRating(3, 1, 3, "it's alright like...");
+        qr5=new QuizRating(1, 1, 3, "actually, ok");
     }
+
     private QuizRating qr1;
     private QuizRating qr2;
     private QuizRating qr3;
     private QuizRating qr4;
     private QuizRating qr5;
-    private QuizRating qr6;
 
     @Test
     public void testInsert() {
-        qr1=new QuizRating(1, 1, 2, "mid af");
-        qr2=new QuizRating(1, 2, 3, "pretty good ngl");
-        qr3=new QuizRating(2, 3, 5, "awesome");
-        qr4=new QuizRating(3, 1, 3, "it's alright like...");
         dao.insertQuizRating(qr1);
         assertTrue(dao.contains(qr1));
         dao.insertQuizRating(qr2);
         dao.insertQuizRating(qr3);
         dao.insertQuizRating(qr4);
         assertEquals(4, dao.getCount());
-        qr5=new QuizRating(1, 1, 3, "actually, ok");
         dao.insertQuizRating(qr5);
         assertTrue(dao.contains(qr5));
         assertFalse(dao.contains(qr1));
         assertEquals(4, dao.getCount());
-
     }
+
     @Test
     public void testRemove() {
         testInsert();
@@ -162,6 +163,7 @@ public class QuizRatingDaoTest {
         assertFalse(dao.contains(qr5));
         assertEquals(3, dao.getCount());
     }
+
     @Test
     public void testGetQuizRatingsByUserId() {
         testInsert();
@@ -170,8 +172,9 @@ public class QuizRatingDaoTest {
         assertTrue(arr.contains(qr5));
         assertTrue(arr.contains(qr4));
     }
+
     @Test
-    public void testGetQuizRatingsByQuizzId() {
+    public void testGetQuizRatingsByQuizId() {
         testInsert();
         ArrayList<QuizRating> arr=dao.getQuizRatingsByQuizId(1);
         assertEquals(2, arr.size());

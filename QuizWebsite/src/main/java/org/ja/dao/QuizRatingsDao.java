@@ -4,10 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.History;
 import org.ja.model.OtherObjects.QuizRating;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 /*
 create table quiz_rating(
@@ -28,21 +25,13 @@ public class QuizRatingsDao {
         this.dataSource = dataSource;
     }
 
-    public void insertQuizRating(QuizRating qr){
-        if(contains(qr)){
-            return;
-        }
-        if(contains(qr.getQuizId(), qr.getUserId())){
-            updateQuizRating(qr);
-            return;
-        }
-        String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) VALUES (?,?,?,?)";
-                //"ON DUPLICATE KEY UPDATE rating = VALUES(rating), review = VALUES(review)";
-        //String sql="MERGE INTO quiz_rating KEY(quiz_id, user_id)"+
-        //"VALUES (?, ?, ?, ?)";
+    /// if already exists in table, updates rating and review
+    public void insertQuizRating(QuizRating qr) {
+        String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) " +
+                "VALUES (?, ?, ?, ?) ";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setLong(1, qr.getQuizId());
             ps.setLong(2, qr.getUserId());
@@ -50,29 +39,31 @@ public class QuizRatingsDao {
             ps.setString(4, qr.getReview());
             ps.executeUpdate();
             cnt++;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error inserting quiz rating into database", e);
+        }
+        catch (SQLException e) {
+            if (e.getErrorCode() == 1062 || e.getErrorCode() == 23505) {
+                String updateSql = "UPDATE quiz_rating SET rating = ?, review = ? WHERE quiz_id = ? AND user_id = ?";
+
+                try (Connection c2 = dataSource.getConnection();
+                     PreparedStatement ps2 = c2.prepareStatement(updateSql)) {
+
+                    ps2.setInt(1, qr.getRating());
+                    ps2.setString(2, qr.getReview());
+                    ps2.setLong(3, qr.getQuizId());
+                    ps2.setLong(4, qr.getUserId());
+                    ps2.executeUpdate();
+
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Failed to update quiz_rating after duplicate insert", ex);
+                }
+
+            } else {
+                throw new RuntimeException("Error inserting or updating quiz rating in database", e);
+            }
         }
     }
-    public void updateQuizRating(QuizRating qr){
-        String sql = "UPDATE quiz_rating SET rating=?, review=? WHERE quiz_id=? AND user_id=?";
 
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setLong(3, qr.getQuizId());
-            ps.setLong(4, qr.getUserId());
-            ps.setInt(1, qr.getRating());
-            ps.setString(2, qr.getReview());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error inserting quiz rating into database", e);
-        }
-    }
     public void removeQuizRating(long quizId, long userId){
-        if(!contains(quizId, userId)){
-            return;
-        }
         String sql = "DELETE FROM quiz_rating WHERE quiz_id = ? AND user_id = ?";
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -80,8 +71,8 @@ public class QuizRatingsDao {
             ps.setLong(1, quizId);
             ps.setLong(2, userId);
 
-            ps.executeUpdate();
-            cnt--;
+            if (ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz rating from database", e);
         }
@@ -130,11 +121,12 @@ public class QuizRatingsDao {
 
         return quizRatings;
     }
+
     public boolean contains(QuizRating qr){
         if(qr==null){
             return false;
         }
-        String sql = "SELECT COUNT(*) FROM quiz_rating WHERE quiz_id=?" +
+        String sql = "SELECT COUNT(*) FROM quiz_rating WHERE quiz_id=? " +
                 "AND user_id=? AND rating=? AND review=?";
 
         try (Connection connection = dataSource.getConnection();
@@ -155,6 +147,7 @@ public class QuizRatingsDao {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public boolean contains(long qid, long uid){
 
         String sql = "SELECT COUNT(*) FROM quiz_rating WHERE quiz_id = ? AND user_id = ?";
@@ -175,9 +168,11 @@ public class QuizRatingsDao {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private QuizRating retrieveQuizRating(ResultSet rs) throws SQLException {
         return new QuizRating(rs.getLong("quiz_id"), rs.getLong("user_id"),
                 rs.getInt("rating"), rs.getString("review"));

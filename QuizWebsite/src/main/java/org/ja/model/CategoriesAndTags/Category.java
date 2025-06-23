@@ -5,7 +5,7 @@ public class Category {
 
     private long categoryId;
 
-    public Category(long categoryId,String categoryName) {
+    public Category(long categoryId, String categoryName) {
         this.categoryName = categoryName;
         this.categoryId = categoryId;
     }

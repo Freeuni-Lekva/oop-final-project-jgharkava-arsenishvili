@@ -77,7 +77,7 @@ public class QuizzesDao {
                 if(rs.next()) {
                     cnt++;
 
-                    long quizId = rs.getLong("quiz_id");
+                    long quizId = rs.getLong(1);
                     quiz.setId(quizId);
 
                     String s = "SELECT creation_date FROM quizzes where quiz_id = ?";

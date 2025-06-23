@@ -22,10 +22,8 @@ public class QuizTagsDao {
         this.dataSource = dataSource;
     }
 
+    /// if already exists row with same quizId and tagId throws RuntimeException
     public void insertQuizTag(QuizTag quizTag) {
-        if(contains(quizTag)||quizTag==null){
-            return;
-        }
         String sql = "insert into quiz_tag values (?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -41,9 +39,6 @@ public class QuizTagsDao {
     }
 
     public void removeQuizTag(long qid, long tid) {
-        if(!contains(new QuizTag(qid,tid))){
-            return;
-        }
         String sql = "DELETE FROM quiz_tag WHERE quiz_id = ? AND tag_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -52,8 +47,8 @@ public class QuizTagsDao {
             ps.setLong(1, qid);
             ps.setLong(2, tid);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz tag from database", e);
         }
@@ -79,6 +74,7 @@ public class QuizTagsDao {
 
         return quizTags;
     }
+
     public boolean contains(QuizTag qt){
         if(qt==null){
             return false;
@@ -90,10 +86,11 @@ public class QuizTagsDao {
 
             ps.setLong(1, qt.getQuizId());
             ps.setLong(2, qt.getTagId());
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;

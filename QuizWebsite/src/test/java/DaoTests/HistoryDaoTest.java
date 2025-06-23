@@ -3,41 +3,35 @@ package DaoTests;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
 import org.ja.model.CategoriesAndTags.Category;
-import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.OtherObjects.*;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.quiz.question.Question;
 import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class HistoryDaoTest {
-
     private BasicDataSource basicDataSource;
     private HistoriesDao dao;
     private UsersDao usersDao;
     private QuizzesDao quizzesDao;
     private CategoriesDao categoriesDao;
+
     @BeforeEach
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -128,20 +122,20 @@ public class HistoryDaoTest {
         quizzesDao.insertQuiz(q3);
         quizzesDao.insertQuiz(q4);
 
+        h1=new History(-1, 1, 1,7,56,null);
+        h2=new History(-1, 1, 2,8,60,null);
+        h3=new History(-1, 2, 3,7,56,null);
+        h4=new History(-1, 2, 4,7,56,null);
+
     }
     private History h1;
     private History h2;
     private History h3;
     private History h4;
     private History h5;
-    private History h6;
 
     @Test
     public void testInsert() {
-        h1=new History(-1, 1, 1,7,56,null);
-        h2=new History(-1, 1, 2,8,60,null);
-        h3=new History(-1, 2, 3,7,56,null);
-        h4=new History(-1, 2, 4,7,56,null);
         dao.insertHistory(h1);
         assertTrue(dao.contains(h1));
         assertFalse(dao.contains(h2));
@@ -149,12 +143,14 @@ public class HistoryDaoTest {
         dao.insertHistory(h3);
         dao.insertHistory(h4);
         assertEquals(4, dao.getCount());
-        dao.insertHistory(h1);
-        assertEquals(4, dao.getCount());
     }
+
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertHistory(h1);
+        dao.insertHistory(h2);
+        dao.insertHistory(h3);
+        dao.insertHistory(h4);
         dao.removeHistory(1);
         assertFalse(dao.contains(h1));
         assertEquals(3, dao.getCount());
@@ -164,9 +160,13 @@ public class HistoryDaoTest {
         assertFalse(dao.contains(h3));
         assertEquals(2, dao.getCount());
     }
+
     @Test
     public void testGetHistories(){
-        testInsert();
+        dao.insertHistory(h1);
+        dao.insertHistory(h2);
+        dao.insertHistory(h3);
+        dao.insertHistory(h4);
         ArrayList<History> arr=dao.getHistoriesByUserIdSortedByDate(1);
         assertEquals(2, arr.size());
         assertTrue(arr.contains(h1));
@@ -174,7 +174,11 @@ public class HistoryDaoTest {
     }
     @Test
     public void testGetUserHistoriesByQuizId(){
-        testInsert();
+        dao.insertHistory(h1);
+        dao.insertHistory(h2);
+        dao.insertHistory(h3);
+        dao.insertHistory(h4);
+
         h4=new History(-1, 1, 1,9,56,null);
         h5=new History(-1, 1, 1,10,56,null);
         dao.insertHistory(h4);
@@ -185,7 +189,10 @@ public class HistoryDaoTest {
     }
     @Test
     public void testGetHistoriesByQuizId(){
-        testInsert();
+        dao.insertHistory(h1);
+        dao.insertHistory(h2);
+        dao.insertHistory(h3);
+        dao.insertHistory(h4);
         h4=new History(-1, 1, 2,9,56,null);
         h5=new History(-1, 1, 1,10,56,null);
         dao.insertHistory(h4);

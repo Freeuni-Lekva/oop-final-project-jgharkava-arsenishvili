@@ -2,7 +2,6 @@ package org.ja.model.user;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import org.ja.utils.PasswordHasher;
 import java.util.Objects;
 
 public class User {
@@ -23,10 +22,6 @@ public class User {
         this.photo = photo;
         this.status = status;
     }
-
-//    public boolean checkPassword(String password, String salt) throws NoSuchAlgorithmException {
-//        return PasswordHasher.verifyPassword(password, passwordHashed, salt);
-//    }  //to check the password when the user logs in
 
     public long getId() {
         return id;
@@ -56,6 +51,12 @@ public class User {
     }
     public void setStatus(String status){this.status = status;}
 
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+    public String getSalt() {
+        return salt;
+    }
 
     @Override
     public boolean equals(Object o) {
