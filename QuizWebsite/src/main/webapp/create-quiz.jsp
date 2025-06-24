@@ -29,20 +29,18 @@
 </head>
 
 <%
-    if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
+//    if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
 %>
 
-<body>
-    <div class = "access-denied">
-        <h1>Access Denied</h1>
-        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>
-    </div>
-</body>
+<%--<body>--%>
+<%--    <div class = "access-denied">--%>
+<%--        <h1>Access Denied</h1>--%>
+<%--        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>--%>
+<%--    </div>--%>
+<%--</body>--%>
 
 <%
-        } else {
-        //clear previous session data!!!
-        session.setAttribute(Constants.SessionAttributes.QUIZ, null);
+//        } else {
 %>
 
 <body>
@@ -117,7 +115,7 @@
 </body>
 
 <%
-    }
+//    }
 %>
 </html>
 

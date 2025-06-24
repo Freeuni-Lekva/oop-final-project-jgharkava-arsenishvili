@@ -20,11 +20,21 @@ function showQuestionForm() {
         selectElement.disabled = true;
 
         answerCount = 1;
+
+        if (selectedType === "matching") {
+            addRightOption();
+            addLeftOption();
+        }
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    addAnswerGroup();
+    const selectedType = document.getElementById("questionType").value;
+
+    if (selectedType === "multi-answer"){
+        addAnswerGroup();
+        return;
+    }
 
     const firstMarkButtonMultiChoice = document.querySelector("#multiple-choice-answer-container .mark-button");
     if (firstMarkButtonMultiChoice) {
@@ -371,3 +381,77 @@ document.getElementById("create-question-form").addEventListener("submit", funct
     this.appendChild(hidden);
 });
 
+let rightOptionId = 0;
+let leftOptionId = 0;
+
+function addRightOption(value = "") {
+    const rightContainer = document.getElementById("right-options");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "right-option-wrapper";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = `right-${rightOptionId}`;
+    input.value = value;
+    input.dataset.optionId = rightOptionId.toString();
+    input.placeholder = "Right option";
+    input.required = true;
+
+    input.addEventListener("input", updateAllDropdowns);
+
+    wrapper.appendChild(input);
+    rightContainer.appendChild(wrapper);
+
+    updateAllDropdowns();
+    rightOptionId++;
+}
+
+function addLeftOption() {
+    const leftContainer = document.getElementById("left-options");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "left-group";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = `left-${leftOptionId}`;
+    input.placeholder = "Left option";
+    input.required = true;
+
+    const select = document.createElement("select");
+    select.name = `match-${leftOptionId}`;
+    select.required = true;
+    select.className = "right-select";
+
+    wrapper.appendChild(input);
+    wrapper.appendChild(select);
+
+    leftContainer.appendChild(wrapper);
+
+    updateDropdown(select);
+    leftOptionId++;
+}
+
+function updateAllDropdowns() {
+    const dropdowns = document.querySelectorAll(".right-select");
+    dropdowns.forEach(updateDropdown);
+}
+
+function updateDropdown(selectElement) {
+    const rightInputs = document.querySelectorAll("#right-options input[type='text']");
+    const currentValue = selectElement.value;
+
+    selectElement.innerHTML = "";
+
+    rightInputs.forEach(input => {
+        const option = document.createElement("option");
+        option.value = input.name;
+        option.textContent = input.value || "(empty)";
+        selectElement.appendChild(option);
+    });
+
+    if (currentValue) {
+        selectElement.value = currentValue;
+    }
+}

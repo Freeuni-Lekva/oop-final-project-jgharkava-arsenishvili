@@ -62,6 +62,7 @@ public class Quiz {
         this.questionPlacement = questionPlacement;
         this.questionCorrection = questionCorrection;
     }
+
     public long getId() {
         return id;
     }

@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ja.model.OtherObjects.Answer;
+import org.ja.model.OtherObjects.Match;
 import org.ja.model.quiz.question.*;
 import org.ja.utils.Constants;
 
@@ -21,6 +22,7 @@ public class CreateQuestionServlet extends HttpServlet {
     private String[] answers;
     private String[] isCorrectValues;
     private Map<Question, List<Answer>> questionAnswerMap;
+    private Map<Question, List<Match>> questionMatchMap;
     private HttpServletRequest request;
 
     @Override
@@ -33,11 +35,7 @@ public class CreateQuestionServlet extends HttpServlet {
         answers = request.getParameterValues("answer");
 
         questionAnswerMap = (Map<Question, List<Answer>>) request.getSession().getAttribute(Constants.SessionAttributes.QUESTIONS);
-
-        System.out.println("Bluuuu");
-        System.out.println(questionType);
-        System.out.println(Arrays.toString(answers));
-        System.out.println(questionText);
+        questionMatchMap = (Map<Question, List<Match>>) request.getSession().getAttribute(Constants.SessionAttributes.MATCHES);
 
         switch (questionType) {
             case Constants.QuestionTypes.RESPONSE_QUESTION:
@@ -63,25 +61,21 @@ public class CreateQuestionServlet extends HttpServlet {
                 break;
         }
 
-        System.out.println(Arrays.toString(isCorrectValues));
-
         request.getSession().setAttribute(Constants.SessionAttributes.QUESTIONS, questionAnswerMap);
+        request.getSession().setAttribute(Constants.SessionAttributes.MATCHES, questionMatchMap);
 
         // Debug print
-        for (Map.Entry<Question, List<Answer>> entry : questionAnswerMap.entrySet()) {
-            System.out.println("Question: " + entry.getKey());
-            for (Answer a : entry.getValue()) {
-                System.out.println(" → Answer: " + a);
-            }
-        }
+//        for (Map.Entry<Question, List<Match>> entry : questionMatchMap.entrySet()) {
+//            System.out.println("Question: " + entry.getKey());
+//            for (Match a : entry.getValue()) {
+//                System.out.println(" → Answer: " + a);
+//            }
+//        }
 
-        // You can redirect here if needed
-        // response.sendRedirect("create-question.jsp");
+        response.sendRedirect("create-question.jsp");
     }
 
     private void handleResponseQuestion() {
-        System.out.println("Blu");
-
         question = new ResponseQuestion(questionText);
 
         String joinedAnswers = Arrays.stream(answers)
@@ -180,7 +174,37 @@ public class CreateQuestionServlet extends HttpServlet {
     }
 
     private void handleMatchingQuestion(){
+        Map<String, String[]> paramNames = request.getParameterMap();
 
+        List<String> leftIds = new ArrayList<>();
+        List<String> rightIds = new ArrayList<>();
+        Map<String, String> rightValues = new HashMap<>();
+
+        for (String param: paramNames.keySet()){
+            if (param.startsWith("left-")) {
+                leftIds.add(param.substring(5));
+            } else if (param.startsWith("right-")){
+                String id = param.substring(6);
+                rightIds.add(id);
+                rightValues.put(id, request.getParameter(param).trim());
+            }
+        }
+
+        List<Match> matches = new ArrayList<>();
+
+        for (String id: leftIds){
+            String leftText = request.getParameter("left-" + id).trim();
+            String matchRightId = request.getParameter("match-" + id);
+
+            String matchedRightValue = rightValues.get(matchRightId.replace("right-", ""));
+
+            Match match = new Match(leftText, matchedRightValue);
+            matches.add(match);
+        }
+
+        question = new MatchingQuestion(questionText, leftIds.size());
+
+        questionMatchMap.put(question, matches);
     }
 
 }

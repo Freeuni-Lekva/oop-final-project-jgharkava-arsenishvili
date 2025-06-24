@@ -33,6 +33,8 @@ public class Answer {
 
     public Answer(String answerText){
         this.answerText = answerText;
+        this.answerOrder = 1;
+        this.answerValidity = true;
     }
 
     public Answer(String answerText, int answerOrder, boolean answerValidity){

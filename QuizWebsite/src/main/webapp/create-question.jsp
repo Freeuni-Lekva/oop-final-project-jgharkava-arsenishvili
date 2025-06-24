@@ -157,9 +157,37 @@
     </div>
   </div>
 
+  <div id="<%=Constants.QuestionTypes.MATCHING_QUESTION%>-form" class="questionForm">
+    <h3><%=Constants.QuestionTypes.MATCHING_QUESTION%></h3>
+
+    <label>
+      <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
+    </label>
+
+    <div id="matching-container">
+      <div class="matching-columns">
+        <div class="left-column">
+          <h4>Left Options</h4>
+          <div id="left-options"></div>
+          <button type="button" onclick="addLeftOption()">Add Left Option</button>
+        </div>
+
+        <div class="right-column">
+          <h4>Right Options</h4>
+          <div id="right-options"></div>
+          <button type="button" onclick="addRightOption()">Add Right Option</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class = "save-question-button">
     <button type = "submit" id = "saveQuestionButton">Save Question</button>
   </div>
+</form>
+
+<form action = "finish-quiz" method = "post">
+  <button type = "submit" class = "finish-button">Finish Creating Quiz</button>
 </form>
 
 </body>

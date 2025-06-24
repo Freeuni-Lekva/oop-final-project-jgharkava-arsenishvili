@@ -1,8 +1,5 @@
 package org.ja.servlet;
 
-import org.ja.dao.QuizTagsDao;
-import org.ja.dao.QuizzesDao;
-import org.ja.dao.TagsDao;
 import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.quiz.Quiz;
 import org.ja.utils.Constants;
@@ -19,11 +16,6 @@ public class CreateQuizServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
-        QuizTagsDao quizTagsDao = (QuizTagsDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
-        TagsDao tagsDao = (TagsDao) getServletContext().getAttribute(Constants.ContextAttributes.TAGS_DAO);
-
-
         String title = request.getParameter("quizTitle");
         String description = request.getParameter("quizDescription");
         String category = request.getParameter("category");
@@ -58,6 +50,7 @@ public class CreateQuizServlet extends HttpServlet {
         request.getSession().setAttribute(Constants.SessionAttributes.TAGS_TO_ADD, tagIds);
 
         String otherTag = request.getParameter("otherTag");
+        System.out.println(otherTag);
 
         if (otherTag != null && !otherTag.trim().isEmpty()){
             Tag tag = new Tag();
@@ -66,7 +59,7 @@ public class CreateQuizServlet extends HttpServlet {
             request.getSession().setAttribute(Constants.SessionAttributes.TAG_TO_CREATE, tag);
         }
 
-        response.sendRedirect("add-questions.jsp");
+        response.sendRedirect("create-question.jsp");
     }
 
 }
