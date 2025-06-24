@@ -24,7 +24,7 @@ public class QuizTagsDao {
 
     /// if already exists row with same quizId and tagId throws RuntimeException
     public void insertQuizTag(QuizTag quizTag) {
-        String sql = "insert into quiz_tag values (?,?)";
+        String sql = "INSERT INTO quiz_tag VALUES (?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -95,12 +95,14 @@ public class QuizTagsDao {
 
             return false;
         } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
+            throw new RuntimeException("Error checking QuizTag existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private QuizTag retrieveQuizTag(ResultSet rs) throws SQLException {
         return new QuizTag(rs.getLong("quiz_id"), rs.getLong("tag_id"));
     }

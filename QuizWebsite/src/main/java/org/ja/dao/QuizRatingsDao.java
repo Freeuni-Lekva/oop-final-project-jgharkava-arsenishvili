@@ -25,7 +25,8 @@ public class QuizRatingsDao {
         this.dataSource = dataSource;
     }
 
-    /// if already exists in table, updates rating and review
+    /// if already exists in table, updates row
+    /// updates quiz rating in quizzes table
     public void insertQuizRating(QuizRating qr) {
         String sql = "INSERT INTO quiz_rating (quiz_id, user_id, rating, review) " +
                 "VALUES (?, ?, ?, ?) ";
@@ -41,6 +42,7 @@ public class QuizRatingsDao {
             cnt++;
         }
         catch (SQLException e) {
+            // if already exists (quiz_id, user_id)
             if (e.getErrorCode() == 1062 || e.getErrorCode() == 23505) {
                 String updateSql = "UPDATE quiz_rating SET rating = ?, review = ? WHERE quiz_id = ? AND user_id = ?";
 
@@ -56,11 +58,12 @@ public class QuizRatingsDao {
                 } catch (SQLException ex) {
                     throw new RuntimeException("Failed to update quiz_rating after duplicate insert", ex);
                 }
-
             } else {
                 throw new RuntimeException("Error inserting or updating quiz rating in database", e);
             }
         }
+
+        updateQuizRating(qr.getQuizId());
     }
 
     public void removeQuizRating(long quizId, long userId){
@@ -176,5 +179,43 @@ public class QuizRatingsDao {
     private QuizRating retrieveQuizRating(ResultSet rs) throws SQLException {
         return new QuizRating(rs.getLong("quiz_id"), rs.getLong("user_id"),
                 rs.getInt("rating"), rs.getString("review"));
+    }
+
+    private void updateQuizRating(long quizId) {
+        String selectSQL = "SELECT AVG(rating) AS avgRating FROM quiz_rating WHERE quiz_id = ?";
+        String updateSQL = "UPDATE quizzes SET average_rating = ? WHERE quiz_id = ?";
+
+        double averageRating = -1;
+
+        // 1. Fetch average rating
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(selectSQL)) {
+
+            ps.setLong(1, quizId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    averageRating = rs.getDouble("avgRating");
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying average of quiz ratings from quiz_rating table", e);
+        }
+
+        if (averageRating == -1) {
+            return;
+        }
+
+        // 2. Update average rating in quizzes table
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(updateSQL)) {
+
+            ps.setDouble(1, averageRating);
+            ps.setLong(2, quizId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating average rating of quiz in quizzes table", e);
+        }
     }
 }

@@ -29,7 +29,8 @@ public class HistoriesDao {
         this.dataSource = dataSource;
     }
 
-    public void insertHistory(History history){
+    /// updates quizs participant count in quizzes table
+    public void insertHistory(History history) throws SQLException{
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -61,6 +62,8 @@ public class HistoriesDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting history into database", e);
         }
+
+        updateQuizParticipantCount(history.getQuizId());
     }
 
     public void removeHistory(long historyId){
@@ -264,5 +267,39 @@ public class HistoriesDao {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
                 rs.getLong("quiz_id"), rs.getLong("score"),
                 rs.getDouble("completion_time"), rs.getTimestamp("completion_date"));
+    }
+
+    private void updateQuizParticipantCount(long quizId) throws SQLException {
+        String selectSQl = "SELECT COUNT(DISTINCT  user_id) AS participantCount FROM history WHERE quiz_id = ?";
+        String updateSQL = "UPDATE quizzes SET participant_count = ? WHERE quiz_id = ?";
+
+        long participantCount = -1;
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(selectSQl)){
+
+            ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    participantCount = rs.getLong("participantCount");
+
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error querying number of participants from quiz database", e);
+        }
+        if(participantCount == -1) {
+            return;
+        }
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(updateSQL)){
+
+            ps.setLong(1, participantCount);
+            ps.setLong(2, quizId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error inserting number of participants into database", e);
+        }
     }
 }

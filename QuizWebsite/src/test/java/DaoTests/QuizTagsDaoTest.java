@@ -149,6 +149,10 @@ public class QuizTagsDaoTest {
             tagsDao.insertTag(t3);
             tagsDao.insertTag(t4);
             dao=new QuizTagsDao(basicDataSource);
+
+            qt1=new QuizTag(1,1);
+            qt2=new QuizTag(2,2);
+            qt3=new QuizTag(3,3);
         }
     }
     private QuizTag qt1;
@@ -158,20 +162,21 @@ public class QuizTagsDaoTest {
     private QuizTag qt5;
     @Test
     public void testInsert() {
-        qt1=new QuizTag(1,1);
-        qt2=new QuizTag(2,2);
-        qt3=new QuizTag(3,3);
         dao.insertQuizTag(qt1);
         dao.insertQuizTag(qt2);
         dao.insertQuizTag(qt3);
         assertEquals(3, dao.getCount());
-        dao.insertQuizTag(qt3);
+        assertThrows(RuntimeException.class, () -> {
+            dao.insertQuizTag(qt3);
+        });
         assertEquals(3, dao.getCount());
 
     }
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertQuizTag(qt1);
+        dao.insertQuizTag(qt2);
+        dao.insertQuizTag(qt3);
         dao.removeQuizTag(1,1);
         assertEquals(2, dao.getCount());
         assertFalse(dao.contains(new QuizTag(1,1)));
@@ -179,7 +184,10 @@ public class QuizTagsDaoTest {
     }
     @Test
     public void testGetQuizTagsByQuizId() {
-        testInsert();
+        dao.insertQuizTag(qt1);
+        dao.insertQuizTag(qt2);
+        dao.insertQuizTag(qt3);
+
         qt4=new QuizTag(1,3);
         qt5=new QuizTag(1,4);
         dao.insertQuizTag(qt4);

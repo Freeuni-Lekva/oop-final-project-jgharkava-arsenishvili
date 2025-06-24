@@ -135,7 +135,7 @@ public class HistoryDaoTest {
     private History h5;
 
     @Test
-    public void testInsert() {
+    public void testInsert() throws SQLException {
         dao.insertHistory(h1);
         assertTrue(dao.contains(h1));
         assertFalse(dao.contains(h2));
@@ -146,7 +146,7 @@ public class HistoryDaoTest {
     }
 
     @Test
-    public void testRemove() {
+    public void testRemove() throws SQLException {
         dao.insertHistory(h1);
         dao.insertHistory(h2);
         dao.insertHistory(h3);
@@ -162,7 +162,7 @@ public class HistoryDaoTest {
     }
 
     @Test
-    public void testGetHistories(){
+    public void testGetHistories() throws SQLException {
         dao.insertHistory(h1);
         dao.insertHistory(h2);
         dao.insertHistory(h3);
@@ -173,7 +173,7 @@ public class HistoryDaoTest {
         assertTrue(arr.contains(h2));
     }
     @Test
-    public void testGetUserHistoriesByQuizId(){
+    public void testGetUserHistoriesByQuizId() throws SQLException {
         dao.insertHistory(h1);
         dao.insertHistory(h2);
         dao.insertHistory(h3);
@@ -188,7 +188,7 @@ public class HistoryDaoTest {
         assertTrue(arr.contains(h4));
     }
     @Test
-    public void testGetHistoriesByQuizId(){
+    public void testGetHistoriesByQuizId() throws SQLException {
         dao.insertHistory(h1);
         dao.insertHistory(h2);
         dao.insertHistory(h3);

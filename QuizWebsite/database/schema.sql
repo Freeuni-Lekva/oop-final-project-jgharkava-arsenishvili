@@ -138,7 +138,7 @@ create table quiz_tag(
     quiz_id bigint not null,
     tag_id bigint not null,
 
-    unique(quiz_id, tag_id),
+    primary key (quiz_id, tag_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (tag_id) references tags(tag_id) on delete cascade
 );

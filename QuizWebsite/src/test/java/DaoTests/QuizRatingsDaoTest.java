@@ -3,29 +3,23 @@ package DaoTests;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
 import org.ja.model.CategoriesAndTags.Category;
-import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.OtherObjects.*;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.quiz.question.Question;
 import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-public class QuizRatingDaoTest {
+public class QuizRatingsDaoTest {
 
     private BasicDataSource basicDataSource;
     private QuizRatingsDao dao;
@@ -158,7 +152,11 @@ public class QuizRatingDaoTest {
 
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertQuizRating(qr1);
+        dao.insertQuizRating(qr2);
+        dao.insertQuizRating(qr3);
+        dao.insertQuizRating(qr4);
+        dao.insertQuizRating(qr5);
         dao.removeQuizRating(1,1);
         assertFalse(dao.contains(qr5));
         assertEquals(3, dao.getCount());
@@ -166,7 +164,11 @@ public class QuizRatingDaoTest {
 
     @Test
     public void testGetQuizRatingsByUserId() {
-        testInsert();
+        dao.insertQuizRating(qr1);
+        dao.insertQuizRating(qr2);
+        dao.insertQuizRating(qr3);
+        dao.insertQuizRating(qr4);
+        dao.insertQuizRating(qr5);
         ArrayList<QuizRating> arr=dao.getQuizRatingsByUserId(1);
         assertEquals(2, arr.size());
         assertTrue(arr.contains(qr5));
@@ -175,7 +177,11 @@ public class QuizRatingDaoTest {
 
     @Test
     public void testGetQuizRatingsByQuizId() {
-        testInsert();
+        dao.insertQuizRating(qr1);
+        dao.insertQuizRating(qr2);
+        dao.insertQuizRating(qr3);
+        dao.insertQuizRating(qr4);
+        dao.insertQuizRating(qr5);
         ArrayList<QuizRating> arr=dao.getQuizRatingsByQuizId(1);
         assertEquals(2, arr.size());
         assertTrue(arr.contains(qr5));
