@@ -61,6 +61,9 @@ public class HistoriesDao {
                     }
                 }
             }
+
+
+
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting history into database", e);
         }

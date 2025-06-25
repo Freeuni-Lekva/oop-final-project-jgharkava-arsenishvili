@@ -3,9 +3,7 @@ package org.ja.dao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.Filters.Filter;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
 
-import java.security.spec.ECField;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -227,9 +225,9 @@ public class QuizzesDao {
     }
 
     public ArrayList<Quiz> filterQuizzes(Filter filter) {
-        String sql = "SELECT DISTINCT quiz_id, quiz_name, quiz_description, average_rating, " +
-                "participant_count, creation_date, time_limit_in_minutes, category_id, " +
-                "creator_id, question_order_status, question_placement_status, question_correction_status " +
+        String sql = "SELECT DISTINCT quizzes.quiz_id, quiz_name, quiz_description, average_rating, " +
+                "participant_count, creation_date, time_limit_in_minutes, quizzes.category_id, " +
+                "creator_id, question_order_status, question_placement_status, question_correction_status, quiz_score " +
                 "FROM quizzes left join categories on categories.category_id = quizzes.category_id " +
                 "left join quiz_tag on quizzes.quiz_id = quiz_tag.quiz_id " +
                 "left join tags on tags.tag_id = quiz_tag.tag_id " +
@@ -403,6 +401,7 @@ public class QuizzesDao {
             throw new RuntimeException("Error inserting number of participants into database", e);
         }
     }
+
     public boolean containsQuiz(String name) {
         String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_name = ?";
 
