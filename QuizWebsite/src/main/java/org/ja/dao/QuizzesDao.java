@@ -76,8 +76,21 @@ public class QuizzesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if(rs.next()) {
                     cnt++;
-                    quiz.setId(rs.getLong(1));
-                    //quiz.setCreationDate(rs.getTimestamp("creation_date"));
+
+                    long quizId = rs.getLong(1);
+                    quiz.setId(quizId);
+
+                    String s = "SELECT creation_date FROM quizzes where quiz_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, quizId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next()) {
+                                quiz.setCreationDate(r.getTimestamp("creation_date"));
+                            }
+                        }
+                    }
                 }
             }
 
@@ -265,6 +278,41 @@ public class QuizzesDao {
         return quizzes;
     }
 
+    public ArrayList<Quiz> getFriendsQuizzesSortedByCreationDate(long userId) {
+        String sql = "SELECT q.*" +
+                "        FROM quizzes q" +
+                "        JOIN (" +
+                "            SELECT" +
+                "                CASE" +
+                "                    WHEN first_user_id = ? THEN second_user_id" +
+                "                    ELSE first_user_id" +
+                "                END AS friend_id" +
+                "            FROM friendships" +
+                "            WHERE (first_user_id = ? OR second_user_id = ?)" +
+                "              AND friendship_status = 'friends'" +
+                "        ) f ON q.creator_id = f.friend_id" +
+                "        ORDER BY q.creation_date DESC";
+        ArrayList<Quiz> quizzes = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)){
+             stmt.setLong(1, userId);
+             stmt.setLong(2, userId);
+             stmt.setLong(3, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()){
+                    quizzes.add(retrieveQuiz(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quizzes by creation date", e);
+        }
+
+        return quizzes;
+    }
+
     //  TO DELETE: probably not useful due to filter.
     public ArrayList<Quiz> getQuizzesSortedByParticipantCount() {
         String sql = "SELECT * FROM quizzes ORDER BY participant_count DESC";
@@ -394,6 +442,7 @@ public class QuizzesDao {
     public long getCount(){
         return cnt;
     }
+
     public Quiz getQuizById(long id) {
         String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
         try (Connection connection = dataSource.getConnection();
@@ -411,6 +460,24 @@ public class QuizzesDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving quiz by ID", e);
         }
+    }
+
+    public ArrayList<Quiz> getQuizzesByCreatorId(long id) {
+        String sql = "SELECT * FROM quizzes WHERE creator_id = ?";
+        ArrayList<Quiz> quizzes = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)){
+             stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quizzes.add(retrieveQuiz(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quizzes by creator id", e);
+        }
+        return quizzes;
     }
 
     private Quiz retrieveQuiz(ResultSet rs) throws SQLException {

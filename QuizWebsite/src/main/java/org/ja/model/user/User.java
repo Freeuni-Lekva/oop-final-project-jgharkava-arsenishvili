@@ -43,9 +43,6 @@ public class User {
     public String getPasswordHashed() {return passwordHashed;}
     public void setPasswordHashed(String passwordHashed){this.passwordHashed = passwordHashed;}
 
-    public String getSalt(){return salt;}
-    public void setSalt(String salt){this.salt = salt;}
-
     public Timestamp getRegistrationDate() {return registrationDate;}
     public void setRegistrationDate(Timestamp registrationDate){this.registrationDate = registrationDate;}
 
@@ -58,6 +55,9 @@ public class User {
         return status;
     }
     public void setStatus(String status){this.status = status;}
+
+    public String getSalt(){return salt;}
+    public void setSalt(String salt){this.salt = salt;}
 
     @Override
     public boolean equals(Object o) {

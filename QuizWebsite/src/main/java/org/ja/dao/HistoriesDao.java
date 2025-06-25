@@ -46,8 +46,19 @@ public class HistoriesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    history.setHistoryId(rs.getLong(1));
-                    history.setCompletionDate(rs.getTimestamp("completion_date"));
+                    long historyId = rs.getLong("history_id");
+                    history.setHistoryId(historyId);
+
+                    String s = "SELECT completion_date FROM history where history_id = ?";
+
+                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
+                        preparedStatement.setLong(1, historyId);
+
+                        try (ResultSet r = preparedStatement.executeQuery()) {
+                            if (r.next())
+                                history.setCompletionDate(r.getTimestamp("completion_date"));
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -171,6 +182,42 @@ public class HistoriesDao {
 
         return historyList;
     }
+
+    public ArrayList<History> getUserFriendsHistorySortedByCompletionDate(long userId){
+        ArrayList<History> historyList = new ArrayList<>();
+
+        String sql = "SELECT h.* " +
+                "FROM history h " +
+                "JOIN (" +
+                "    SELECT " +
+                "        CASE " +
+                "            WHEN first_user_id = ? THEN second_user_id " +
+                "            ELSE first_user_id " +
+                "        END AS friend_id " +
+                "    FROM friendships " +
+                "    WHERE (first_user_id = ? OR second_user_id = ?) " +
+                "      AND friendship_status = 'friends' " +
+                ") f ON h.user_id = f.friend_id " +
+                "ORDER BY h.completion_date DESC";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, userId);
+            ps.setLong(2, userId);
+            ps.setLong(3, userId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    historyList.add(retrieveHistory(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving histories for friends by quiz_id and user_id from database", e);
+        }
+
+        return historyList;
+    }
+
     public boolean contains(History h){
         if(h==null){
             return false;

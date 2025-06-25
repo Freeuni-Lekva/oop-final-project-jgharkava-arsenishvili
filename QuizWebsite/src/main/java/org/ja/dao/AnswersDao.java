@@ -46,7 +46,7 @@ public class AnswersDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    answer.setAnswerId(rs.getLong(1));
+                    answer.setAnswerId(rs.getLong("answer_id"));
                 }
 
             }

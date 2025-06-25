@@ -24,9 +24,22 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
+/*
+    create table history(
+    history_id bigint primary key auto_increment,
+    user_id bigint not null,
+    quiz_id bigint not null,
+    score bigint not null default 0,
+    completion_time double not null,
+    completion_date timestamp default current_timestamp,
+
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
+    foreign key (user_id) references users(user_id) on delete cascade
+);
+
+ */
 
 public class MatchesDaoTest {
-
     private BasicDataSource basicDataSource;
     private MatchesDao dao;
     private QuestionDao questionsDao;
@@ -36,6 +49,7 @@ public class MatchesDaoTest {
     Question qu11;
     Question qu12;
     Question qu13;
+
     @BeforeEach
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();

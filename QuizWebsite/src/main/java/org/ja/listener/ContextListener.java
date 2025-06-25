@@ -26,8 +26,13 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(Constants.ContextAttributes.QUESTIONS_DAO, new QuestionDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.MATCHES_DAO, new MatchesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.ANSWERS_DAO, new AnswersDao(ds));
-
-
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO, new AnnouncementsDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.HISTORIES_DAO, new HistoriesDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.MESSAGE_DAO, new MessageDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.CHALLENGES_DAO, new ChallengesDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO, new UserAchievementsDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO, new AchievementsDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO, new FriendShipsDao(ds));
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
