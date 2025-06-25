@@ -2,7 +2,6 @@ package org.ja.model.user;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import org.ja.utils.PasswordHasher;
 import java.util.Objects;
 
 public class User {

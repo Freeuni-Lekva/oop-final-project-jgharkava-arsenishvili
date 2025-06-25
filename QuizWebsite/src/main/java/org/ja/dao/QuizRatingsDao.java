@@ -54,6 +54,7 @@ public class QuizRatingsDao {
             throw new RuntimeException("Error inserting quiz rating into database", e);
         }
     }
+
     public void updateQuizRating(QuizRating qr){
         String sql = "UPDATE quiz_rating SET rating=?, review=? WHERE quiz_id=? AND user_id=?";
 
