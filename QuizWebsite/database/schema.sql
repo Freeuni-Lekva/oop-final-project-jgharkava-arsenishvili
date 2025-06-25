@@ -92,8 +92,8 @@ create table questions(
     ),
 
     check (
-        question_type not in ('multi-answer', 'matching')
-        or num_answers > 1
+        question_type in ('multi-answer', 'multi-choice-multi-answers', 'matching')
+        or num_answers = 1
     ),
 
     check (

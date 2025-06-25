@@ -26,6 +26,11 @@ public class CreateQuestionServlet extends HttpServlet {
     private HttpServletRequest request;
 
     @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.sendRedirect("create-question.jsp");
+    }
+
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         this.request = request;
         questionText = request.getParameter("questionText");
@@ -64,7 +69,7 @@ public class CreateQuestionServlet extends HttpServlet {
         request.getSession().setAttribute(Constants.SessionAttributes.QUESTIONS, questionAnswerMap);
         request.getSession().setAttribute(Constants.SessionAttributes.MATCHES, questionMatchMap);
 
-        // Debug print
+        // Debug print just in case TODO delete
 //        for (Map.Entry<Question, List<Match>> entry : questionMatchMap.entrySet()) {
 //            System.out.println("Question: " + entry.getKey());
 //            for (Match a : entry.getValue()) {
@@ -72,6 +77,7 @@ public class CreateQuestionServlet extends HttpServlet {
 //            }
 //        }
 
+        request.getSession().setAttribute(Constants.SessionAttributes.HAS_QUESTIONS, true);
         response.sendRedirect("create-question.jsp");
     }
 
@@ -177,7 +183,6 @@ public class CreateQuestionServlet extends HttpServlet {
         Map<String, String[]> paramNames = request.getParameterMap();
 
         List<String> leftIds = new ArrayList<>();
-        List<String> rightIds = new ArrayList<>();
         Map<String, String> rightValues = new HashMap<>();
 
         for (String param: paramNames.keySet()){
@@ -185,7 +190,6 @@ public class CreateQuestionServlet extends HttpServlet {
                 leftIds.add(param.substring(5));
             } else if (param.startsWith("right-")){
                 String id = param.substring(6);
-                rightIds.add(id);
                 rightValues.put(id, request.getParameter(param).trim());
             }
         }

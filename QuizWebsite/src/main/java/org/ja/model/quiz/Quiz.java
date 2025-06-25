@@ -1,5 +1,6 @@
 package org.ja.model.quiz;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 /*
 create table quizzes(
@@ -55,6 +56,24 @@ public class Quiz {
         this.avgRating = avgRating;
         this.participantCount = participantCount;
         this.creationDate = creationDate;
+        this.timeInMinutes = timeInMinutes;
+        this.categoryId = categoryId;
+        this.creatorId = creatorId;
+        this.questionOrder = questionOrder;
+        this.questionPlacement = questionPlacement;
+        this.questionCorrection = questionCorrection;
+    }
+
+    public Quiz(String name, String description, int timeInMinutes,
+                long categoryId, long creatorId, String questionOrder,
+                String questionPlacement, String questionCorrection) {
+        this.id = 0L;
+        this.name = name;
+        this.description = description;
+        this.quizScore = 0;
+        this.avgRating = 0;
+        this.participantCount = 0;
+        this.creationDate = Timestamp.from(Instant.now());
         this.timeInMinutes = timeInMinutes;
         this.categoryId = categoryId;
         this.creatorId = creatorId;

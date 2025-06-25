@@ -29,18 +29,18 @@
 </head>
 
 <%
-//    if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
+    if (session.getAttribute(Constants.SessionAttributes.USER) == null) {
 %>
 
-<%--<body>--%>
-<%--    <div class = "access-denied">--%>
-<%--        <h1>Access Denied</h1>--%>
-<%--        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>--%>
-<%--    </div>--%>
-<%--</body>--%>
+<body>
+    <div class = "access-denied">
+        <h1>Access Denied</h1>
+        <p>You must <a href = "index.jsp" style = "color: cornflowerblue;">log in</a> to create a quiz</p>
+    </div>
+</body>
 
 <%
-//        } else {
+        } else {
 %>
 
 <body>
@@ -67,7 +67,7 @@
 
                     <div class = "checkbox-scroll-pane">
                         <div class="checkbox-wrapper other-wrapper">
-                            <input type="checkbox" id="tag_other" name="tags" value="" onclick="toggleOtherInput(this)">
+                            <input type="checkbox" id="tag_other" name="tag_editor" value="" onclick="toggleOtherInput(this)">
                             <label class="checkbox-button" for="tag_other">Other</label>
                             <input type="text" id="otherTagInput" name="otherTag" placeholder="Enter your tag" oninput="updateOtherValue()">
                         </div>
@@ -115,7 +115,7 @@
 </body>
 
 <%
-//    }
+    }
 %>
 </html>
 

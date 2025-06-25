@@ -2,6 +2,7 @@ package org.ja.servlet;
 
 import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.quiz.Quiz;
+import org.ja.model.user.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.annotation.WebServlet;
@@ -16,10 +17,12 @@ public class CreateQuizServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        User user = (User) request.getSession().getAttribute(Constants.SessionAttributes.USER);
+
         String title = request.getParameter("quizTitle");
         String description = request.getParameter("quizDescription");
         String category = request.getParameter("category");
-        String[] tags = request.getParameterValues("tags[]");
+        String[] tags = request.getParameterValues("tags");
         String time = request.getParameter("quizDuration");
         String orderType = request.getParameter("orderType");
         String placementType = request.getParameter("placementType");
@@ -28,14 +31,7 @@ public class CreateQuizServlet extends HttpServlet {
         long categoryId = Integer.parseInt(category);
         int timeLimit = Integer.parseInt(time);
 
-        Quiz quiz = new Quiz();
-        quiz.setName(title);
-        quiz.setDescription(description);
-        quiz.setCategoryId(categoryId);
-        quiz.setTimeInMinutes(timeLimit);
-        quiz.setQuestionOrder(orderType);
-        quiz.setQuestionPlacement(placementType);
-        quiz.setQuestionCorrection(correctionType);
+        Quiz quiz = new Quiz(title, description, timeLimit, categoryId, user.getId(), orderType, placementType, correctionType);
 
         request.getSession().setAttribute(Constants.SessionAttributes.QUIZ, quiz);
 
@@ -50,11 +46,9 @@ public class CreateQuizServlet extends HttpServlet {
         request.getSession().setAttribute(Constants.SessionAttributes.TAGS_TO_ADD, tagIds);
 
         String otherTag = request.getParameter("otherTag");
-        System.out.println(otherTag);
 
         if (otherTag != null && !otherTag.trim().isEmpty()){
-            Tag tag = new Tag();
-            tag.setTagName(otherTag);
+            Tag tag = new Tag(otherTag);
 
             request.getSession().setAttribute(Constants.SessionAttributes.TAG_TO_CREATE, tag);
         }

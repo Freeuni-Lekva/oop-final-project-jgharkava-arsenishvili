@@ -57,6 +57,7 @@ public class Constants {
         public static final String TAGS_TO_ADD = "tags-to-add";
         public static final String TAG_TO_CREATE = "tag-to-create";
         public static final String MATCHES = "current-matches";
+        public static final String HAS_QUESTIONS = "hasQuestions";
 
     }
 }

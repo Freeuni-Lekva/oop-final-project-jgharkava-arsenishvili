@@ -11,6 +11,11 @@ public class Tag {
         this.tagName = tagName;
     }
 
+    public Tag(String tagName){
+        this.tagId = 0L;
+        this.tagName = tagName;
+    }
+
     public String getTagName() {
         return tagName;
     }

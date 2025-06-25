@@ -52,7 +52,7 @@ public class QuizzesDao {
             return;
         }*/
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, quiz_score, average_rating, " +
-                "participant_count,time_limit_in_minutes, category_id," +
+                "participant_count, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
                 "question_correction_status ) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -76,8 +76,8 @@ public class QuizzesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if(rs.next()) {
                     cnt++;
-                    quiz.setId(rs.getLong("quiz_id"));
-                    quiz.setCreationDate(rs.getTimestamp("creation_date"));
+                    quiz.setId(rs.getLong(1));
+                    //quiz.setCreationDate(rs.getTimestamp("creation_date"));
                 }
             }
 

@@ -28,9 +28,9 @@ public class AnswersDao {
     }
 
     public void insertAnswer(Answer answer) {
-        if(contains(answer)) {
-            return;
-        }
+//        if(contains(answer)) {
+//            return;
+//        }
         String sql = "INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();

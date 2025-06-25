@@ -14,6 +14,8 @@ function showQuestionForm() {
     });
 
     if (selectedType) {
+        document.getElementById("discardQuestionContainer").style.display = "block";
+
         let hiddenInput = document.getElementById("questionTypeHidden");
         hiddenInput.value = selectedType;
 
@@ -27,6 +29,13 @@ function showQuestionForm() {
         }
     }
 }
+
+window.addEventListener("DOMContentLoaded", function (){
+    const finishButton = document.getElementById("finishQuizButton");
+    if (finishButton && hasQuestionFromSession){
+        finishButton.disabled = false;
+    }
+})
 
 document.addEventListener("DOMContentLoaded", function () {
     const selectedType = document.getElementById("questionType").value;
@@ -101,12 +110,13 @@ function addAnswerOption(containerId) {
         buttonRow.appendChild(markButton);
     }
 
-    const addOptionButton = document.createElement("button");
-    addOptionButton.type = "button";
-    addOptionButton.textContent = (isMultipleChoice || isMultipleChoiceMultiAnswer) ?
-        "Add another option..." : "Add another answer...";
-    addOptionButton.onclick = function() { addAnswerOption(containerId); };
-    buttonRow.appendChild(addOptionButton);
+    if (containerId === "multi-answer-container") {
+        const addOptionButton = document.createElement("button");
+        addOptionButton.type = "button";
+        addOptionButton.textContent = "Add another answer...";
+        addOptionButton.onclick = function() { addAnswerOption(containerId); };
+        buttonRow.appendChild(addOptionButton);
+    }
 
     optionBlock.appendChild(label);
     optionBlock.appendChild(textarea);
@@ -455,3 +465,12 @@ function updateDropdown(selectElement) {
         selectElement.value = currentValue;
     }
 }
+
+function confirmDiscard(){
+    return confirm("Are you sure you want to discard all changes? This cannot be undone.");
+}
+
+function confirmQuestionDiscard(){
+    return confirm("Are you sure you want to discard this question?");
+}
+

@@ -10,6 +10,10 @@
 <!DOCTYPE html>
 <html>
 
+<script>
+  const hasQuestionFromSession = <%= session.getAttribute(Constants.SessionAttributes.HAS_QUESTIONS) %>;
+</script>
+
 <head>
   <title>Create Question</title>
   <link rel = "stylesheet" href = "css/create-question.css" />
@@ -186,9 +190,20 @@
   </div>
 </form>
 
-<form action = "finish-quiz" method = "post">
-  <button type = "submit" class = "finish-button">Finish Creating Quiz</button>
+<form id = "finish-quiz-form" action = "finish-quiz" method = "post">
+  <button type = "submit" id = "finishQuizButton" disabled>Finish Creating Quiz</button>
 </form>
+
+<form id = "discard-form" action = "discard-quiz" method = "post" onsubmit = "return confirmDiscard();">
+  <button type = "submit" id = "discardChangesButton">Discard All Changes</button>
+</form>
+
+<div id = "discardQuestionContainer" style = "display: none;">
+  <form id = "discard-question-form" action = "create-question" method = "get" onsubmit = "return confirmQuestionDiscard();">
+    <button type = "submit" id = "discardQuestionButton">Discard Question</button>
+  </form>
+
+</div>
 
 </body>
 

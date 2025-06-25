@@ -27,9 +27,9 @@ public class MatchesDao {
     }
 
     public void insertMatch(Match match) {
-        if(contains(match)) {
-            return;
-        }
+//        if(contains(match)) {
+//            return;
+//        }
         String sql = "insert into matches (question_id, left_match, right_match) values(?,?,?)";
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {

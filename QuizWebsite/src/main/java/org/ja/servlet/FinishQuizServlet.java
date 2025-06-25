@@ -36,20 +36,25 @@ public class FinishQuizServlet extends HttpServlet {
         List<Long> tagIds = (List<Long>) session.getAttribute(Constants.SessionAttributes.TAGS_TO_ADD);
         Tag tagToAdd = (Tag) session.getAttribute(Constants.SessionAttributes.TAG_TO_CREATE);
 
-        System.out.println("Quiz: " + quiz);
-        System.out.println("Question → Answer map: " + questionAnswerMap);
-        System.out.println("Question → Match map: " + questionMatchMap);
-        System.out.println("Tag IDs to add: " + tagIds);
-        System.out.println("Tag to create: " + tagToAdd);
-
+        // resetting data stored
         session.setAttribute(Constants.SessionAttributes.QUESTIONS, new HashMap<Question, List<Answer>>());
         session.setAttribute(Constants.SessionAttributes.MATCHES, new HashMap<Question, List<Match>>());
         session.setAttribute(Constants.SessionAttributes.QUIZ, null);
         session.setAttribute(Constants.SessionAttributes.TAGS_TO_ADD, null);
         session.setAttribute(Constants.SessionAttributes.TAG_TO_CREATE, null);
+        session.setAttribute(Constants.SessionAttributes.HAS_QUESTIONS, false);
 
         if (quiz == null) return;
 
+        int score = questionAnswerMap.keySet().stream()
+                    .mapToInt(Question::getNumAnswers)
+                    .sum();
+
+        score += questionMatchMap.keySet().stream()
+                .mapToInt(Question::getNumAnswers)
+                .sum();
+
+        quiz.setScore(score);
         quizzesDao.insertQuiz(quiz);
 
         if (tagToAdd != null) {
@@ -64,7 +69,7 @@ public class FinishQuizServlet extends HttpServlet {
                 .forEach(quizTagsDao::insertQuizTag);
 
 
-        Optional.ofNullable(questionAnswerMap)
+        Optional.of(questionAnswerMap)
                 .filter(map -> !map.isEmpty())
                 .ifPresent(map -> map.forEach((question, answers) -> {
                     question.setQuizId(quiz.getId());
@@ -76,7 +81,7 @@ public class FinishQuizServlet extends HttpServlet {
                     });
                 }));
 
-        Optional.ofNullable(questionMatchMap)
+        Optional.of(questionMatchMap)
                 .filter(map -> !map.isEmpty())
                 .ifPresent(map -> map.forEach((question, matches) -> {
                     question.setQuizId(quiz.getId());

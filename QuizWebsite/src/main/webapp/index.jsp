@@ -23,6 +23,7 @@
 </label>
     <input type="submit" value="Login" />
 </form>
+<a href="sign-up.jsp"> sin up</a>
 <p><a href="create-quiz.jsp">Sign Up Here</a></p>
 
 </body>
