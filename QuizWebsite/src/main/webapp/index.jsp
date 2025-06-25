@@ -24,6 +24,5 @@
     <input type="submit" value="Login" />
 </form>
 <p><a href="sign-up.jsp">Sign Up Here</a></p>
-
 </body>
 </html>

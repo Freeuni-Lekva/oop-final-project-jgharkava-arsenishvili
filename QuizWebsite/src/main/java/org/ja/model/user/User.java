@@ -2,7 +2,6 @@ package org.ja.model.user;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
-import org.ja.utils.PasswordHasher;
 import java.util.Objects;
 
 public class User {
@@ -42,9 +41,6 @@ public class User {
 
     public String getPasswordHashed() {return passwordHashed;}
     public void setPasswordHashed(String passwordHashed){this.passwordHashed = passwordHashed;}
-
-    public String getSalt(){return salt;}
-    public void setSalt(String salt){this.salt = salt;}
 
     public Timestamp getRegistrationDate() {return registrationDate;}
     public void setRegistrationDate(Timestamp registrationDate){this.registrationDate = registrationDate;}
