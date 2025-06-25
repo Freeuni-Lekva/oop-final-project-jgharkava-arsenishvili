@@ -157,6 +157,4 @@ public class MessagesDaoTest {
         assertEquals(1, arr4.size());
 
     }
-
-
 }
