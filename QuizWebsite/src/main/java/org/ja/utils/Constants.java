@@ -14,6 +14,7 @@ public class Constants {
         public static final String USERS_DAO = "userDao";
         public static final String QUIZZES_DAO = "quizzesDao";
         public static final String HISTORIES_DAO = "historyDao";
+        public static final String ADMINISTRATORS_DAO = "administratorsDao";
         public static final String ANSWERS_DAO = "answersDao";
         public static final String ACHIEVEMENTS_DAO = "achievementsDao";
         public static final String ANNOUNCEMENTS_DAO = "announcementsDao";
