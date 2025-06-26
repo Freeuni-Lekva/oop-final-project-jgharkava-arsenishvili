@@ -260,6 +260,14 @@
   <p>No new friend requests.</p>
   <%}%>
 </div>
+
+<!-- administrator-->
+<div>
+  <%
+    if(user.getStatus().equals("administrator")){ %>
+    <a href="administrator.jsp">Switch to Your Administrator Page</a>
+  <%}%>
+</div>
 </body>
 </html>
 

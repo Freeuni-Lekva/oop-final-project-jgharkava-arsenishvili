@@ -54,7 +54,7 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (6, 'Neon', 1, true),
 (6, 'Helium', 2, true),
 (6, 'Argon', 3, true),
-(6, 'Oxygen', 4, false),
+(6,  'Oxygen', 4, false),
 (6, 'Nitrogen', 5, false),
 (7, 'Hydrogen/H', 1, true),
 (7, 'Helium/He', 2, true),

@@ -141,11 +141,9 @@ public class AnswersDao {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
-
     public long getCount(){
         return cnt;
     }
-
     private Answer retrieveAnswer(ResultSet rs) throws SQLException {
         return new Answer(rs.getLong("answer_id"), rs.getLong("question_id"),
                 rs.getString("answer_text"), rs.getInt("answer_order"),

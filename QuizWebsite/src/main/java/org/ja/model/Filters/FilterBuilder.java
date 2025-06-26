@@ -23,10 +23,16 @@ public class FilterBuilder {
 
             switch (parameterName) {
                 case Constants.FilterFields.USERNAME -> {
-                    for (String value : values) andFilter.addFilter(new UserNameFilter(value));
+                    for (String value : values) {
+                        if(value.trim().isEmpty()) continue;
+                        andFilter.addFilter(new UserNameFilter(value.trim()));
+                    }
                 }
                 case Constants.FilterFields.QUIZ_NAME -> {
-                    for (String value : values) andFilter.addFilter(new QuizNameFilter(value));
+                    for (String value : values) {
+                        if(value.trim().isEmpty()) continue;
+                        andFilter.addFilter(new QuizNameFilter(value.trim()));
+                    }
                 }
                 case Constants.FilterFields.CATEGORY -> {
                     for (String value : values) orFilter.addFilter(new CategoryFilter(value));
@@ -35,7 +41,10 @@ public class FilterBuilder {
                     for (String value : values) orFilter.addFilter(new TagFilter(value));
                 }
                 case Constants.FilterFields.ORDER -> {
-                    for (String value : values) orFilter.addFilter(new OrderFilter(value, OrderFilter.DECREASING));
+                    for (String value : values) {
+                        if(Constants.FilterFields.ORDER_PLACEHOLDER.equals(value)) continue;
+                        orFilter.addFilter(new OrderFilter(value, OrderFilter.DECREASING));
+                    }
                 }
             }
         }

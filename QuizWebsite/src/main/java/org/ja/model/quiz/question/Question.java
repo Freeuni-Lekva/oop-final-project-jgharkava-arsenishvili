@@ -55,7 +55,6 @@ public class Question {
         this.numAnswers = numAnswers;
         this.orderStatus = orderStatus;
         this.quizId = quizId;
-
     }
 
     public int gradeResponse (List<?> correctAnswersList, Response response){
@@ -110,6 +109,7 @@ public class Question {
     public void setOrderStatus(String orderStatus){
         this.orderStatus = orderStatus;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -127,4 +127,10 @@ public class Question {
                 orderStatus.equals(((Question) o).getOrderStatus());
 
     }
+
+    @Override
+    public int hashCode(){
+        return questionText.hashCode();
+    }
+
 }

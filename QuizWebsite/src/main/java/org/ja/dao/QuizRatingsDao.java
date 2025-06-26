@@ -6,18 +6,7 @@ import org.ja.model.OtherObjects.QuizRating;
 
 import java.sql.*;
 import java.util.ArrayList;
-/*
-create table quiz_rating(
-    quiz_id bigint not null,
-    user_id bigint not null,
-    rating tinyint not null check (rating between 0 and 5),
-    review text,
 
-    primary key (quiz_id, user_id),
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade
-)
- */
 public class QuizRatingsDao {
     private final BasicDataSource dataSource;
     private long cnt=0;
