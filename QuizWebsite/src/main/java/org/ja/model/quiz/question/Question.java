@@ -130,7 +130,7 @@ public class Question {
 
     @Override
     public int hashCode(){
-        return 1;
+        return questionText.hashCode();
     }
 
 }

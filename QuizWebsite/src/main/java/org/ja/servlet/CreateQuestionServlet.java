@@ -119,7 +119,6 @@ public class CreateQuestionServlet extends HttpServlet {
 
         for (int i = 0; i < answers.length; i++) {
             boolean isCorrect = Boolean.parseBoolean(isCorrectValues[i]);
-            System.out.println(isCorrect);
 
             answerList.add(new Answer(answers[i].trim(), i + 1, isCorrect));
         }
@@ -140,7 +139,6 @@ public class CreateQuestionServlet extends HttpServlet {
 
         for (int i = 0; i < answers.length; i++) {
             boolean isCorrect = Boolean.parseBoolean(isCorrectValues[i]);
-            System.out.println(isCorrect);
             answerList.add(new Answer(answers[i].trim(), i + 1, isCorrect));
         }
 

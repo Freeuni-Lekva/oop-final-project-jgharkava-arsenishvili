@@ -46,6 +46,7 @@ public class FinishQuizServlet extends HttpServlet {
 
         if (quiz == null) return;
 
+
         int score = questionAnswerMap.keySet().stream()
                     .mapToInt(Question::getNumAnswers)
                     .sum();
