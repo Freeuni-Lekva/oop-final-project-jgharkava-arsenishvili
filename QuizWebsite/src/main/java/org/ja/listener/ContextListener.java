@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 @WebListener
 public class ContextListener implements ServletContextListener {
-    BasicDataSource ds;
+    private BasicDataSource ds;
 
     public void contextInitialized(ServletContextEvent sce) {
         ds = new BasicDataSource();

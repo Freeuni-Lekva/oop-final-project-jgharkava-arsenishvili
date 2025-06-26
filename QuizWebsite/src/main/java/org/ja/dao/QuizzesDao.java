@@ -50,7 +50,7 @@ public class QuizzesDao {
             return;
         }*/
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, quiz_score, average_rating, " +
-                "participant_count,time_limit_in_minutes, category_id," +
+                "participant_count, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
                 "question_correction_status ) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -75,7 +75,7 @@ public class QuizzesDao {
                 if(rs.next()) {
                     cnt++;
 
-                    long quizId = rs.getLong("quiz_id");
+                    long quizId = rs.getLong(1);
                     quiz.setId(quizId);
 
                     String s = "SELECT creation_date FROM quizzes where quiz_id = ?";
@@ -339,7 +339,7 @@ public class QuizzesDao {
              stmt.setLong(1, userId);
              stmt.setLong(2, userId);
              stmt.setLong(3, userId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
                     quizzes.add(retrieveQuiz(rs));
@@ -528,7 +528,7 @@ public class QuizzesDao {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
              stmt.setLong(1, id);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     quizzes.add(retrieveQuiz(rs));

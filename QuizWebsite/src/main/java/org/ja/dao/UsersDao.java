@@ -41,7 +41,7 @@ public class UsersDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
                     cnt++;
-                    long userId = keys.getLong("user_id");
+                    long userId = keys.getLong(1);
                     user.setId(userId);
 
                     String s = "SELECT registration_date FROM users where user_id = ?";

@@ -32,7 +32,7 @@ public class CategoriesDao {
             try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
                 if (keys.next()) {
                     cnt++;
-                    long newId = keys.getLong("category_id");
+                    long newId = keys.getLong(1);
                     category.setCategoryId(newId); // if you want to store it in your object
                 }
             }
