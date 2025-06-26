@@ -106,7 +106,6 @@ public class MessagesDaoTest {
         dao.insertMessage(m3);
         dao.insertMessage(m4);
         assertEquals(4, dao.getCount());
-        dao.insertMessage(m5);
     }
 
     @Test
@@ -115,7 +114,6 @@ public class MessagesDaoTest {
         dao.insertMessage(m2);
         dao.insertMessage(m3);
         dao.insertMessage(m4);
-        dao.insertMessage(m5);
         dao.removeMessage(4);
         assertEquals(3, dao.getCount());
         assertFalse(dao.contains(m4));
@@ -128,7 +126,6 @@ public class MessagesDaoTest {
         dao.insertMessage(m2);
         dao.insertMessage(m3);
         dao.insertMessage(m4);
-        dao.insertMessage(m5);
         ArrayList<Message> arr=dao.getMessagesForUserSorted(4);
         assertEquals(2, arr.size());
         ArrayList<Message> arr2=dao.getMessagesForUserSorted(1);
@@ -143,7 +140,6 @@ public class MessagesDaoTest {
         dao.insertMessage(m2);
         dao.insertMessage(m3);
         dao.insertMessage(m4);
-        dao.insertMessage(m5);
         m5=new Message(2,2,1,"hello sandro", null);
         dao.insertMessage(m5);
         ArrayList<Message> arr=dao.getMutualMessagesSorted(1, 2);

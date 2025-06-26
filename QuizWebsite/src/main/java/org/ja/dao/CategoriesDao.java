@@ -17,7 +17,7 @@ public class CategoriesDao {
         this.dataSource = dataSource;
     }
 
-    /// throws RuntimeException if category_name is already in use
+    /// throws RuntimeException if category name is already in use
     public void insertCategory(Category category) {
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 

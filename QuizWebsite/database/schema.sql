@@ -191,8 +191,8 @@ create table messages(
     message_text text not null,
     message_send_date timestamp default current_timestamp,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id)
+    foreign key (sender_user_id) references users(user_id) on delete cascade,
+    foreign key (recipient_user_id) references users(user_id) on delete cascade
 );
 
 -- Challenges table.
@@ -204,9 +204,9 @@ create table challenges(
     recipient_user_id bigint not null,
     quiz_id bigint not null,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id),
-    foreign key (quiz_id) references quizzes(quiz_id)
+    foreign key (sender_user_id) references users(user_id) on delete cascade,
+    foreign key (recipient_user_id) references users(user_id) on delete cascade,
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
 -- History table.

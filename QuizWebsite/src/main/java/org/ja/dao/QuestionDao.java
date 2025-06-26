@@ -2,7 +2,6 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.quiz.question.Question;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,18 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class QuestionDao {
-    /*
-    create table questions(
-    question_id bigint primary key auto_increment,
-    quiz_id bigint not null,
-    question text not null,
-    image_url varchar(256) default null,
-    question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
-       'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
-
-    num_answers int not null default 1,
-    order_status enum('unordered', 'ordered') not null default 'ordered',
-     */
     private final BasicDataSource dataSource;
     private long cnt=0;
     public QuestionDao(BasicDataSource dataSource) {
@@ -29,7 +16,7 @@ public class QuestionDao {
     }
 
     public void insertQuestion(Question question) {
-        String sql = "INSERT INTO questions ( quiz_id, question, image_url, " +
+        String sql = "INSERT INTO questions (quiz_id, question, image_url, " +
                 "question_type, num_answers, order_status) VALUES (?,?, ?, ?, ?, ?);";
 
         try (Connection c = dataSource.getConnection();
@@ -93,7 +80,7 @@ public class QuestionDao {
     public ArrayList<Question> getQuizQuestions(long quizId) {
         ArrayList<Question> questions = new ArrayList<>();
 
-        String sql = "SELECT * FROM questions WHERE quiz_id = ?";
+        String sql = "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_id";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -113,8 +100,8 @@ public class QuestionDao {
     }
 
     public void updateQuestion(Question question){
-        String sql = "UPDATE questions SET quiz_Id=?, question = ?," +
-                "image_url=?, question_type=?, num_answers=?," +
+        String sql = "UPDATE questions SET quiz_Id=?, question = ?, " +
+                "image_url=?, question_type=?, num_answers=?, " +
                 "order_status=? WHERE question_id = ?";
 
         try (Connection c = dataSource.getConnection();

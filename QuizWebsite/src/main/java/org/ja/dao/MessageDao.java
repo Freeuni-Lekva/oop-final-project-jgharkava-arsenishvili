@@ -2,24 +2,12 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.Message;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-/*
-create table messages(
-    message_id bigint primary key auto_increment,
-    sender_user_id bigint not null,
-    recipient_user_id bigint not null,
-    message_text text not null,
-    message_send_date timestamp default current_timestamp,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id)
-);
- */
 public class MessageDao {
     private final BasicDataSource dataSource;
     private long cnt=0;
@@ -28,10 +16,6 @@ public class MessageDao {
     }
 
     public void insertMessage(Message message) {
-        if(message==null){
-            return;
-        }
-
         String sql = "INSERT INTO messages (sender_user_id, recipient_user_id, message_text) VALUES (?,?,?)";
 
         try (Connection c = dataSource.getConnection();
@@ -132,6 +116,7 @@ public class MessageDao {
 
         return messages;
     }
+
     public boolean contains(Message m){
         if(m==null){
             return false;
@@ -160,9 +145,6 @@ public class MessageDao {
         }
     }
     public boolean contains(long mid){
-        if(mid<0||mid>cnt){
-            return false;
-        }
         String sql = "SELECT COUNT(*) FROM messages WHERE message_id = ?";
 
         try (Connection connection = dataSource.getConnection();

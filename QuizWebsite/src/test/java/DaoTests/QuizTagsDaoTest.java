@@ -183,7 +183,7 @@ public class QuizTagsDaoTest {
         assertTrue(dao.contains(new QuizTag(2,2)));
     }
     @Test
-    public void testGetQuizTagsByQuizId() {
+    public void testGetTagsByQuizId() {
         dao.insertQuizTag(qt1);
         dao.insertQuizTag(qt2);
         dao.insertQuizTag(qt3);
@@ -192,8 +192,8 @@ public class QuizTagsDaoTest {
         qt5=new QuizTag(1,4);
         dao.insertQuizTag(qt4);
         dao.insertQuizTag(qt5);
-        ArrayList<QuizTag> arr=dao.getQuizTagsByQuizId(1);
+        ArrayList<Long> arr=dao.getTagsByQuizId(1);
         assertEquals(3, arr.size());
-        assertTrue(arr.contains(qt4));
+        assertTrue(arr.contains(3L));
     }
 }

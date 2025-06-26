@@ -6,17 +6,6 @@ import org.ja.model.OtherObjects.Announcement;
 import java.sql.*;
 import java.util.ArrayList;
 
-/*
-create table announcements(
-    announcement_id bigint primary key auto_increment,
-    administrator_id bigint,
-    announcement_text text not null,
-    creation_date timestamp default current_timestamp,
-
-    foreign key (administrator_id) references users(user_id) on delete cascade
-);
- */
-
 public class AnnouncementsDao {
     private final BasicDataSource dataSource;
     private long cnt = 0;
@@ -66,7 +55,7 @@ public class AnnouncementsDao {
         String sql = "SELECT * FROM announcements ORDER BY creation_date DESC";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql);
+             PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
 
             while(rs.next()) {

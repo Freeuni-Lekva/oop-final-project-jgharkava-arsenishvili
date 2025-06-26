@@ -2,23 +2,12 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.Match;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-/*
-create table matches(
-    match_id bigint primary key auto_increment,
-    question_id bigint not null,
-    left_match text not null,
-    right_match text not null,
 
-    foreign key (question_id) references questions(question_id) on delete cascade
-);
-
- */
 public class MatchesDao {
     private final BasicDataSource dataSource;
     private long cnt=0;

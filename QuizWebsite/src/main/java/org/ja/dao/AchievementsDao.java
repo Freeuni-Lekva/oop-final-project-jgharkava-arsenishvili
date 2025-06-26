@@ -8,14 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/*
-create table achievements(
-    achievement_id bigint primary key auto_increment,
-    achievement_name varchar(64) unique not null,
-    achievement_description text not null,
-    achievement_photo varchar(256)
-);
- */
 public class AchievementsDao {
     private final BasicDataSource dataSource;
     private long cnt = 0;
@@ -66,6 +58,7 @@ public class AchievementsDao {
         }
     }
 
+    /// returns null if achievement is not present in table
     public Achievement getAchievement(long id){
         String sql = "SELECT * FROM achievements WHERE achievement_id = ?";
 
@@ -91,7 +84,7 @@ public class AchievementsDao {
             return false;
         }
 
-        String sql = "SELECT COUNT(*) FROM achievements WHERE achievement_id = ? AND achievement_name=?" +
+        String sql = "SELECT COUNT(*) FROM achievements WHERE achievement_id = ? AND achievement_name=? " +
                 "AND achievement_description=? AND achievement_photo = ?";
 
         try (Connection connection = dataSource.getConnection();

@@ -2,25 +2,12 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.Friendship;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/*
-create table friendships(
-    first_user_id bigint not null,
-    second_user_id bigint not null,
-    friendship_date timestamp default current_timestamp,
-    friendship_status enum('pending', 'friends'),
-
-    primary key (first_user_id, second_user_id),
-    foreign key (first_user_id) references users(user_id) on delete cascade,
-    foreign key (second_user_id) references users(user_id) on delete cascade
-);
- */
 public class FriendShipsDao {
     private final BasicDataSource dataSource;
     private long cnt=0;
@@ -108,6 +95,7 @@ public class FriendShipsDao {
         }
     }
 
+    /// returns empty list if no friends found
     public ArrayList<Friendship> getFriends(long userId) {
         ArrayList<Friendship> friendships = new ArrayList<>();
 
@@ -135,6 +123,7 @@ public class FriendShipsDao {
 
     /// its assumed that when A send friend request to B,
     /// when this 'friendship' is added to the database, A is the firstUser and B is the secondUser
+    /// returns empty list if no requests are found
     public ArrayList<Friendship> getFriendRequests(long userId) {
         ArrayList<Friendship> friendships = new ArrayList<>();
 

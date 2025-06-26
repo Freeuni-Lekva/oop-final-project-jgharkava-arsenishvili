@@ -70,6 +70,7 @@ public class AnswersDao {
     }
 
     // TODO DELETE
+    /// returns null if answer is not present in table
     public Answer getAnswerById(long id) {
         String sql = "SELECT * FROM answers where answer_id = ?";
 
@@ -89,6 +90,7 @@ public class AnswersDao {
         return null;
     }
 
+    /// returns empty list if no answers found
     public ArrayList<Answer> getQuestionAnswers(long questionId) {
         String sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY answer_order";
 
@@ -115,9 +117,9 @@ public class AnswersDao {
             return false;
         }
 
-        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=?" +
-                "AND answer_text=? AND answer_order = ?" +
-                " AND answer_validity = ?";
+        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=? " +
+                "AND answer_text=? AND answer_order = ? " +
+                "AND answer_validity = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {

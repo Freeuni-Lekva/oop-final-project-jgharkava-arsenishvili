@@ -3,9 +3,6 @@ package org.ja.dao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.Filters.Filter;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
-
-import java.security.spec.ECField;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,33 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuizzesDao {
-    /*
-    create table quizzes(
-    quiz_id bigint primary key auto_increment,
-    quiz_name varchar(64) unique not null,
-    quiz_description text,
-    quiz_score int not null,
-    average_rating double not null default 0,
-    participant_count bigint not null default 0,
-    creation_date timestamp default current_timestamp,
-    time_limit_in_minutes int not null default 0,
-    category_id bigint not null,
-    creator_id bigint not null,
-    question_order_status enum('ordered', 'randomized') not null default 'ordered',
-    question_placement_status enum('one-page', 'multiple-page') not null default 'one-page',
-    question_correction_status enum('immediate-correction', 'final-correction')
-        not null default 'final-correction',
-
-    check (
-        question_placement_status != 'one-page'
-        or question_correction_status = 'final-correction'
-    ),
-
-    foreign key (creator_id) references users(user_id) on delete cascade,
-    foreign key (category_id) references categories(category_id) on delete cascade
-    );
-    */
-
     private final BasicDataSource dataSource;
     private long cnt=0;
     public QuizzesDao(BasicDataSource dataSource) {
@@ -249,7 +219,6 @@ public class QuizzesDao {
 
         return quizzes;
     }
-
 
     // TODO change name
     public ArrayList<Quiz> getQuizzesSortedByCreationDate() {

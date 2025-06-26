@@ -4,19 +4,6 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.UserAchievement;
 import java.sql.*;
 import java.util.ArrayList;
-/*
-create table user_achievement(
-    user_id bigint not null,
-    achievement_id bigint not null,
-    achievement_date timestamp default current_timestamp,
-
-    primary key (user_id, achievement_id),
-    foreign key (user_id) references users(user_id) on delete cascade,
-    foreign key (achievement_id) references achievements(achievement_id) on delete cascade
-);
- */
-
-
 
 public class UserAchievementsDao {
     private final BasicDataSource dataSource;
@@ -74,6 +61,7 @@ public class UserAchievementsDao {
         }
     }
 
+    // TODO change to ArrayList<Long>
     // Returns all user_achievement rows for a user
     public ArrayList<UserAchievement> getUserAchievements(long userId) {
         ArrayList<UserAchievement> achievements = new ArrayList<>();

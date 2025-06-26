@@ -2,25 +2,13 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.Challenge;
-import org.ja.model.OtherObjects.Message;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-/*
-create table challenges(
-    challenge_id bigint primary key auto_increment,
-    sender_user_id bigint not null,
-    recipient_user_id bigint not null,
-    quiz_id bigint not null,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id),
-    foreign key (quiz_id) references quizzes(quiz_id)
-);
- */
 public class ChallengesDao {
     private final BasicDataSource dataSource;
     private long cnt = 0;
@@ -68,6 +56,7 @@ public class ChallengesDao {
         }
     }
 
+    /// returns empty list if no challenges found
     public ArrayList<Challenge> challengesAsSender(long senderId){
         ArrayList<Challenge> challenges = new ArrayList<>();
 
@@ -90,6 +79,7 @@ public class ChallengesDao {
         return challenges;
     }
 
+    /// returns empty list if no challenges found
     public ArrayList<Challenge> challengesAsReceiver(long receiverId){
         ArrayList<Challenge> challenges = new ArrayList<>();
 

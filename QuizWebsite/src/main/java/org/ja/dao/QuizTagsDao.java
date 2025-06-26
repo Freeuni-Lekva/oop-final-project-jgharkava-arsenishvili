@@ -54,8 +54,9 @@ public class QuizTagsDao {
         }
     }
 
-    public ArrayList<QuizTag> getQuizTagsByQuizId(long quizId) {
-        ArrayList<QuizTag> quizTags = new ArrayList<>();
+    ///  returns list of Ids
+    public ArrayList<Long> getTagsByQuizId(long quizId) {
+        ArrayList<Long> tagIds = new ArrayList<>();
 
         String sql = "select * from quiz_tag where quiz_id = ?";
         try (Connection c = dataSource.getConnection()){
@@ -65,14 +66,14 @@ public class QuizTagsDao {
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
-                    quizTags.add(retrieveQuizTag(rs));
+                    tagIds.add(rs.getLong("tag_id"));
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz tags by quiz id from database", e);
         }
 
-        return quizTags;
+        return tagIds;
     }
 
     public boolean contains(QuizTag qt){

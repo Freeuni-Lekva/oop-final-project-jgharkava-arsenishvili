@@ -2,26 +2,12 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.History;
-import org.ja.model.OtherObjects.Message;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-/*
-create table history(
-    history_id bigint primary key auto_increment,
-    user_id bigint not null,
-    quiz_id bigint not null,
-    score double not null default 0,
-    completion_time bigint not null,
-    completion_date timestamp default current_timestamp,
 
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade
-);
- */
 public class HistoriesDao {
     private final BasicDataSource dataSource;
     private long cnt = 0;
@@ -29,7 +15,7 @@ public class HistoriesDao {
         this.dataSource = dataSource;
     }
 
-    /// updates quizs participant count in quizzes table
+    /// updates quiz's participant count in quizzes table
     public void insertHistory(History history) throws SQLException{
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
@@ -80,6 +66,7 @@ public class HistoriesDao {
         }
     }
 
+    /// retrieves user's history, sorted by decreasing completion date
     public ArrayList<History> getHistoriesByUserIdSortedByDate(long userId){
         ArrayList<History> histories = new ArrayList<>();
 
@@ -101,6 +88,7 @@ public class HistoriesDao {
         return histories;
     }
 
+    /// retrieves quiz's history, sorted by decreasing completion date
     public ArrayList<History> getHistoriesByQuizIdSortedByDate(long quizId){
         ArrayList<History> histories = new ArrayList<>();
 
