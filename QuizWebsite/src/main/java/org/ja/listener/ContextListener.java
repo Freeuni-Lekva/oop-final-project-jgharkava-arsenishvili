@@ -28,6 +28,7 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(Constants.ContextAttributes.CHALLENGES_DAO, new ChallengesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.HISTORIES_DAO, new HistoriesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO, new FriendShipsDao(ds));
+        sce.getServletContext().setAttribute(Constants.ContextAttributes.ADMINISTRATORS_DAO, new AdministratorsDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.MATCHES_DAO, new MatchesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.QUIZZES_DAO, new QuizzesDao(ds));
         sce.getServletContext().setAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO, new UserAchievementsDao(ds));
