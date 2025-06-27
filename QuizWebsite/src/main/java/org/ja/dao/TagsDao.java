@@ -16,15 +16,12 @@ public class TagsDao {
         this.dataSource = dataSource;
     }
 
+    ///  if tagName already exists throws RuntimeException
     public void insertTag(Tag tag) {
-        if(containsTag(tag.getTagName())) {
-            return;
-        }
         String sql = "INSERT INTO tags (tag_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement preparedStatement =
-                    c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+            PreparedStatement preparedStatement = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             preparedStatement.setString(1, tag.getTagName());
 
@@ -43,17 +40,13 @@ public class TagsDao {
     }
 
     public void removeTag(Tag tag) {
-        if(!containsTag(tag.getTagName())) {
-            return;
-        }
         String sql = "DELETE FROM tags WHERE tag_id = ?";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement preparedStatement =
-                    c.prepareStatement(sql)){
+            PreparedStatement preparedStatement = c.prepareStatement(sql)){
 
             preparedStatement.setLong(1, tag.getTagId());
-            preparedStatement.executeUpdate();
-            cnt--;
+            if(preparedStatement.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing tag from database", e);
         }
@@ -135,23 +128,6 @@ public class TagsDao {
     public long getCount() {
         return cnt;
     }
-    /*public ArrayList<Tag> filterCategories(Filter filter) {
-        String sql="SELECT * FROM categories WHERE "+filter.toString();
-        ArrayList<Tag> tags = new ArrayList<>();
-        try(Connection c=dataSource.getConnection()){
-            PreparedStatement preparedStatement =
-                    c.prepareStatement(sql);
-            ResultSet rs=preparedStatement.executeQuery();
-            while(rs.next()){
-                Tag newTag=new Tag(rs.getLong("tag_id"),
-                        rs.getString("tag_name"));
-                tags.add(newTag);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return tags;
-    }*/
 
     public ArrayList<Tag> getAllTags(){
         ArrayList<Tag> tags = new ArrayList<>();

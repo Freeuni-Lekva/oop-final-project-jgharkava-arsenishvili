@@ -23,10 +23,6 @@ public class User {
         this.status = status;
     }
 
-//    public boolean checkPassword(String password, String salt) throws NoSuchAlgorithmException {
-//        return PasswordHasher.verifyPassword(password, passwordHashed, salt);
-//    }  //to check the password when the user logs in
-
     public long getId() {
         return id;
     }

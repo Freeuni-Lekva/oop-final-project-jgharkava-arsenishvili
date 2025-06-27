@@ -2,37 +2,21 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.History;
-import org.ja.model.OtherObjects.Message;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-/*
-create table history(
-    history_id bigint primary key auto_increment,
-    user_id bigint not null,
-    quiz_id bigint not null,
-    score double not null default 0,
-    completion_time bigint not null,
-    completion_date timestamp default current_timestamp,
 
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade
-);
- */
 public class HistoriesDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+    private long cnt = 0;
     public HistoriesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void insertHistory(History history){
-        if(contains(history)){
-            return;
-        }
+    /// updates quiz's participant count in quizzes table
+    public void insertHistory(History history) throws SQLException{
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -46,7 +30,7 @@ public class HistoriesDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    long historyId = rs.getLong("history_id");
+                    long historyId = rs.getLong(1);
                     history.setHistoryId(historyId);
 
                     String s = "SELECT completion_date FROM history where history_id = ?";
@@ -67,25 +51,25 @@ public class HistoriesDao {
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting history into database", e);
         }
+
+        updateQuizParticipantCount(history.getQuizId());
     }
 
     public void removeHistory(long historyId){
-        if(!contains(historyId)){
-            return;
-        }
         String sql = "DELETE FROM history WHERE history_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, historyId);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing history from database", e);
         }
     }
 
+    /// retrieves user's history, sorted by decreasing completion date
     public ArrayList<History> getHistoriesByUserIdSortedByDate(long userId){
         ArrayList<History> histories = new ArrayList<>();
 
@@ -107,6 +91,7 @@ public class HistoriesDao {
         return histories;
     }
 
+    /// retrieves quiz's history, sorted by decreasing completion date
     public ArrayList<History> getHistoriesByQuizIdSortedByDate(long quizId){
         ArrayList<History> histories = new ArrayList<>();
 
@@ -236,44 +221,76 @@ public class HistoriesDao {
             ps.setDouble(3, h.getScore());
             ps.setDouble(4, h.getCompletionTime());
             ps.setTimestamp(5, h.getCompletionDate());
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public boolean contains(long hid){
-        if(hid<0||hid>cnt){
-            return false;
-        }
         String sql = "SELECT COUNT(*) FROM history WHERE history_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, hid);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private History retrieveHistory(ResultSet rs) throws SQLException {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
                 rs.getLong("quiz_id"), rs.getLong("score"),
                 rs.getDouble("completion_time"), rs.getTimestamp("completion_date"));
+    }
+
+    private void updateQuizParticipantCount(long quizId) throws SQLException {
+        String selectSQl = "SELECT COUNT(DISTINCT  user_id) AS participantCount FROM history WHERE quiz_id = ?";
+        String updateSQL = "UPDATE quizzes SET participant_count = ? WHERE quiz_id = ?";
+
+        long participantCount = -1;
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(selectSQl)){
+
+            ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    participantCount = rs.getLong("participantCount");
+
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error querying number of participants from quiz database", e);
+        }
+        if(participantCount == -1) {
+            return;
+        }
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(updateSQL)){
+
+            ps.setLong(1, participantCount);
+            ps.setLong(2, quizId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error inserting number of participants into database", e);
+        }
     }
 }

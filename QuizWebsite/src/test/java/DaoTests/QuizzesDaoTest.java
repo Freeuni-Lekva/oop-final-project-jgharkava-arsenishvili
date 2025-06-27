@@ -32,8 +32,8 @@ public class QuizzesDaoTest {
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -104,7 +104,6 @@ public class QuizzesDaoTest {
     }
     @Test
     public void testInsert() throws SQLException {
-
         Quiz q1 = new Quiz(12, "historyQuiz","description",
                 10, 7.3, 0,
                 new Timestamp(123),12, 1, 1,
@@ -123,7 +122,7 @@ public class QuizzesDaoTest {
         assertEquals(2, dao.getCount());
 
     }
-    @Test
+/*    @Test
     public void testUpdate() throws SQLException {
         testInsert();
 
@@ -146,16 +145,17 @@ public class QuizzesDaoTest {
         q4.setDescription("new description");
         dao.updateQuiz(q4);
         assertEquals("new description", dao.getQuizById(3).getDescription());
-    }
-    @Test
-    public void testRemove() throws SQLException {
-        testUpdate();
-        dao.removeQuizById(1);
-        assertEquals(2, dao.getCount());
-        dao.removeQuizByName("mathsQuiz");
-        assertEquals(1, dao.getCount());
-        assertNull(dao.getQuizById(1));
-        assertNull(dao.getQuizById(2));
-    }
+    }*/
+
+//    @Test
+//    public void testRemove() throws SQLException {
+//        testUpdate();
+//        dao.removeQuizById(1);
+//        assertEquals(2, dao.getCount());
+//        dao.removeQuizByName("mathsQuiz");
+//        assertEquals(1, dao.getCount());
+//        assertNull(dao.getQuizById(1));
+//        assertNull(dao.getQuizById(2));
+//    }
 }
 

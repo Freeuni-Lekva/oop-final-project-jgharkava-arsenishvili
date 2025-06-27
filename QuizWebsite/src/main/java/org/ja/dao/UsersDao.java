@@ -10,9 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.sql.*;
 import java.util.ArrayList;
-
 public class UsersDao {
     private final BasicDataSource dataSource;
     private long cnt=0;
@@ -20,10 +18,8 @@ public class UsersDao {
         this.dataSource = dataSource;
     }
 
+    /// if user with same username already exists throws RuntimeException
     public void insertUser(User user) throws SQLException {
-        if(containsUser(user.getUsername())){
-            return;
-        }
         String sql = "INSERT INTO users (password_hashed, username, user_photo, user_status, salt) " +
                 "VALUES (?, ?, ?, ?, ?);";
         try (Connection c = dataSource.getConnection();
@@ -63,26 +59,20 @@ public class UsersDao {
     }
 
     public void removeUserById(long id) {
-        if(!containsUser(id)){
-            return;
-        }
         String sql = "DELETE FROM users WHERE user_id = ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement preparedStatement = c.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
 
-            preparedStatement.executeUpdate();
-            cnt--;
+            if(preparedStatement.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing user by id from database", e);
         }
     }
 
     public void removeUserByName(String name) {
-        if(!containsUser(name)){
-            return;
-        }
         String sql = "DELETE FROM users WHERE username = ?";
 
         try(Connection c=dataSource.getConnection();
@@ -90,8 +80,8 @@ public class UsersDao {
 
             preparedStatement.setString(1, name);
 
-            preparedStatement.executeUpdate();
-            cnt--;
+            if(preparedStatement.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing user by name from database", e);
         }
@@ -160,12 +150,11 @@ public class UsersDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
@@ -178,10 +167,10 @@ public class UsersDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;
