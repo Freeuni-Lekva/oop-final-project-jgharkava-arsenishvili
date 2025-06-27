@@ -55,7 +55,7 @@ public class Constants {
         public static final String RESPONSES = "current-responses";
         public static final String ANSWERS = "answers";
         public static final String QUESTIONS = "questions";
-        public static final String QUESTION_ITERATOR = "question-iterator";
+        public static final String CURRENT_QUESTION_INDEX = "question-index";
         public static final String TAGS_TO_ADD = "tags-to-add";
         public static final String TAG_TO_CREATE = "tag-to-create";
         public static final String MATCHES = "current-matches";

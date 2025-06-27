@@ -61,10 +61,10 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (7, 'Lithium/Li', 3, true);
 
 insert into matches(question_id, left_match, right_match) values
-(5, 'France', 'Paris'),
-(5, 'Germany', 'Berlin'),
-(5, 'Italy', 'Rome'),
-(5, 'Spain', 'Madrid'),
+(4, 'France', 'Paris'),
+(4, 'Germany', 'Berlin'),
+(4, 'Italy', 'Rome'),
+(4, 'Spain', 'Madrid'),
 (8, 'Hydrogen', '1'),
 (8, 'Helium', '2'),
 (8, 'Lithium', '3'),

@@ -20,5 +20,10 @@
 </head>
 <body>
     <h1><%=quiz.getName()%></h1>
+
+    <form action="start-quiz" method="get">
+        <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+        <button type="submit">Start Quiz</button>
+    </form>
 </body>
 </html>
