@@ -3,7 +3,6 @@ package org.ja.model.quiz.question;
 import org.ja.model.OtherObjects.Match;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
-
 import java.util.List;
 
 public class MatchingQuestion extends Question {

@@ -1,14 +1,11 @@
 package org.ja.servlet;
 
-import org.ja.dao.AnswersDao;
 import org.ja.dao.QuestionDao;
 import org.ja.dao.QuizzesDao;
-import org.ja.model.OtherObjects.Answer;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,9 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 
 @WebServlet("/start-quiz")
 public class StartQuizServlet extends HttpServlet {
@@ -40,8 +35,8 @@ public class StartQuizServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, 0);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, new ArrayList<Response>());
 
-
-        req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
+        req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
+//        req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
 
 /*        if("one-page".equals(quiz.getQuestionPlacement())) {
             req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
