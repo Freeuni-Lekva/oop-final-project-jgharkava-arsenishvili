@@ -92,8 +92,8 @@ create table questions(
     ),
 
     check (
-        question_type not in ('multi-answer', 'matching')
-        or num_answers > 1
+        question_type in ('multi-answer', 'multi-choice-multi-answers', 'matching')
+        or num_answers = 1
     ),
 
     check (
@@ -115,7 +115,8 @@ create table answers(
     answer_order int not null default 1,
     answer_validity boolean not null default true,
 
-    foreign key (question_id) references questions(question_id) on delete cascade
+    foreign key (question_id) references questions(question_id) on delete cascade,
+    unique (question_id, answer_order)
 );
 
 
@@ -137,7 +138,7 @@ create table quiz_tag(
     quiz_id bigint not null,
     tag_id bigint not null,
 
-    unique(quiz_id, tag_id),
+    primary key (quiz_id, tag_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (tag_id) references tags(tag_id) on delete cascade
 );
@@ -190,8 +191,8 @@ create table messages(
     message_text text not null,
     message_send_date timestamp default current_timestamp,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id)
+    foreign key (sender_user_id) references users(user_id) on delete cascade,
+    foreign key (recipient_user_id) references users(user_id) on delete cascade
 );
 
 -- Challenges table.
@@ -203,9 +204,9 @@ create table challenges(
     recipient_user_id bigint not null,
     quiz_id bigint not null,
 
-    foreign key (sender_user_id) references users(user_id),
-    foreign key (recipient_user_id) references users(user_id),
-    foreign key (quiz_id) references quizzes(quiz_id)
+    foreign key (sender_user_id) references users(user_id) on delete cascade,
+    foreign key (recipient_user_id) references users(user_id) on delete cascade,
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
 -- History table.

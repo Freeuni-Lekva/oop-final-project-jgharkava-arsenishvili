@@ -22,11 +22,9 @@ public class QuizTagsDao {
         this.dataSource = dataSource;
     }
 
+    /// if already exists row with same quizId and tagId throws RuntimeException
     public void insertQuizTag(QuizTag quizTag) {
-        if(contains(quizTag)||quizTag==null){
-            return;
-        }
-        String sql = "insert into quiz_tag values (?,?)";
+        String sql = "INSERT INTO quiz_tag VALUES (?,?)";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -41,9 +39,6 @@ public class QuizTagsDao {
     }
 
     public void removeQuizTag(long qid, long tid) {
-        if(!contains(new QuizTag(qid,tid))){
-            return;
-        }
         String sql = "DELETE FROM quiz_tag WHERE quiz_id = ? AND tag_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -52,15 +47,16 @@ public class QuizTagsDao {
             ps.setLong(1, qid);
             ps.setLong(2, tid);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz tag from database", e);
         }
     }
 
-    public ArrayList<QuizTag> getQuizTagsByQuizId(long quizId) {
-        ArrayList<QuizTag> quizTags = new ArrayList<>();
+    ///  returns list of Ids
+    public ArrayList<Long> getTagsByQuizId(long quizId) {
+        ArrayList<Long> tagIds = new ArrayList<>();
 
         String sql = "select * from quiz_tag where quiz_id = ?";
         try (Connection c = dataSource.getConnection()){
@@ -70,15 +66,16 @@ public class QuizTagsDao {
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
-                    quizTags.add(retrieveQuizTag(rs));
+                    tagIds.add(rs.getLong("tag_id"));
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz tags by quiz id from database", e);
         }
 
-        return quizTags;
+        return tagIds;
     }
+
     public boolean contains(QuizTag qt){
         if(qt==null){
             return false;
@@ -90,20 +87,23 @@ public class QuizTagsDao {
 
             ps.setLong(1, qt.getQuizId());
             ps.setLong(2, qt.getTagId());
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
 
             return false;
         } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
+            throw new RuntimeException("Error checking QuizTag existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private QuizTag retrieveQuizTag(ResultSet rs) throws SQLException {
         return new QuizTag(rs.getLong("quiz_id"), rs.getLong("tag_id"));
     }

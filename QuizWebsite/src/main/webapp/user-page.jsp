@@ -30,7 +30,7 @@
 <div>
   <h2>Recent Announcements by Administrators</h2>
   <%
-    ArrayList<Announcement> ann = announcementsDao.getAnnouncementsSortedByCreationDate();
+    ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
     Map<Announcement, String> announcements = new HashMap<Announcement, String>();
     for (Announcement a : ann) {
       User administrator = usersDao.getUserById(a.getAdministratorId());
@@ -258,6 +258,14 @@
       } %> <a href="friend-requests.jsp">See all requests</a>
   <%}else{%>
   <p>No new friend requests.</p>
+  <%}%>
+</div>
+
+<!-- administrator-->
+<div>
+  <%
+    if(user.getStatus().equals("administrator")){ %>
+    <a href="administrator.jsp">Switch to Your Administrator Page</a>
   <%}%>
 </div>
 </body>

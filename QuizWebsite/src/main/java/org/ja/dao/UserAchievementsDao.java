@@ -1,24 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.OtherObjects.Achievement;
-
-import java.util.ArrayList;
-/*
-create table user_achievement(
-    user_id bigint not null,
-    achievement_id bigint not null,
-    achievement_date timestamp default current_timestamp,
-
-    primary key (user_id, achievement_id),
-    foreign key (user_id) references users(user_id) on delete cascade,
-    foreign key (achievement_id) references achievements(achievement_id) on delete cascade
-);
- */
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.UserAchievement;
-import org.ja.model.user.User;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -29,11 +12,8 @@ public class UserAchievementsDao {
         this.dataSource = dataSource;
     }
 
-    // Grants the given achievement to a user
+    ///  if UserAchievement with same user and achievement ids exists, returns RuntimeException
     public void insertAchievement(UserAchievement ua) {
-        if(contains(ua)){
-            return;
-        }
         String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection();
@@ -66,9 +46,6 @@ public class UserAchievementsDao {
 
     // Removes the specified achievement from a user
     public void removeAchievement(UserAchievement ua) {
-        if(!contains(ua)){
-            return;
-        }
         String sql = "DELETE FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -77,13 +54,14 @@ public class UserAchievementsDao {
             ps.setLong(1, ua.getUserId());
             ps.setLong(2, ua.getAchievementId());
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to remove user achievement", e);
         }
     }
 
+    // TODO change to ArrayList<Long>
     // Returns all user_achievement rows for a user
     public ArrayList<UserAchievement> getUserAchievements(long userId) {
         ArrayList<UserAchievement> achievements = new ArrayList<>();
@@ -104,6 +82,7 @@ public class UserAchievementsDao {
 
         return achievements;
     }
+
     public boolean contains(UserAchievement ua) {
         if(ua==null){
             return false;
@@ -117,20 +96,21 @@ public class UserAchievementsDao {
             ps.setLong(1, ua.getUserId());
             ps.setLong(2, ua.getAchievementId());
             ps.setTimestamp(3, ua.getAchievementDate());
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return  cnt;
     }
+
     private UserAchievement retrieveUserAchievement(ResultSet rs) throws SQLException {
         return new UserAchievement(rs.getLong("user_id"), rs.getLong("achievement_id"),
                 rs.getTimestamp("achievement_date"));

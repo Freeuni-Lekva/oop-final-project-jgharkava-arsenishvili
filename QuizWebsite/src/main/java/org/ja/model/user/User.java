@@ -23,10 +23,6 @@ public class User {
         this.status = status;
     }
 
-//    public boolean checkPassword(String password, String salt) throws NoSuchAlgorithmException {
-//        return PasswordHasher.verifyPassword(password, passwordHashed, salt);
-//    }  //to check the password when the user logs in
-
     public long getId() {
         return id;
     }
@@ -55,8 +51,8 @@ public class User {
     }
     public void setStatus(String status){this.status = status;}
 
-    private String getSalt() {return salt;}
-    private void setSalt(String salt) {this.salt = salt;}
+    public String getSalt() {return salt;}
+    public void setSalt(String salt) {this.salt = salt;}
 
     @Override
     public boolean equals(Object o) {
@@ -71,7 +67,5 @@ public class User {
                 status.equals(((User) o).getStatus()) &&
                 salt.equals(((User) o).getSalt());
     }
-
-
 
 }

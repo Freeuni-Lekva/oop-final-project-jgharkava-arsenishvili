@@ -42,8 +42,8 @@ public class UserAchievementDaoTest {
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -108,7 +108,11 @@ public class UserAchievementDaoTest {
         achievementsDao.insertAchievement(a1);
         achievementsDao.insertAchievement(a2);
         achievementsDao.insertAchievement(a3);
-        achievementsDao.insertAchievement(a3);
+
+        ua1=new UserAchievement(1,1,null);
+        ua2=new UserAchievement(2,2,null);
+        ua3=new UserAchievement(3,3,null);
+        ua4=new UserAchievement(4,3,null);
     }
     private UserAchievement ua1;
     private UserAchievement ua2;
@@ -119,10 +123,6 @@ public class UserAchievementDaoTest {
 
     @Test
     public void testInsert() {
-        ua1=new UserAchievement(1,1,null);
-        ua2=new UserAchievement(2,2,null);
-        ua3=new UserAchievement(3,3,null);
-        ua4=new UserAchievement(4,3,null);
         dao.insertAchievement(ua1);
         assertTrue(dao.contains(ua1));
         assertFalse(dao.contains(ua2));
@@ -130,12 +130,17 @@ public class UserAchievementDaoTest {
         dao.insertAchievement(ua3);
         dao.insertAchievement(ua4);
         assertEquals(4, dao.getCount());
-        dao.insertAchievement(ua3);
+        assertThrows(RuntimeException.class, () -> {
+            dao.insertAchievement(ua3);
+        });
         assertEquals(4, dao.getCount());
     }
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertAchievement(ua1);
+        dao.insertAchievement(ua2);
+        dao.insertAchievement(ua3);
+        dao.insertAchievement(ua4);
         dao.removeAchievement(ua1);
         assertFalse(dao.contains(ua1));
         assertEquals(3, dao.getCount());
@@ -143,9 +148,11 @@ public class UserAchievementDaoTest {
         assertEquals(3, dao.getCount());
     }
     @Test
-    public void testGetUserAchievments() {
-        testInsert();
-
+    public void testGetUserAchievements() {
+        dao.insertAchievement(ua1);
+        dao.insertAchievement(ua2);
+        dao.insertAchievement(ua3);
+        dao.insertAchievement(ua4);
         ua5=new UserAchievement(1,3,null);
         ua6=new UserAchievement(1,2,null);
         dao.insertAchievement(ua5);

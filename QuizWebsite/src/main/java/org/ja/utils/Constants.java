@@ -14,6 +14,7 @@ public class Constants {
         public static final String USERS_DAO = "userDao";
         public static final String QUIZZES_DAO = "quizzesDao";
         public static final String HISTORIES_DAO = "historyDao";
+        public static final String ADMINISTRATORS_DAO = "administratorsDao";
         public static final String ANSWERS_DAO = "answersDao";
         public static final String ACHIEVEMENTS_DAO = "achievementsDao";
         public static final String ANNOUNCEMENTS_DAO = "announcementsDao";
@@ -55,6 +56,11 @@ public class Constants {
         public static final String ANSWERS = "answers";
         public static final String QUESTIONS = "questions";
         public static final String QUESTION_ITERATOR = "question-iterator";
+        public static final String TAGS_TO_ADD = "tags-to-add";
+        public static final String TAG_TO_CREATE = "tag-to-create";
+        public static final String MATCHES = "current-matches";
+        public static final String HAS_QUESTIONS = "hasQuestions";
+
     }
 
     public static class RequestParameters {

@@ -8,13 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,8 +22,8 @@ public class UsersDaoTest{
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -87,7 +84,10 @@ public class UsersDaoTest{
     }
     @Test
     public void testGetUser() throws SQLException, NoSuchAlgorithmException {
-        testInsert();
+        User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        dao.insertUser(sandro);
+        User tornike=new User(12, "Tornike", "123", "2025-6-14", null,"sth.jpg", "administrator");
+        dao.insertUser(tornike);
         assertEquals("Sandro", dao.getUserById(1).getUsername());
         assertEquals("Tornike", dao.getUserById(2).getUsername());
         assertTrue(dao.containsUser("Sandro"));
@@ -96,7 +96,10 @@ public class UsersDaoTest{
     }
     @Test
     public void testRemoveUser() throws SQLException, NoSuchAlgorithmException {
-        testGetUser();
+        User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
+        dao.insertUser(sandro);
+        User tornike=new User(12, "Tornike", "123", "2025-6-14", null,"sth.jpg", "administrator");
+        dao.insertUser(tornike);
         dao.removeUserById(1);
         dao.removeUserById(4);
         dao.removeUserByName("Liza");

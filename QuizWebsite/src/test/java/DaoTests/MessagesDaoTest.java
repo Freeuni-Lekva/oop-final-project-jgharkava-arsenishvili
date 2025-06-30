@@ -2,42 +2,31 @@ package DaoTests;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
-import org.ja.model.CategoriesAndTags.Category;
-import org.ja.model.CategoriesAndTags.Tag;
 import org.ja.model.OtherObjects.*;
-import org.ja.model.quiz.Quiz;
-import org.ja.model.quiz.question.Question;
 import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-
-public class QuizRatingDaoTest {
+public class MessagesDaoTest {
 
     private BasicDataSource basicDataSource;
-    private QuizRatingsDao dao;
+    private MessageDao dao;
     private UsersDao usersDao;
-    private QuizzesDao quizzesDao;
-    private CategoriesDao categoriesDao;
     @BeforeEach
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -81,7 +70,7 @@ public class QuizRatingDaoTest {
                 }
             }
 
-            dao=new QuizRatingsDao(basicDataSource);
+            dao=new MessageDao(basicDataSource);
             finishSetup();
         }
     }
@@ -96,86 +85,72 @@ public class QuizRatingDaoTest {
         User nini=new User(4, "Nini", "123", "2025-6-14",null, "sth.jpg", "administrator");
         usersDao.insertUser(nini);
 
-
-        categoriesDao=new CategoriesDao(basicDataSource);
-        Category h=new Category(1, "history");
-        categoriesDao.insertCategory(h);
-        Category g=new Category(2, "geography");
-        categoriesDao.insertCategory(g);
-        Category m=new Category(3, "Maths");
-        categoriesDao.insertCategory(m);
-
-        quizzesDao=new QuizzesDao(basicDataSource);
-        Quiz q1 = new Quiz(12, "historyQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-
-        Quiz q2 = new Quiz(12, "geoQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q3 = new Quiz(12, "mathsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q4 = new Quiz(12, "physicsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        quizzesDao.insertQuiz(q1);
-        quizzesDao.insertQuiz(q2);
-        quizzesDao.insertQuiz(q3);
-        quizzesDao.insertQuiz(q4);
+        m1=new Message(2,1,2,"hello tornike", null);
+        m2=new Message(3,1,3,"hello liza", null);
+        m3=new Message(4,2,4,"hello nini", null);
+        m4=new Message(5,3,4,"hello administrator", null);
 
     }
-    private QuizRating qr1;
-    private QuizRating qr2;
-    private QuizRating qr3;
-    private QuizRating qr4;
-    private QuizRating qr5;
-    private QuizRating qr6;
+    private Message m1;
+    private Message m2;
+    private Message m3;
+    private Message m4;
+    private Message m5;
 
     @Test
     public void testInsert() {
-        qr1=new QuizRating(1, 1, 2, "mid af");
-        qr2=new QuizRating(1, 2, 3, "pretty good ngl");
-        qr3=new QuizRating(2, 3, 5, "awesome");
-        qr4=new QuizRating(3, 1, 3, "it's alright like...");
-        dao.insertQuizRating(qr1);
-        assertTrue(dao.contains(qr1));
-        dao.insertQuizRating(qr2);
-        dao.insertQuizRating(qr3);
-        dao.insertQuizRating(qr4);
+        dao.insertMessage(m1);
+        assertTrue(dao.contains(m1));
+        assertFalse(dao.contains(m2));
+        dao.insertMessage(m2);
+        dao.insertMessage(m3);
+        dao.insertMessage(m4);
         assertEquals(4, dao.getCount());
-        qr5=new QuizRating(1, 1, 3, "actually, ok");
-        dao.insertQuizRating(qr5);
-        assertTrue(dao.contains(qr5));
-        assertFalse(dao.contains(qr1));
-        assertEquals(4, dao.getCount());
-
     }
+
     @Test
     public void testRemove() {
-        testInsert();
-        dao.removeQuizRating(1,1);
-        assertFalse(dao.contains(qr5));
+        dao.insertMessage(m1);
+        dao.insertMessage(m2);
+        dao.insertMessage(m3);
+        dao.insertMessage(m4);
+        dao.removeMessage(4);
+        assertEquals(3, dao.getCount());
+        assertFalse(dao.contains(m4));
+        dao.removeMessage(4);
         assertEquals(3, dao.getCount());
     }
     @Test
-    public void testGetQuizRatingsByUserId() {
-        testInsert();
-        ArrayList<QuizRating> arr=dao.getQuizRatingsByUserId(1);
+    public void testMessagesForUser(){
+        dao.insertMessage(m1);
+        dao.insertMessage(m2);
+        dao.insertMessage(m3);
+        dao.insertMessage(m4);
+        ArrayList<Message> arr=dao.getMessagesForUserSorted(4);
         assertEquals(2, arr.size());
-        assertTrue(arr.contains(qr5));
-        assertTrue(arr.contains(qr4));
+        ArrayList<Message> arr2=dao.getMessagesForUserSorted(1);
+        assertEquals(0, arr2.size());
+        ArrayList<Message> arr3=dao.getMessagesForUserSorted(2);
+        assertEquals(1, arr3.size());
+        assertTrue(arr3.contains(m1));
     }
     @Test
-    public void testGetQuizRatingsByQuizzId() {
-        testInsert();
-        ArrayList<QuizRating> arr=dao.getQuizRatingsByQuizId(1);
+    public void testMutualMessages(){
+        dao.insertMessage(m1);
+        dao.insertMessage(m2);
+        dao.insertMessage(m3);
+        dao.insertMessage(m4);
+        m5=new Message(2,2,1,"hello sandro", null);
+        dao.insertMessage(m5);
+        ArrayList<Message> arr=dao.getMutualMessagesSorted(1, 2);
         assertEquals(2, arr.size());
-        assertTrue(arr.contains(qr5));
-        assertTrue(arr.contains(qr2));
+        ArrayList<Message> arr2=dao.getMutualMessagesSorted(2, 1);
+        assertEquals(arr, arr2);
+
+        ArrayList<Message> arr3=dao.getMutualMessagesSorted(2, 3);
+        assertEquals(0, arr3.size());
+        ArrayList<Message> arr4=dao.getMutualMessagesSorted(2, 4);
+        assertEquals(1, arr4.size());
+
     }
 }

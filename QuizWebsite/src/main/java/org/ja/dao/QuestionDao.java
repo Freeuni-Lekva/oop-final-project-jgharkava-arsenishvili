@@ -2,7 +2,6 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.quiz.question.Question;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,18 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class QuestionDao {
-    /*
-    create table questions(
-    question_id bigint primary key auto_increment,
-    quiz_id bigint not null,
-    question text not null,
-    image_url varchar(256) default null,
-    question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
-       'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
-
-    num_answers int not null default 1,
-    order_status enum('unordered', 'ordered') not null default 'ordered',
-     */
     private final BasicDataSource dataSource;
     private long cnt=0;
     public QuestionDao(BasicDataSource dataSource) {
@@ -29,10 +16,7 @@ public class QuestionDao {
     }
 
     public void insertQuestion(Question question) {
-        if(contains(question)) {
-            return;
-        }
-        String sql = "INSERT INTO questions ( quiz_id, question, image_url, " +
+        String sql = "INSERT INTO questions (quiz_id, question, image_url, " +
                 "question_type, num_answers, order_status) VALUES (?,?, ?, ?, ?, ?);";
 
         try (Connection c = dataSource.getConnection();
@@ -50,7 +34,7 @@ public class QuestionDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-                    question.setQuestionId(rs.getLong("question_id"));
+                    question.setQuestionId(rs.getLong(1));
                 }
             }
 
@@ -60,9 +44,6 @@ public class QuestionDao {
     }
 
     public void removeQuestion(long questionId) {
-        if(getQuestionById(questionId)==null){
-            return;
-        }
         String sql = "DELETE FROM questions WHERE quiz_id = ?";
 
         try(Connection c = dataSource.getConnection();
@@ -70,8 +51,8 @@ public class QuestionDao {
 
             ps.setLong(1, questionId);
 
-            ps.executeUpdate();
-            cnt--;
+            if(ps.executeUpdate() > 0)
+                cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing question from database", e);
         }
@@ -99,7 +80,7 @@ public class QuestionDao {
     public ArrayList<Question> getQuizQuestions(long quizId) {
         ArrayList<Question> questions = new ArrayList<>();
 
-        String sql = "SELECT * FROM questions WHERE quiz_id = ?";
+        String sql = "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_id";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -119,8 +100,8 @@ public class QuestionDao {
     }
 
     public void updateQuestion(Question question){
-        String sql = "UPDATE questions SET quiz_Id=?, question = ?," +
-                "image_url=?, question_type=?, num_answers=?," +
+        String sql = "UPDATE questions SET quiz_Id=?, question = ?, " +
+                "image_url=?, question_type=?, num_answers=?, " +
                 "order_status=? WHERE question_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -138,6 +119,7 @@ public class QuestionDao {
             throw new RuntimeException("Error updating question into database", e);
         }
     }
+
     public boolean contains(Question question){
         String sql = "SELECT COUNT(*) FROM questions WHERE quiz_id = ? AND question=?" +
                 "AND image_url=? AND question_type = ?" +
@@ -153,20 +135,21 @@ public class QuestionDao {
             ps.setInt(5, question.getNumAnswers());
             ps.setString(6, question.getOrderStatus());
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
-
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
+
     private Question retrieveQuestion(ResultSet rs) throws SQLException {
         return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
                 rs.getString("question"), rs.getString("image_url"),

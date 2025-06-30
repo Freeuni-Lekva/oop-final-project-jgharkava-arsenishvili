@@ -54,8 +54,8 @@ public class MatchesDaoTest {
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -157,26 +157,22 @@ public class MatchesDaoTest {
             questionsDao.insertQuestion(qu13);
             questionsDao.insertQuestion(qu21);
             dao=new MatchesDao(basicDataSource);
+
+            m1=new Match(3,1,"france", "paris");
+            m2=new Match(3,1,"germany", "berlin");
+            m3=new Match(3,1,"italy", "rome");
+            m4=new Match(3,2,"Georgia", "Tbilisi");
         }
     }
     private Match m1;
-    private Match m5;
     private Match m2;
     private Match m3;
     private Match m4;
     @Test
     public void testInsert() {
-        m1=new Match(3,1,"france", "paris");
-        m2=new Match(3,1,"germany", "berlin");
-        m3=new Match(3,1,"italy", "rome");
-
-        m4=new Match(3,2,"Georgia", "Tbilisi");
-
         dao.insertMatch(m1);
         assertEquals(1, m1.getMatchId());
         dao.insertMatch(m2);
-        dao.insertMatch(m3);
-        assertEquals(3, dao.getCount());
         dao.insertMatch(m3);
         assertEquals(3, dao.getCount());
         assertTrue(dao.contains(m1));
@@ -185,7 +181,9 @@ public class MatchesDaoTest {
     }
     @Test
     public void testRemove() {
-        testInsert();
+        dao.insertMatch(m1);
+        dao.insertMatch(m2);
+        dao.insertMatch(m3);
         dao.removeMatch(2);
         assertEquals(2, dao.getCount());
         assertFalse(dao.contains(m2));
@@ -195,8 +193,9 @@ public class MatchesDaoTest {
     }
     @Test
     public void testQuestionMatches(){
-        testInsert();
-        ArrayList<Match> arr=dao.getQuestionMatches(1);
+        dao.insertMatch(m1);
+        dao.insertMatch(m2);
+        dao.insertMatch(m3);        ArrayList<Match> arr=dao.getQuestionMatches(1);
         assertEquals(3, arr.size());
         assertTrue(arr.contains(m1));
         assertTrue(arr.contains(m2));

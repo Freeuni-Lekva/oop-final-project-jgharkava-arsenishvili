@@ -14,6 +14,11 @@ public class MultiAnswerQuestion extends Question{
         super(questionId, quizId, questionText, imageUrl, questionType, numAnswers, orderStatus);
     }
 
+    public MultiAnswerQuestion(String questionText, int numAnswers, String orderStatus){
+        super(0L, 0L, questionText, null,
+                Constants.QuestionTypes.MULTI_ANSWER_QUESTION, numAnswers, orderStatus);
+    }
+
     @Override
     public int gradeResponse(List<?> correctAnswersList, Response response){
         int grade = 0;

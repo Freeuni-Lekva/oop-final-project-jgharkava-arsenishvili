@@ -1,23 +1,15 @@
 package DaoTests;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.dao.CategoriesDao;
 import org.ja.dao.TagsDao;
-import org.ja.dao.UsersDao;
-import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TagsDaoTest {
@@ -27,8 +19,8 @@ public class TagsDaoTest {
     public void setUp() throws Exception {
         basicDataSource = new BasicDataSource();
         basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa"); // h2 username
-        basicDataSource.setPassword(""); // h2 password
+        basicDataSource.setUsername("sa");
+        basicDataSource.setPassword("");
 
         try (
                 Connection connection = basicDataSource.getConnection();
@@ -92,7 +84,10 @@ public class TagsDaoTest {
     }
     @Test
     public void testRemove() throws Exception {
-        testInsert();
+        Tag e=new Tag(12, "easy");
+        dao.insertTag(e);
+        Tag m=new Tag(15, "medium");
+        dao.insertTag(m);
         Tag h=new Tag(12, "hard");
         dao.insertTag(h);
         dao.removeTag(h);
