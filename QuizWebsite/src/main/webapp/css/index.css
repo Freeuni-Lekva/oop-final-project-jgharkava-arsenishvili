@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #e18989;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.header a:hover {
+    color: #007BFF;
+}
+
+.login_field {
+    max-width: 300px;
+    margin: 60px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.login_field input[type="text"],
+.login_field input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    margin-bottom: 10px;
+}
+
+.login_field input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #e18989;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login_field input[type="submit"]:hover {
+    background-color: #d06d6d;
+}
+
+h1, h3 {
+    text-align: center;
+}

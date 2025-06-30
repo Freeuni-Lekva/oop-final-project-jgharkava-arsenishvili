@@ -22,8 +22,8 @@ public class PasswordHasher {
     }
 
     public static boolean verifyPassword(String password, String hashed, String salt) throws NoSuchAlgorithmException {
-        String pass = hashPassword(password, salt);
-        return hashed.equals(pass);
-        //return password.equals(hashed);
+       // String pass = hashPassword(password, salt);
+       // return hashed.equals(pass);
+        return password.equals(hashed);
     }
 }
