@@ -354,6 +354,54 @@ public class HistoriesDao {
         }
     }
 
+    public long getTotalAttempts(long quizId){
+        String sql = "SELECT COUNT(*) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public double getAverageScore(long quizId){
+        String sql = "SELECT AVG(score) FROM history WHERE quiz_id = ?";
+
+        return statisticsCalculations(quizId, sql);
+    }
+
+    public long getMaximumScore(long quizId){
+        String sql = "SELECT MAX(score) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public long getMinimumScore(long quizId){
+        String sql = "SELECT MIN(score) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public double getAverageTime(long quizId){
+        String sql = "SELECT AVG(completion_time) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    private double statisticsCalculations(long quizId, String sql) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error calculating total attempts on this quiz", e);
+        }
+
+        return 0.0;
+    }
+
+
     public long getCount(){
         return cnt;
     }

@@ -14,8 +14,8 @@
     UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
     HistoriesDao historiesDao = (HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
 
-    User user = usersDao.getUserById(1);
-    long quizId = 2;
+    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
+    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
 
     String quizName = quiz.getName();
@@ -23,9 +23,18 @@
     int quizScore = quizzesDao.getQuizScore(quizId);
     String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
 
+    boolean isCreator = user.getId() == quiz.getCreatorId();
+
     List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId);
     List<History> topPerformers = historiesDao.getTopNDistinctHistoriesByQuizId(quizId, 3);
     List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId);
+    List<History> recentPerformers = historiesDao.getHistoriesByQuizIdSortedByDate(quizId);
+
+    long totalAttempts = historiesDao.getTotalAttempts(quizId);
+    double averageScore = historiesDao.getAverageScore(quizId);
+    long maxScore = historiesDao.getMaximumScore(quizId);
+    long minScore = historiesDao.getMinimumScore(quizId);
+    double averageTime = historiesDao.getAverageTime(quizId);
 
     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");
 
@@ -140,7 +149,7 @@
 </div>
 
 <%--range--%>
-<h3>Top Performers by Range:</h3>
+<h3>Top Performers by Range</h3>
 <select id = "timeFilter" onchange = "filterByRange()">
     <option value = "last_day">Last Day</option>
     <option value = "last_week">Last Week</option>
@@ -152,7 +161,6 @@
     <% for (String range: Arrays.asList("last_day", "last_week", "last_month", "last_year")){
         List<History> list = topByRange.get(range);
     %>
-
 
     <div class = "range-table scrollable-pane" id = "range-<%=range%>" style = "<%="last_day".equals(range) ? "" : "display:none;"%>">
         <table class = "styled-table">
@@ -186,6 +194,68 @@
         }
     %>
 </div>
+
+<%--recent performers--%>
+<h3>Recent Performers</h3>
+<div>
+    <div class = "scrollable-pane">
+        <table class = "styled-table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Score</th>
+                <th>Time (min)</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <% for (History history: recentPerformers){
+                User performer = usersDao.getUserById(history.getUserId());
+            %>
+            <tr>
+                <td><%=performer.getUsername()%></td>
+                <td><%=history.getScore()%></td>
+                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                <td><%=sdf.format(history.getCompletionDate())%></td>
+
+            </tr>
+            <%
+                }
+            %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%--statistics --%>
+<%--TODO: would be great to use chart.js--%>
+<h3>Summary Statistics</h3>
+<div class = "summary-statistics">
+    <ul>
+        <li>Total attempts: <%=totalAttempts%></li>
+        <li>Average Score: <%=averageScore%></li>
+        <li>Highest Score: <%=maxScore%></li>
+        <li>Lowest Score: <%=minScore%></li>
+        <li>Average Time: <%=averageTime%></li>
+    </ul>
+</div>
+
+<%--buttons--%>
+<form action = "start-quiz" method = "post">
+    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
+    <button type = "submit">Start Quiz</button>
+</form>
+
+<form action = "practice-quiz" method = "post">
+    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
+    <button type = "submit">Start Quiz in Practice Mode</button>
+</form>
+
+<form action="edit-quiz" method="post">
+    <input type = "hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value = "<%= quizId %>">
+    <button type = "submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
+</form>
 
 </body>
 </html>
