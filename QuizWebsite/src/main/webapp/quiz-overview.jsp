@@ -1,27 +1,52 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="org.ja.dao.QuizzesDao" %>
-<%@ page import="org.ja.dao.UsersDao" %>
-<%@ page import="org.ja.dao.HistoriesDao" %>
 <%@ page import="java.util.*" %>
 <%@ page import="org.ja.model.OtherObjects.History" %>
 <%@ page import="org.ja.model.user.User" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="org.ja.dao.*" %>
+<%@ page import="org.ja.model.OtherObjects.QuizRating" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%--TODO: add categories and tags--%>
 
 <%
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
     UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
     HistoriesDao historiesDao = (HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
+    CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
+    QuizTagsDao quizTagsDao = (QuizTagsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
+    TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
+    QuizRatingsDao quizRatingsDao = (QuizRatingsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_RATING_DAO);
 
-    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
-    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
+//    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
+    User user = usersDao.getUserById(2);
+//    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
+    long quizId = 2;
     Quiz quiz = quizzesDao.getQuizById(quizId);
 
     String quizName = quiz.getName();
     String quizDescription = quiz.getDescription();
     int quizScore = quiz.getScore();
     String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
+    String categoryName = categoriesDao.getCategoryById(quiz.getCategoryId()).getCategoryName();
+    List<Long> quizTagIds = quizTagsDao.getTagsByQuizId(quizId);
+    double averageRating = quiz.getAvgRating();
+    List<QuizRating> quizRatings = quizRatingsDao.getQuizRatingsByQuizIdLimit(quizId, 3);
+
+    List<String> quizTags = new ArrayList<String>();
+    for (Long quizTag: quizTagIds)
+        quizTags.add(tagsDao.getTagById(quizTag).getTagName());
+
+    Map<String, List<String>> userReviews = new HashMap<String, List<String>>();
+    for (QuizRating quizRating: quizRatings){
+        if (quizRating.getReview() != null){
+            String currUsername = usersDao.getUserById(quizRating.getUserId()).getUsername();
+            userReviews.putIfAbsent(currUsername, new ArrayList<String>());
+            List<String> reviews = userReviews.get(currUsername);
+            reviews.add(quizRating.getReview());
+        }
+    }
 
     boolean isCreator = user.getId() == quiz.getCreatorId();
 
@@ -52,13 +77,51 @@
     <link rel="stylesheet" href="css/quiz-overview.css" />
     <script src="js/quiz-overview.js" defer></script>
 </head>
+
 <body>
-<h1><%= quizName %></h1>
-<h2><%= creatorName %></h2>
-<p><%= quizDescription%></p>
-<h2>Max Score: <%= quizScore %></h2>
+<div class="information-container">
+    <h1 class="quiz-title"><%= quizName %></h1>
+
+    <%-- TODO: Hotlink to creator's profile --%>
+    <h2 class="creator-name">Creator: <%= creatorName %></h2>
+
+    <p class="quiz-description"><%= quizDescription %></p>
+
+    <div class="quiz-meta">
+        <p><strong>Max Score:</strong> <%= quizScore %></p>
+        <p><strong>Average Rating:</strong> <%= averageRating %></p>
+        <p><strong>Category:</strong> <%= categoryName %></p>
+        <p><strong>Tags:</strong> <%= String.join(", ", quizTags) %></p>
+    </div>
+
+    <div class="quiz-reviews">
+        <p><Strong>Reviews:</Strong></p>
+
+        <% for (String username : userReviews.keySet()) {
+            List<String> reviews = userReviews.get(username); %>
+
+        <div class="review-block">
+            <h4><%= username %></h4>
+            <ul>
+                <% for (String review : reviews) { %>
+                <li><%= review %></li>
+                <% } %>
+            </ul>
+        </div>
+
+        <% } %>
+    </div>
+</div>
+
+
 
 <h3>Your Attempts on this Quiz</h3>
+<% if (histories.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
 <label for="sortBy">Sort by:</label>
 <select id="sortBy" onchange="sortTable()">
     <option value="date">Date</option>
@@ -90,9 +153,18 @@
     <% } %>
     </tbody>
 </table>
+<%
+    }
+%>
 
 <%--top performers--%>
 <h3>Top Performers</h3>
+<% if (topPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
 <div>
     <button id="showTopBtn" onclick="showTopPerformers()" style="display: none;">Show Top 3</button>
     <button id="showAllBtn" onclick="showAllPerformers()">Show All</button>
@@ -147,9 +219,18 @@
         </tbody>
     </table>
 </div>
+<%
+    }
+%>
 
 <%--range--%>
 <h3>Top Performers by Range</h3>
+<% if (topByRange.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
 <select id = "timeFilter" onchange = "filterByRange()">
     <option value = "last_day">Last Day</option>
     <option value = "last_week">Last Week</option>
@@ -194,9 +275,18 @@
         }
     %>
 </div>
+<%
+    }
+%>
 
 <%--recent performers--%>
 <h3>Recent Performers</h3>
+<% if (recentPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
 <div>
     <div class = "scrollable-pane">
         <table class = "styled-table">
@@ -227,10 +317,19 @@
         </table>
     </div>
 </div>
+<%
+    }
+%>
 
 <%--statistics --%>
 <%--TODO: would be great to use chart.js--%>
 <h3>Summary Statistics</h3>
+<% if (recentPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
 <div class = "summary-statistics">
     <ul>
         <li>Total attempts: <%=totalAttempts%></li>
@@ -240,6 +339,9 @@
         <li>Average Time: <%=averageTime%></li>
     </ul>
 </div>
+<%
+    }
+%>
 
 <%--buttons--%>
 <form action = "start-quiz" method = "post">
