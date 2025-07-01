@@ -35,13 +35,10 @@ public class StartQuizServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, 0);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, new ArrayList<Response>());
 
-        req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-//        req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
-
-/*        if("one-page".equals(quiz.getQuestionPlacement())) {
+        if("one-page".equals(quiz.getQuestionPlacement())) {
             req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
         } else {
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-        }*/
+        }
     }
 }
