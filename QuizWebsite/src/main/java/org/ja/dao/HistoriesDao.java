@@ -18,7 +18,7 @@ public class HistoriesDao {
     public void insertHistory(History history) throws SQLException{
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             ps.setLong(1, history.getUserId());
             ps.setLong(2, history.getQuizId());
@@ -57,7 +57,7 @@ public class HistoriesDao {
     public void removeHistory(long historyId){
         String sql = "DELETE FROM history WHERE history_id = ?";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, historyId);
 
@@ -98,7 +98,7 @@ public class HistoriesDao {
         String sql = "SELECT DISTINCT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, quizId);
 
@@ -187,9 +187,9 @@ public class HistoriesDao {
         return histories;
     }
 
-    public ArrayList<History> getTopPerformersByQuizIdAndRange(long quizId, String range, int limit) {
+    public ArrayList<History> getTopPerformersByQuizIdAndRange(long quizId, String range) {
         ArrayList<History> histories = new ArrayList<>();
-        String sql = "SELECT * FROM history WHERE quiz_id = ? AND completion_date >= ? ORDER BY score DESC, completion_time ASC, completion_date DESC LIMIT ?";
+        String sql = "SELECT * FROM history WHERE quiz_id = ? AND completion_date >= ? ORDER BY score DESC, completion_time ASC, completion_date DESC";
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime cutoff = switch (range) {
@@ -204,7 +204,6 @@ public class HistoriesDao {
 
             ps.setLong(1, quizId);
             ps.setTimestamp(2, Timestamp.valueOf(cutoff));
-            ps.setInt(3, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -399,3 +398,4 @@ public class HistoriesDao {
         }
     }
 }
+

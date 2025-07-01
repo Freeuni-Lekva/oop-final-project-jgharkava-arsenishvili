@@ -30,7 +30,7 @@
     margin-top: 15px;
 }
 
-.scrollable-pain{
+.scrollable-pane{
     max-height: 120px;
     overflow-y: auto;
     border: 2px solid #ccc;

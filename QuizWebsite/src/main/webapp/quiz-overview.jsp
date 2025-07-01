@@ -23,18 +23,18 @@
     int quizScore = quizzesDao.getQuizScore(quizId);
     String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
 
-    String range = request.getParameter("range");
-    if (range == null) {
-        range = "last_day";
-    }
-
     List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId);
     List<History> topPerformers = historiesDao.getTopNDistinctHistoriesByQuizId(quizId, 3);
     List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId);
-    List<History> filteredPerformersByDate = historiesDao.getTopPerformersByQuizIdAndRange(quizId, range, 10);
-    List<History> recentPerformers = historiesDao.getHistoriesByQuizIdSortedByDate(quizId);
 
     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+
+    Map<String, List<History>> topByRange = new HashMap<String, List<History>>();
+    topByRange.put("last_day", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_day"));
+    topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week"));
+    topByRange.put("last_month", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_month"));
+    topByRange.put("last_year", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_year"));
+
 %>
 
 <html>
@@ -46,7 +46,7 @@
 <body>
 <h1><%= quizName %></h1>
 <h2><%= creatorName %></h2>
-<p><%= quizDescription%>
+<p><%= quizDescription%></p>
 <h2>Max Score: <%= quizScore %></h2>
 
 <h3>Your Attempts on this Quiz</h3>
@@ -140,42 +140,53 @@
 </div>
 
 <%--range--%>
-<form method="get" action="">
-    <input type="hidden" name="quizId" value="<%=quizId%>" />
-    <label for="range">Show top performers from: </label>
-    <select name="range" id="range" onchange="this.form.submit()">
-        <option value="last_day" <%= "last_day".equals(range) ? "selected" : "" %>>Last Day</option>
-        <option value="last_week" <%= "last_week".equals(range) ? "selected" : "" %>>Last Week</option>
-        <option value="last_month" <%= "last_month".equals(range) ? "selected" : "" %>>Last Month</option>
-        <option value="last_year" <%= "last_year".equals(range) ? "selected" : "" %>>Last Year</option>
-    </select>
-</form>
+<h3>Top Performers by Range:</h3>
+<select id = "timeFilter" onchange = "filterByRange()">
+    <option value = "last_day">Last Day</option>
+    <option value = "last_week">Last Week</option>
+    <option value = "last_month">Last Month</option>
+    <option value = "last_year">Last Year</option>
+</select>
 
-<div id = "rangedPerformaceContainer" class = "scrollable-pain">
-<table class = styled-table>
-    <thead>
-    <tr>
-        <th>User</th>
-        <th>Score</th>
-        <th>Time (min)</th>
-        <th>Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% for (History h : filteredPerformersByDate) {
-        User performer = usersDao.getUserById(h.getUserId());
+<div id = "rangeContainer">
+    <% for (String range: Arrays.asList("last_day", "last_week", "last_month", "last_year")){
+        List<History> list = topByRange.get(range);
     %>
-    <tr>
-        <td><%= performer.getUsername() %></td>
-        <td><%= h.getScore() %></td>
-        <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-        <td><%= sdf.format(h.getCompletionDate()) %></td>
-    </tr>
-    <% } %>
-    </tbody>
-</table>
-</div>
 
+
+    <div class = "range-table scrollable-pane" id = "range-<%=range%>" style = "<%="last_day".equals(range) ? "" : "display:none;"%>">
+        <table class = "styled-table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Score</th>
+                <th>Time (min)</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <% for (History history: list){
+                User performer = usersDao.getUserById(history.getUserId());
+            %>
+            <tr>
+                <td><%=performer.getUsername()%></td>
+                <td><%=history.getScore()%></td>
+                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                <td><%=sdf.format(history.getCompletionDate())%></td>
+
+            </tr>
+            <%
+                }
+            %>
+            </tbody>
+        </table>
+    </div>
+    <%
+        }
+    %>
+</div>
 
 </body>
 </html>
+

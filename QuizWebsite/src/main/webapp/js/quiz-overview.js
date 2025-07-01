@@ -35,6 +35,8 @@ function toggleSortDirection(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    filterByRange();
+
     const btn = document.getElementById("sortDirectionBtn");
     btn.textContent = ascending ? "Sort Descending" : "Sort Ascending";
 
@@ -55,3 +57,21 @@ function showTopPerformers() {
     document.getElementById("showAllBtn").style.display = "inline-block";
     document.getElementById("showTopBtn").style.display = "none";
 }
+
+function filterByRange(){
+    const selected = document.getElementById("timeFilter").value;
+
+    console.log("Selected range:", selected); // Debug log
+
+    const sections = document.querySelectorAll(".range-table");
+
+    console.log("Found sections:", sections.length); // Debug log
+
+    sections.forEach(section => section.style.display = "none");
+
+    const active = document.getElementById("range-" + selected);
+    console.log("Looking for:", "range-" + selected, "Found:", active); // Debug log
+
+    active.style.display = "block";
+}
+
