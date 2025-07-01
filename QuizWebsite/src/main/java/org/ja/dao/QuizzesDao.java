@@ -433,28 +433,6 @@ public class QuizzesDao {
         return quizzes;
     }
 
-    public int getQuizScore(long quizId){
-        int answer = 0;
-        String sql = "SELECT COALESCE(SUM(num_answers), 0) FROM questions WHERE quiz_id = ?";
-
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            preparedStatement.setLong(1, quizId);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()){
-                if (resultSet.next()){
-                    answer = resultSet.getInt(1);
-                }
-            }
-        } catch(SQLException e) {
-            throw new RuntimeException("Error calculating score for quiz by id", e);
-        }
-
-        System.out.println(answer);
-
-        return answer;
-    }
-
     private Quiz retrieveQuiz(ResultSet rs) throws SQLException {
         return new Quiz(rs.getLong("quiz_id"), rs.getString("quiz_name"),
                 rs.getString("quiz_description"), rs.getInt("quiz_score"),

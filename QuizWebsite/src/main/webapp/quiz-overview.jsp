@@ -20,7 +20,7 @@
 
     String quizName = quiz.getName();
     String quizDescription = quiz.getDescription();
-    int quizScore = quizzesDao.getQuizScore(quizId);
+    int quizScore = quiz.getScore();
     String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
 
     boolean isCreator = user.getId() == quiz.getCreatorId();
