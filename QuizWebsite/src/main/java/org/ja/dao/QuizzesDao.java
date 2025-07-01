@@ -82,6 +82,7 @@ public class QuizzesDao {
         }
     }
 
+    // TODO remove unnecessary deletes
     public void removeQuizByName(String name) {
         String sql = "DELETE FROM quizzes WHERE quiz_name = ?";
 

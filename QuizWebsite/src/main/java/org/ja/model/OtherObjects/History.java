@@ -10,8 +10,7 @@ public class History {
     private Timestamp completionDate;
 
     // Empty constructor
-    public History() {
-    }
+    public History() {}
 
     // Constructor with all parameters
     public History(long historyId, long userId, long quizId, long score, double completionTime, Timestamp completionDate) {
