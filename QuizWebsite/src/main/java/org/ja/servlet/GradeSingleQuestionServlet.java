@@ -4,6 +4,7 @@ import org.ja.dao.AnswersDao;
 import org.ja.dao.MatchesDao;
 import org.ja.model.OtherObjects.Answer;
 import org.ja.model.OtherObjects.Match;
+import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
@@ -48,6 +49,8 @@ public class GradeSingleQuestionServlet extends HttpServlet {
 
             grade = question.gradeResponse(answers, response);
         }
+
+        Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
 
         if(index+1 != questions.size())
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);

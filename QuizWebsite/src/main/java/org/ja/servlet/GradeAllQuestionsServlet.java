@@ -25,12 +25,16 @@ public class GradeAllQuestionsServlet extends HttpServlet {
         List<Response> responseList = ResponseBuilder.buildResponse(req);
 
         HttpSession session = req.getSession();
-        ArrayList<Question> questions = (ArrayList<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
+        List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
         MatchesDao matchesDao = (MatchesDao) getServletContext().getAttribute(Constants.ContextAttributes.MATCHES_DAO);
         AnswersDao answersDao = (AnswersDao) getServletContext().getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
 
         ArrayList<ArrayList<Integer>> grades = new ArrayList<>();
 
+        System.out.println(questions);
+        System.out.println(responseList);
+
+        // TODO response size is less than questions.size if some field if left unused same may be in single question grader
         for(int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
             Response response = responseList.get(i);

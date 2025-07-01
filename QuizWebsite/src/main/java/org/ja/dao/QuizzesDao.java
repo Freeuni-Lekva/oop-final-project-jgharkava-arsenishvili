@@ -236,7 +236,7 @@ public class QuizzesDao {
     public ArrayList<Quiz> filterQuizzes(Filter filter) {
         String sql = "SELECT DISTINCT quizzes.quiz_id, quiz_name, quiz_description, average_rating, " +
                 "participant_count, creation_date, time_limit_in_minutes, quizzes.category_id, " +
-                "creator_id, question_order_status, question_placement_status, question_correction_status " +
+                "creator_id, question_order_status, question_placement_status, question_correction_status, quiz_score " +
                 "FROM quizzes left join categories on categories.category_id = quizzes.category_id " +
                 "left join quiz_tag on quizzes.quiz_id = quiz_tag.quiz_id " +
                 "left join tags on tags.tag_id = quiz_tag.tag_id " +
