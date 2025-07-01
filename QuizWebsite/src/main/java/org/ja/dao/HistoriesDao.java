@@ -2,10 +2,9 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.History;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class HistoriesDao {
@@ -19,7 +18,7 @@ public class HistoriesDao {
     public void insertHistory(History history) throws SQLException{
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
 
             ps.setLong(1, history.getUserId());
             ps.setLong(2, history.getQuizId());
@@ -58,7 +57,7 @@ public class HistoriesDao {
     public void removeHistory(long historyId){
         String sql = "DELETE FROM history WHERE history_id = ?";
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, historyId);
 
@@ -92,13 +91,14 @@ public class HistoriesDao {
     }
 
     /// retrieves quiz's history, sorted by decreasing completion date
+    /// todo: should add limit here
     public ArrayList<History> getHistoriesByQuizIdSortedByDate(long quizId){
         ArrayList<History> histories = new ArrayList<>();
 
-        String sql = "SELECT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC";
+        String sql = "SELECT DISTINCT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, quizId);
 
@@ -108,6 +108,110 @@ public class HistoriesDao {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving histories by quiz_id from database", e);
+        }
+
+        return histories;
+    }
+
+    public ArrayList<History> getTopNDistinctHistoriesByQuizId(long quizId, int limit) {
+        ArrayList<History> histories = new ArrayList<>();
+
+        String sql = """
+            SELECT ranked.*
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY user_id
+                           ORDER BY score DESC, completion_time ASC, completion_date DESC
+                       ) AS rn
+                FROM history
+                WHERE quiz_id = ?
+            ) ranked
+            WHERE rn = 1
+            ORDER BY score DESC, completion_time ASC, completion_date DESC
+            LIMIT ?
+        """;
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+            ps.setInt(2, limit);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    histories.add(retrieveHistory(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving top N distinct histories", e);
+        }
+
+        return histories;
+    }
+
+    public ArrayList<History> getDistinctTopHistoriesByQuizId(long quizId) {
+        ArrayList<History> histories = new ArrayList<>();
+
+        String sql = """
+        SELECT ranked.*
+        FROM (
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY user_id
+                       ORDER BY score DESC, completion_time ASC, completion_date DESC
+                   ) AS rn
+            FROM history
+            WHERE quiz_id = ?
+        ) ranked
+        WHERE rn = 1
+        ORDER BY score DESC, completion_time ASC, completion_date DESC
+    """;
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    histories.add(retrieveHistory(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving distinct top histories", e);
+        }
+
+        return histories;
+    }
+
+    public ArrayList<History> getTopPerformersByQuizIdAndRange(long quizId, String range) {
+        ArrayList<History> histories = new ArrayList<>();
+        String sql = "SELECT * FROM history WHERE quiz_id = ? AND completion_date >= ? ORDER BY score DESC, completion_time ASC, completion_date DESC";
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cutoff = switch (range) {
+            case "last_week" -> now.minusWeeks(1);
+            case "last_month" -> now.minusMonths(1);
+            case "last_year" -> now.minusYears(1);
+            default -> now.minusDays(1);
+        };
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+            ps.setTimestamp(2, Timestamp.valueOf(cutoff));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    histories.add(retrieveHistory(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving top performers filtered by range", e);
         }
 
         return histories;
@@ -250,6 +354,54 @@ public class HistoriesDao {
         }
     }
 
+    public long getTotalAttempts(long quizId){
+        String sql = "SELECT COUNT(*) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public double getAverageScore(long quizId){
+        String sql = "SELECT AVG(score) FROM history WHERE quiz_id = ?";
+
+        return statisticsCalculations(quizId, sql);
+    }
+
+    public long getMaximumScore(long quizId){
+        String sql = "SELECT MAX(score) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public long getMinimumScore(long quizId){
+        String sql = "SELECT MIN(score) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    public double getAverageTime(long quizId){
+        String sql = "SELECT AVG(completion_time) FROM history WHERE quiz_id = ?";
+
+        return (long) statisticsCalculations(quizId, sql);
+    }
+
+    private double statisticsCalculations(long quizId, String sql) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error calculating total attempts on this quiz", e);
+        }
+
+        return 0.0;
+    }
+
+
     public long getCount(){
         return cnt;
     }
@@ -294,3 +446,4 @@ public class HistoriesDao {
         }
     }
 }
+
