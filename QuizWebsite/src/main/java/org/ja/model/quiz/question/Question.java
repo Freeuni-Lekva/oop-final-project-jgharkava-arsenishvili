@@ -25,6 +25,7 @@ public class Question {
         this.quizId = quizId;
     }
 
+    // TODO response may not be great
     public int gradeResponse (List<?> correctAnswersList, Response response){
         if (!correctAnswersList.isEmpty() && correctAnswersList.get(0) instanceof Answer){
             @SuppressWarnings("unchecked")
@@ -33,6 +34,16 @@ public class Question {
             return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? 1 : 0;
         }
         return 0;
+    }
+
+    public boolean checkNth(Object usersAnswer, List<?> correctAnswersList, int index) {
+//        if (correctAnswersList.size() > index && correctAnswersList.get(0) instanceof Answer && index == 0){
+//            @SuppressWarnings("unchecked")
+//            Answer answer = ((List<Answer>) correctAnswersList).get(0);
+//
+//            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? 1 : 0;
+//        }
+        return false;
     }
 
     public long getQuestionId(){

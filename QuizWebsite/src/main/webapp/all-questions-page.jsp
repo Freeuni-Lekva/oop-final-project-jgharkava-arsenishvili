@@ -29,17 +29,23 @@
 
             <h2>Question <%=i+1%></h2><%
 
+            ///  RESPONSE OF FILL_IN_THE_BLANK questions
             if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION) || type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
                 <h3><%=question.getQuestionText()%></h3>
                 <input type="text" name="response_<%=i+1%>_1"><br><br><%
+            }
 
-            } else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
+            /// PICTURE RESPONSE QUESTION
+            else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
                 if (!(question.getQuestionText() == null)  && !question.getQuestionText().trim().isEmpty()) {%>
                     <h3><%=question.getQuestionText()%></h3><%
                 }%>
                 <img src="<%=question.getImageUrl()%>" width="300" height="200"><br>
                 <input type="text" name="response_<%=i+1%>_1"><br><br><%
-            } else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
+            }
+
+            /// MULTIPLE CHOICE QUESTION
+            else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
                 ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
                 Collections.shuffle(answers);%>
 
@@ -50,9 +56,11 @@
 
                     <input type="radio" name="response_<%=i+1%>_1" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><%
                 }
-            } else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
-                ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
-                Collections.shuffle(answers);%>
+            }
+
+            /// MULTI CHOICE MULTI ANSWER QUESTION
+            else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
+                ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
 
                 <h3><%=question.getQuestionText()%></h3><%
 
@@ -62,13 +70,19 @@
                         <input type="checkbox" name="response_<%=i+1%>_<%=j+1%>" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%>
                     </label><br><%
                 }
-            } else if (type.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) {%>
+            }
+
+            /// MULTI ANSWER QUESTION
+            else if (type.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) {%>
                 <h3><%=question.getQuestionText()%></h3><%
 
                 for (int j = 0; j < question.getNumAnswers(); j++) {%>
                         <input type="text" name="response_<%=i+1%>_<%=j+1%>"><br><%
                 }
-            } else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
+            }
+
+            /// MATCHING QUESTION
+            else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
                 ArrayList<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
                 List<String> leftMatches = new ArrayList<String>();
                 for (int k = 0; k < matches.size(); k++) {

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @WebServlet("/start-quiz")
 public class StartQuizServlet extends HttpServlet {
@@ -23,7 +24,7 @@ public class StartQuizServlet extends HttpServlet {
         long quizId = Long.parseLong(req.getParameter(Constants.RequestParameters.QUIZ_ID));
         Quiz quiz  = ((QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizById(quizId);
         QuestionDao questionDao = (QuestionDao) getServletContext().getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);
-        ArrayList<Question> questions = questionDao.getQuizQuestions(quizId);
+        List<Question> questions = questionDao.getQuizQuestions(quizId);
 
         HttpSession session = req.getSession();
         session.setAttribute(Constants.SessionAttributes.QUIZ, quiz);
@@ -34,6 +35,7 @@ public class StartQuizServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.QUESTIONS, questions);
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, 0);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, new ArrayList<Response>());
+        session.setAttribute("grades", new ArrayList<Integer>());
 
         if("one-page".equals(quiz.getQuestionPlacement())) {
             req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
