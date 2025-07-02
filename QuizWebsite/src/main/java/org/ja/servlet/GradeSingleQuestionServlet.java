@@ -32,35 +32,38 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, index+1);
         List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
         List<Integer> grades = (List<Integer>) session.getAttribute("grades");
+        List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
 
         Question question = questions.get(index);
 
         int grade = 0;
+        List<Integer> respGrades;
+
+        // TODO response size is less than questions.size if some field if left unused same may be in single question grader
 
         if(Constants.QuestionTypes.MATCHING_QUESTION.equals(question.getQuestionType())) {
             MatchesDao matchesDao = (MatchesDao) getServletContext().getAttribute(Constants.ContextAttributes.MATCHES_DAO);
             List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
 
-            grade = question.gradeResponse(matches, response);
+            respGrades = question.gradeResponse(matches, response);
         } else {
             AnswersDao answersDao = (AnswersDao) getServletContext().getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
             List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
 
-            grade = question.gradeResponse(answers, response);
+            respGrades = question.gradeResponse(answers, response);
         }
 
+        grade = Math.max(0, respGrades.stream().mapToInt(Integer::intValue).sum());
+
         grades.add(grade);
+        responseGrades.add(respGrades);
 
         Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
 
         if(quiz.getQuestionCorrection().equals("immediate-correction")) {
             req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
-        }
-
-/*
-        if(index+1 != questions.size())
+        } else if(index+1 != questions.size())
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-*/
-
+        else req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
     }
 }

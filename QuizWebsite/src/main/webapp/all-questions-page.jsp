@@ -7,7 +7,6 @@
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%

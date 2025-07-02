@@ -31,7 +31,7 @@ public class MatchingQuestionTest {
         response.addMatch(new Match("Egypt", "Cairo"));
         response.addMatch(new Match("France", "Paris"));
 
-        assertEquals(5, question.gradeResponse(matches, response));
+        assertEquals(List.of(1, 1, 1, 1, 1), question.gradeResponse(matches, response));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class MatchingQuestionTest {
         response.addMatch(new Match("Egypt", "Cairo"));
         response.addMatch(new Match("France", "Tokyo"));
 
-        assertEquals(3, question.gradeResponse(matches, response));
+        assertEquals(List.of(0, 1, 1, 1, 0), question.gradeResponse(matches, response));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class MatchingQuestionTest {
         response.addMatch(new Match("Egypt", "Paris"));
         response.addMatch(new Match("France", "Paris"));
 
-        assertEquals(1, question.gradeResponse(matches, response));
+        assertEquals(List.of(0, 0, 0, 0, 1), question.gradeResponse(matches, response));
     }
 
 }

@@ -27,15 +27,16 @@ public class StartQuizServlet extends HttpServlet {
         List<Question> questions = questionDao.getQuizQuestions(quizId);
 
         HttpSession session = req.getSession();
-        session.setAttribute(Constants.SessionAttributes.QUIZ, quiz);
 
         if("randomized".equals(quiz.getQuestionOrder()))
             Collections.shuffle(questions);
 
+        session.setAttribute(Constants.SessionAttributes.QUIZ, quiz);
         session.setAttribute(Constants.SessionAttributes.QUESTIONS, questions);
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, 0);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, new ArrayList<Response>());
         session.setAttribute("grades", new ArrayList<Integer>());
+        session.setAttribute("responseGrades", new ArrayList<ArrayList<Integer>>());
 
         if("one-page".equals(quiz.getQuestionPlacement())) {
             req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);

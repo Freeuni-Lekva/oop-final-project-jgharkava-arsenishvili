@@ -27,7 +27,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
         response.addAnswer("nigeria");
         response.addAnswer("rsa");
 
-        assertEquals(3, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, 1, 1), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
         response.addAnswer("rsa");
         response.addAnswer("brazil");
 
-        assertEquals(2, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, 1, 1, -1), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
         response.addAnswer("nigeria");
         response.addAnswer("brazil");
 
-        assertEquals(1, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, 1, -1), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -78,6 +78,6 @@ public class MultiChoiceMultiAnswersQuestionTest {
         response.addAnswer("egypt");
         response.addAnswer("brazil");
 
-        assertEquals(0, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, -1), question.gradeResponse(answers, response));
     }
 }

@@ -2,6 +2,8 @@ package org.ja.model.quiz.question;
 
 import org.ja.model.OtherObjects.Answer;
 import org.ja.model.quiz.response.Response;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,14 +28,15 @@ public class Question {
     }
 
     // TODO response may not be great
-    public int gradeResponse (List<?> correctAnswersList, Response response){
+    /// returns immutable list
+    public List<Integer> gradeResponse (List<?> correctAnswersList, Response response){
         if (!correctAnswersList.isEmpty() && correctAnswersList.get(0) instanceof Answer){
             @SuppressWarnings("unchecked")
             List<Answer> correctAnswers = (List<Answer>) correctAnswersList;
 
-            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? 1 : 0;
+            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? List.of(1) : List.of(0);
         }
-        return 0;
+        return List.of();
     }
 
     public boolean checkNth(Object usersAnswer, List<?> correctAnswersList, int index) {
