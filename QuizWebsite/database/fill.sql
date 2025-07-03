@@ -1,10 +1,10 @@
 use ja_project_db;
 
 insert into users (user_id, password_hashed, salt, username, user_status) values
-(1, 'hashed_password1', 'salt1', 'Nini', 'administrator'),
-(2, 'hashed_password2', 'salt2', 'Sandro', 'user'),
-(3, 'hashed_password3', 'salt3', 'Tornike', 'user'),
-(4, 'hashed_password1', 'salt1', 'Liza', 'user');
+(1, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Nini', 'administrator'),
+(2, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Sandro', 'user'),
+(3, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Tornike', 'user'),
+(4, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Liza', 'user');
 
 insert into categories (category_id, category_name) values
 (1, 'History'),

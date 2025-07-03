@@ -93,7 +93,8 @@
 
             for (String left : leftMatches) {%>
                 <label><%=left%></label>
-                <select name="response_1_<%=left%>"><%
+                <select name="response_1_<%=left%>">
+                    <option value="not selected">select</option> <%
                 for (String right : rightMatches) {%>
                     <option value="<%=right%>"><%=right%></option><%
                 }%>
