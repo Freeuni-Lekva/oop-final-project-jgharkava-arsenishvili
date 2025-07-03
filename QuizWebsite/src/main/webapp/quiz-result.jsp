@@ -21,13 +21,21 @@
 
     Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
+    List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
     List<Response> responses = (List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES);
     List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
     int totalScore = 0;
     for (Integer g : grades) {
         totalScore += g;
     }
+
+
 %>
+
+<style>
+    .incorrect { color: red; }
+    .correct { color: green; }
+</style>
 
 <html>
 <head>
@@ -47,11 +55,12 @@
         Question question = questions.get(j);
         Response resp = responses.get(j);
         int grade = grades.get(j);
+        List<Integer> respGrades = responseGrades.get(j);
         String type = question.getQuestionType();
 %>
 <div class="question-block">
     <div class="question-text">
-        Question <%= j + 1 %>: <%= question.getQuestionText() %>
+        Question <%= j + 1 %>: <%= question.getQuestionText() != null ? question.getQuestionText() : ""%>
     </div>
 
     <% if (question.getImageUrl() != null) { %>
@@ -66,7 +75,7 @@
         <% for(int i = 0; i < resp.size(); i++) {
             Match match = resp.getMatch(i);
         %>
-        <div><%= match.getLeftMatch() %> → <%= match.getRightMatch() %></div>
+        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= match.getLeftMatch() %> → <%= match.getRightMatch() %></div>
         <% } %>
     </div>
 
@@ -89,7 +98,8 @@
         %>
         <div class="<%=checked ? "correct" : ""%>">
             <input type="radio" <%=checked ? "checked" : ""%> disabled>
-            <%= answer.getAnswerText() %>
+<%--TODO allign next to radio--%>
+            <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
         </div>
         <% } %>
     </div>
@@ -97,7 +107,7 @@
     <div class="answer-block">
         <div class="label">Correct Answer(s):</div>
         <% for (Answer answer : answers) { %>
-        <div class="<%= answer.getAnswerValidity() ? "correct" : "" %>">
+        <div>
             <input type="radio" <%= answer.getAnswerValidity() ? "checked" : "" %> disabled>
             <%= answer.getAnswerText() %>
         </div>
@@ -110,24 +120,23 @@
     <div class="answer-block">
         <div class="label">Your Answer(s):</div>
         <% for(int i = 0; i < resp.size(); i++) { %>
-        <div><%= resp.getAnswer(i) %></div>
+        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
         <% } %>
     </div>
 
     <div class="answer-block">
         <div class="label">Correct Answer(s):</div>
-        <% for(Answer answer : answers) { %>
-        <div class="correct"><%= answer.getAnswerText() %></div>
+        <% for(Answer answer : answers) {
+            String answerText = answer.getAnswerText();%>
+        <div><%= answerText.contains("/") ? answerText.substring(0, answerText.indexOf('/')) : answerText %></div>
         <% } %>
     </div>
     <% } %>
 </div>
+
+    <div class="score-display">
+        Score: <%=grade%> out of <%=question.getNumAnswers()%>
+    </div>
 <% } %>
-
-<%
-    List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
-    System.out.println(responseGrades);
-%>
-
 </body>
 </html>

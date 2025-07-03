@@ -25,7 +25,9 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         HttpSession session = req.getSession();
 
         List<Response> responses = (List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES);
-        Response response = ResponseBuilder.buildResponse(req).get(0);
+        List<Response> responseList = ResponseBuilder.buildResponse(req);
+        // if multi choice and not selected any
+        Response response = responseList.isEmpty() ? new Response() : responseList.get(0);
         responses.add(response);
 
         Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
@@ -39,7 +41,7 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         int grade = 0;
         List<Integer> respGrades;
 
-        // TODO response size is less than questions.size if some field if left unused same may be in single question grader
+        // TODO response size is less than questions.size at the end is multi choice questions and not been selected any
 
         if(Constants.QuestionTypes.MATCHING_QUESTION.equals(question.getQuestionType())) {
             MatchesDao matchesDao = (MatchesDao) getServletContext().getAttribute(Constants.ContextAttributes.MATCHES_DAO);

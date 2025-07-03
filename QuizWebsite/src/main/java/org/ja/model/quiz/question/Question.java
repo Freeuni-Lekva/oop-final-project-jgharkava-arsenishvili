@@ -34,19 +34,10 @@ public class Question {
             @SuppressWarnings("unchecked")
             List<Answer> correctAnswers = (List<Answer>) correctAnswersList;
 
+            if(response.size() == 0) return List.of(0);
             return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? List.of(1) : List.of(0);
         }
         return List.of();
-    }
-
-    public boolean checkNth(Object usersAnswer, List<?> correctAnswersList, int index) {
-//        if (correctAnswersList.size() > index && correctAnswersList.get(0) instanceof Answer && index == 0){
-//            @SuppressWarnings("unchecked")
-//            Answer answer = ((List<Answer>) correctAnswersList).get(0);
-//
-//            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? 1 : 0;
-//        }
-        return false;
     }
 
     public long getQuestionId(){
