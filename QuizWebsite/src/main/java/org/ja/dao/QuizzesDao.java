@@ -67,6 +67,66 @@ public class QuizzesDao {
         }
     }
 
+    public void updateQuizTitle(long id, String title){
+        String sql = "UPDATE quizzes SET quiz_name = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setString(1, title);
+            preparedStatement.setLong(2, id);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz title by id", e);
+        }
+    }
+
+    public void updateQuizDescription(long id, String description){
+        String sql = "UPDATE quizzes SET quiz_description = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setString(1, description);
+            preparedStatement.setLong(2, id);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz description by id", e);
+        }
+    }
+
+    public void updateQuizTimeLimit(long id, int timeLimit){
+        String sql = "UPDATE quizzes SET time_limit_in_minutes = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setInt(1, timeLimit);
+            preparedStatement.setLong(2, id);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz time limit by id", e);
+        }
+    }
+
+    public void updateQuizCategory(long quizId, long categoryId){
+        String sql = "UPDATE quizzes SET category_id = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setLong(1, categoryId);
+            preparedStatement.setLong(2, quizId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz category by id", e);
+        }
+    }
+
     public void removeQuizById(long id) {
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 

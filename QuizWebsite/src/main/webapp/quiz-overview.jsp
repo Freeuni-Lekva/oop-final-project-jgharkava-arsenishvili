@@ -18,6 +18,7 @@
     long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
 
+    // TODO: add participant count
     String quizName = quiz.getName();
     String quizDescription = quiz.getDescription();
     int quizScore = quiz.getScore();
