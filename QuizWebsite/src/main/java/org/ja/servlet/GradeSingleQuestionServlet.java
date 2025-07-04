@@ -61,11 +61,19 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         responseGrades.add(respGrades);
 
         Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
+        long startTime = (long) session.getAttribute("start-time");
+        long currTime = System.currentTimeMillis();
 
-        if(quiz.getQuestionCorrection().equals("immediate-correction")) {
+        if(quiz.getTimeInMinutes() != 0 && quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) {
+            // TODO update database
+            req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
+        } else if(quiz.getQuestionCorrection().equals("immediate-correction")) {
             req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
         } else if(index+1 != questions.size())
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-        else req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
+        else {
+            // TODO update database
+            req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
+        }
     }
 }

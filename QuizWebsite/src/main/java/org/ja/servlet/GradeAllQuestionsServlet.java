@@ -63,6 +63,7 @@ public class GradeAllQuestionsServlet extends HttpServlet {
         session.setAttribute("responseGrades", responseGrades);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, responses);
 
+        // TODO update database
         req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
     }
 }

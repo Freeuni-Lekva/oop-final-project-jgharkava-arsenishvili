@@ -27,6 +27,37 @@
 </head>
 <body>
 
+<%
+  long startTime = (Long) session.getAttribute("start-time");
+  int duration = (Integer) session.getAttribute("time-limit-in-seconds");
+  long now = System.currentTimeMillis();
+  long timeLeft = duration - (now - startTime) / 1000;
+%>
+
+<script>
+  let timeLeft = <%= timeLeft %>;
+
+  function formatTime(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return m + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function updateTimer() {
+    if (timeLeft <= 0) {
+      document.getElementById("next-form").submit();
+    } else {
+      document.getElementById("timer").textContent = formatTime(timeLeft);
+      timeLeft--;
+      setTimeout(updateTimer, 1000);
+    }
+  }
+
+  window.onload = updateTimer;
+</script>
+
+<div>Time left: <span id="timer"></span></div>
+
 <div class="question-block">
   <div class="question-text">
     Question <%=index%>: <%=question.getQuestionText() != null ? question.getQuestionText() : ""%>
@@ -112,11 +143,11 @@
 </div>
 
 <% if(index == questions.size()) { %>
-<form method="get" action="quiz-result.jsp">
+<form id="next-form" method="get" action="quiz-result.jsp">
   <input type="submit" value="View Quiz Result">
 </form>
 <% } else { %>
-<form method="get" action="single-question-page.jsp">
+<form id="next-form" method="get" action="single-question-page.jsp">
   <input type="submit" value="Next Question">
 </form>
 <% } %>

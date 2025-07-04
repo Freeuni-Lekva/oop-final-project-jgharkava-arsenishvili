@@ -38,12 +38,17 @@ public class StartQuizServlet extends HttpServlet {
         session.setAttribute("grades", new ArrayList<Integer>());
         session.setAttribute("responseGrades", new ArrayList<ArrayList<Integer>>());
 
-        req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
+        int timeLimitInMinutes = quiz.getTimeInMinutes();
 
-//        if(("one-page").equals(quiz.getQuestionPlacement())) {
-//            req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
-//        } else {
-//            req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-//        }
+        if(timeLimitInMinutes != 0) {
+            session.setAttribute("time-limit-in-seconds", timeLimitInMinutes * 60);
+            session.setAttribute("start-time", System.currentTimeMillis());
+        }
+
+        if(("one-page").equals(quiz.getQuestionPlacement())) {
+            req.getRequestDispatcher("/all-questions-page.jsp").forward(req, resp);
+        } else {
+            req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
+        }
     }
 }

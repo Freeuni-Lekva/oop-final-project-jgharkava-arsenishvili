@@ -75,7 +75,7 @@ create table questions(
     question_id bigint primary key auto_increment,
     quiz_id bigint not null,
     question text,
-    image_url varchar(256) default null,
+    image_url varchar(2048) default null,
     question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
        'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
 

@@ -28,8 +28,6 @@
     for (Integer g : grades) {
         totalScore += g;
     }
-
-
 %>
 
 <style>
@@ -53,9 +51,20 @@
 <%
     for(int j = 0; j < questions.size(); j++) {
         Question question = questions.get(j);
-        Response resp = responses.get(j);
-        int grade = grades.get(j);
-        List<Integer> respGrades = responseGrades.get(j);
+
+        Response resp;
+        int grade;
+        List<Integer> respGrades = null;
+
+        if(responses.size() <= j) {
+            resp = null;
+            grade = 0;
+        } else {
+            resp = responses.get(j);
+            grade = grades.get(j);
+            respGrades = responseGrades.get(j);
+        }
+
         String type = question.getQuestionType();
 %>
 <div class="question-block">
@@ -72,11 +81,17 @@
     %>
     <div class="answer-block">
         <div class="label">Your Matches:</div>
-        <% for(int i = 0; i < resp.size(); i++) {
-            Match match = resp.getMatch(i);
-        %>
-        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= match.getLeftMatch() %> → <%= match.getRightMatch() %></div>
-        <% } %>
+        <%
+            if(resp == null) {%>
+                <h6>Haven't Chosen In Time</h6><%
+            } else {
+                for(int i = 0; i < resp.size(); i++) {
+                    Match match = resp.getMatch(i);%>
+
+                <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= match.getLeftMatch() %> → <%= match.getRightMatch() %></div><%
+                }
+            }%>
+
     </div>
 
     <div class="answer-block">
@@ -92,16 +107,22 @@
     %>
     <div class="answer-block">
         <div class="label">Your Answer(s):</div>
-        <% for (Answer answer : answers) {
-            boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
-            if (checked) responseIndex++;
-        %>
-        <div class="<%=checked ? "correct" : ""%>">
-            <input type="radio" <%=checked ? "checked" : ""%> disabled>
-<%--TODO allign next to radio--%>
-            <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
-        </div>
-        <% } %>
+        <%
+            if(resp == null) {%>
+                <h6>Haven't Chosen In Time</h6>
+        <%
+            } else {
+                for (Answer answer : answers) {
+                    boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
+                    if (checked) responseIndex++;%>
+
+                    <div class="<%=checked ? "correct" : ""%>">
+                        <input type="radio" <%=checked ? "checked" : ""%> disabled>
+                        <%--TODO allign next to radio--%>
+                        <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
+                    </div><%
+                }
+            }%>
     </div>
 
     <div class="answer-block">
@@ -119,9 +140,15 @@
     %>
     <div class="answer-block">
         <div class="label">Your Answer(s):</div>
-        <% for(int i = 0; i < resp.size(); i++) { %>
+        <%
+            if(resp == null) {%>
+                <h6>Haven't Chosen In Time</h6><%
+            } else {
+                for(int i = 0; i < resp.size(); i++) { %>
         <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
-        <% } %>
+        <% }
+            } %>
+
     </div>
 
     <div class="answer-block">

@@ -20,7 +20,39 @@
     <title>Quiz Questions</title>
 </head>
 <body>
-<form action="grade-single-page-quiz" method="post">
+
+<%
+    long startTime = (Long) session.getAttribute("start-time");
+    int duration = (Integer) session.getAttribute("time-limit-in-seconds");
+    long now = System.currentTimeMillis();
+    long timeLeft = duration - (now - startTime) / 1000;
+%>
+
+<script>
+    let timeLeft = <%= timeLeft %>;
+
+    function formatTime(secs) {
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        return m + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    function updateTimer() {
+        if (timeLeft <= 0) {
+            document.getElementById("questions-form").submit();
+        } else {
+            document.getElementById("timer").textContent = formatTime(timeLeft);
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
+    window.onload = updateTimer;
+</script>
+
+<div>Time left: <span id="timer"></span></div>
+
+<form id="questions-form" action="grade-single-page-quiz" method="post">
     <%
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
