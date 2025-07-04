@@ -127,6 +127,51 @@ public class QuizzesDao {
         }
     }
 
+    public void updateQuizQuestionOrderStatus(long quizId, String questionOrderStatus){
+        String sql = "UPDATE quizzes SET question_order_status = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setString(1, questionOrderStatus);
+            preparedStatement.setLong(2, quizId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz question order status by id", e);
+        }
+    }
+
+    public void updateQuizQuestionPlacementStatus(long quizId, String questionPlacementStatus){
+        String sql = "UPDATE quizzes SET question_placement_status = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setString(1, questionPlacementStatus);
+            preparedStatement.setLong(2, quizId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz question placement status by id", e);
+        }
+    }
+
+    public void updateQuizQuestionCorrectionStatus(long quizId, String questionCorrectionStatus){
+        String sql = "UPDATE quizzes SET question_correction_status = ? WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setString(1, questionCorrectionStatus);
+            preparedStatement.setLong(2, quizId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz question correction status by id", e);
+        }
+    }
+
     public void removeQuizById(long id) {
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 

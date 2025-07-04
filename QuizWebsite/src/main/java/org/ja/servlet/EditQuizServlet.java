@@ -1,6 +1,8 @@
 package org.ja.servlet;
 
+import org.ja.dao.QuizTagsDao;
 import org.ja.dao.QuizzesDao;
+import org.ja.model.OtherObjects.QuizTag;
 import org.ja.utils.Constants;
 
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +16,7 @@ public class EditQuizServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
+        QuizTagsDao quizTagsDao = (QuizTagsDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
 
         long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
         String field = request.getParameter("field");
@@ -40,6 +43,31 @@ public class EditQuizServlet extends HttpServlet {
                 System.out.println(newCategory);
                 quizzesDao.updateQuizCategory(quizId, newCategory);
                 response.setStatus(HttpServletResponse.SC_OK);
+                break;
+            case "removeTag":
+                long tagToRemove = Long.parseLong(request.getParameter("tagId"));
+                System.out.println(tagToRemove);
+                quizTagsDao.removeQuizTag(quizId, tagToRemove);
+                break;
+            case "addTag":
+                long tagToAdd = Long.parseLong(request.getParameter("tagId"));
+                System.out.println(tagToAdd);
+                quizTagsDao.insertQuizTag(new QuizTag(quizId, tagToAdd));
+                break;
+            case "orderStatus":
+                String newOrderStatus = request.getParameter("questionOrderStatus");
+                System.out.println(newOrderStatus);
+                quizzesDao.updateQuizQuestionOrderStatus(quizId, newOrderStatus);
+                break;
+            case "placementStatus":
+                String newPlacementStatus = request.getParameter("questionPlacementStatus");
+                System.out.println(newPlacementStatus);
+                quizzesDao.updateQuizQuestionPlacementStatus(quizId, newPlacementStatus);
+                break;
+            case "correctionStatus":
+                String newCorrectionStatus = request.getParameter("questionCorrectionStatus");
+                System.out.println(newCorrectionStatus);
+                quizzesDao.updateQuizQuestionCorrectionStatus(quizId, newCorrectionStatus);
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown field");
