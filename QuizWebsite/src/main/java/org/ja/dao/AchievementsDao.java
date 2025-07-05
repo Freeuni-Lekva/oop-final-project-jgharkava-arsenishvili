@@ -16,7 +16,7 @@ public class AchievementsDao {
         this.dataSource = dataSource;
     }
 
-    /// Throws RuntimeException when achievement name is already in use
+    /// Throws RuntimeException when achievement name is already in usee
     public void insertAchievement(Achievement achievement){
         String sql = "INSERT INTO achievements (achievement_name, " +
                 "achievement_description, achievement_photo) VALUES (?,?,?)";
