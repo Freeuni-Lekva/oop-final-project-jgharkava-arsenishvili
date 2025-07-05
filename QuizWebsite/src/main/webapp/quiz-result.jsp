@@ -28,6 +28,11 @@
     for (Integer g : grades) {
         totalScore += g;
     }
+
+    double timeSpent = (Double) session.getAttribute("time-spent-in-minutes");
+    int totalSeconds = (int) (timeSpent * 60);
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
 %>
 
 <style>
@@ -44,6 +49,7 @@
 <div class="score-box">
     <h2>Quiz Result</h2>
     <p><span class="label">Your Total Score:</span> <%= totalScore %> / <%= quiz.getScore() %></p>
+    <p><span class="label">Your Time Spent: <%= minutes %> minutes <%= seconds %> seconds </span> </p>
 </div>
 
 <h2 class="section-title">Review Your Answers</h2>
@@ -165,5 +171,14 @@
         Score: <%=grade%> out of <%=question.getNumAnswers()%>
     </div>
 <% } %>
+
+
+
+
+<%--Some other things--%>
+
+
+
+
 </body>
 </html>

@@ -1,13 +1,16 @@
 package org.ja.servlet;
 
 import org.ja.dao.AnswersDao;
+import org.ja.dao.HistoriesDao;
 import org.ja.dao.MatchesDao;
 import org.ja.model.OtherObjects.Answer;
+import org.ja.model.OtherObjects.History;
 import org.ja.model.OtherObjects.Match;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
+import org.ja.model.user.User;
 import org.ja.utils.Constants;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 @WebServlet("/grade-single-question")
@@ -64,16 +69,33 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         long startTime = (long) session.getAttribute("start-time");
         long currTime = System.currentTimeMillis();
 
-        if(quiz.getTimeInMinutes() != 0 && quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) {
-            // TODO update database
+        if((quiz.getTimeInMinutes() != 0 && quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) ||
+            index + 1 == questions.size()) {
+            long quizId = ((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId();
+            long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
+            double completionTime = (double) (currTime - startTime) / 60000;
+            if(quiz.getTimeInMinutes() != 0 && completionTime >= quiz.getTimeInMinutes())
+                completionTime = quiz.getTimeInMinutes();
+
+            session.setAttribute("time-spent-in-minutes", completionTime);
+            long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
+
+            Timestamp completionDate = new Timestamp(currTime);
+
+            History newHistory = new History(userId, quizId, totalScore, completionTime, completionDate);
+            HistoriesDao historiesDao = (HistoriesDao) getServletContext().getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
+
+            try {
+                historiesDao.insertHistory(newHistory);
+            } catch (SQLException e) {
+                throw new RuntimeException("Error Inserting New History In Database");
+            }
+
             req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
+
         } else if(quiz.getQuestionCorrection().equals("immediate-correction")) {
             req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
-        } else if(index+1 != questions.size())
+        } else
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
-        else {
-            // TODO update database
-            req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
-        }
     }
 }

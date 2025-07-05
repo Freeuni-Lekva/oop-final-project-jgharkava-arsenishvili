@@ -209,6 +209,7 @@ create table challenges(
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
+-- TODO change score to int
 -- History table.
 -- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
 create table history(

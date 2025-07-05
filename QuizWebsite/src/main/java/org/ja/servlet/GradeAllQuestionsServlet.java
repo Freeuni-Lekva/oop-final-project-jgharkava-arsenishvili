@@ -1,12 +1,16 @@
 package org.ja.servlet;
 
 import org.ja.dao.AnswersDao;
+import org.ja.dao.HistoriesDao;
 import org.ja.dao.MatchesDao;
 import org.ja.model.OtherObjects.Answer;
+import org.ja.model.OtherObjects.History;
 import org.ja.model.OtherObjects.Match;
+import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
+import org.ja.model.user.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -16,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +69,28 @@ public class GradeAllQuestionsServlet extends HttpServlet {
         session.setAttribute("responseGrades", responseGrades);
         session.setAttribute(Constants.SessionAttributes.RESPONSES, responses);
 
-        // TODO update database
+        // updating database
+        Quiz quiz =  (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
+        long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
+        long endTime = System.currentTimeMillis();
+        long startTime = (long) session.getAttribute("start-time");
+        double completionTime = (double) (endTime - startTime) / 60000;
+        if(quiz.getTimeInMinutes() != 0 && completionTime >= quiz.getTimeInMinutes())
+            completionTime = quiz.getTimeInMinutes();
+
+        session.setAttribute("time-spent-in-minutes", completionTime);
+        long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
+
+        Timestamp completionDate = new Timestamp(endTime);
+
+        History newHistory = new History(userId, quiz.getId(), totalScore, completionTime, completionDate);
+        HistoriesDao historiesDao = (HistoriesDao) getServletContext().getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
+        try {
+            historiesDao.insertHistory(newHistory);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error Inserting New History In Database");
+        }
+
         req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
     }
 }

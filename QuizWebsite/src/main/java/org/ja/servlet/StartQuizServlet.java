@@ -38,6 +38,7 @@ public class StartQuizServlet extends HttpServlet {
         session.setAttribute("grades", new ArrayList<Integer>());
         session.setAttribute("responseGrades", new ArrayList<ArrayList<Integer>>());
 
+        // TODO can quiz exist without time limit?
         int timeLimitInMinutes = quiz.getTimeInMinutes();
 
         if(timeLimitInMinutes != 0) {
