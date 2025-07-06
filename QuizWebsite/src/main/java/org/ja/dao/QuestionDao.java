@@ -1,7 +1,8 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.quiz.question.Question;
+import org.ja.model.quiz.question.*;
+import org.ja.utils.Constants;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -150,10 +151,67 @@ public class QuestionDao {
         return cnt;
     }
 
+    // TODO add specific constructor to questions
     private Question retrieveQuestion(ResultSet rs) throws SQLException {
-        return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                rs.getString("question"), rs.getString("image_url"),
-                rs.getString("question_type"), rs.getInt("num_answers"),
-                rs.getString("order_status"));
+        String type = rs.getString("question_type");
+
+        switch (type) {
+            case Constants.QuestionTypes.RESPONSE_QUESTION -> {
+                return new ResponseQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION -> {
+                return new PictureResponseQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.MATCHING_QUESTION -> {
+                return new MatchingQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.MULTI_ANSWER_QUESTION -> {
+                return new MultiAnswerQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION -> {
+                return new MultipleChoiceQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION -> {
+                return new MultiChoiceMultiAnswersQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            case Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION -> {
+                return new FillInTheBlankQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+
+            default -> {
+                return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
+                        rs.getString("question"), rs.getString("image_url"),
+                        rs.getString("question_type"), rs.getInt("num_answers"),
+                        rs.getString("order_status"));
+            }
+        }
+
     }
 }

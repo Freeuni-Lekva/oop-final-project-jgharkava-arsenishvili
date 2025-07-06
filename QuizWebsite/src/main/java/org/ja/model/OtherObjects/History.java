@@ -22,6 +22,15 @@ public class History {
         this.completionDate = completionDate;
     }
 
+    public History(long userId, long quizId, long score, double completionTime, Timestamp completionDate) {
+        this.historyId = -1;
+        this.userId = userId;
+        this.quizId = quizId;
+        this.score = score;
+        this.completionTime = completionTime;
+        this.completionDate = completionDate;
+    }
+
     // Getters and Setters
 
     public long getHistoryId() {

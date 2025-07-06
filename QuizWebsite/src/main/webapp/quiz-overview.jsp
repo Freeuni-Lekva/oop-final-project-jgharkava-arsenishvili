@@ -242,7 +242,7 @@
 </div>
 
 <%--buttons--%>
-<form action = "start-quiz" method = "post">
+<form action = "start-quiz" method = "get">
     <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
     <button type = "submit">Start Quiz</button>
 </form>

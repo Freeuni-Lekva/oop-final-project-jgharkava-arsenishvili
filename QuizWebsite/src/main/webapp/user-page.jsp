@@ -141,8 +141,8 @@
     <button type="submit">Create Quiz</button>
   </form> <br>
 
-  <form action="take-quiz.jsp" method="get">
-    <button type="submit">Take Quiz</button>
+  <form action="quiz-search.jsp" method="get">
+    <button type="submit">Search Quiz</button>
   </form>
 </div>
 

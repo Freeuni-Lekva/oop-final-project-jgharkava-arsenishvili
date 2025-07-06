@@ -4,8 +4,11 @@ import org.ja.model.OtherObjects.Answer;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MultiAnswerQuestion extends Question{
@@ -20,17 +23,18 @@ public class MultiAnswerQuestion extends Question{
     }
 
     @Override
-    public int gradeResponse(List<?> correctAnswersList, Response response){
-        int grade = 0;
+    public List<Integer> gradeResponse(List<?> correctAnswersList, Response response){
+        List<Integer> grades = new ArrayList<>();
 
         if (!correctAnswersList.isEmpty() && correctAnswersList.get(0) instanceof Answer) {
             @SuppressWarnings("unchecked")
             List<Answer> correctAnswers = (List<Answer>) correctAnswersList;
 
             if (orderStatus.equals(Constants.OrderTypes.ORDERED)) {
-                grade = (int) IntStream.range(0, correctAnswers.size())
-                        .filter(i -> (correctAnswers.get(i)).containsAnswer(response.getAnswer(i)))
-                        .count();
+                grades = IntStream.range(0, correctAnswers.size())
+                         .map(i -> (correctAnswers.get(i)).containsAnswer(response.getAnswer(i)) ? 1 : 0)
+                         .boxed()
+                         .toList();
             } else {
                 Boolean[] unorderedCorrectAnswers = new Boolean[correctAnswers.size()];
                 Arrays.fill(unorderedCorrectAnswers, false);
@@ -39,15 +43,16 @@ public class MultiAnswerQuestion extends Question{
                     String currResponse = response.getAnswer(i);
                     for (int j = 0; j < correctAnswers.size(); j++) {
                         if (correctAnswers.get(j).containsAnswer(currResponse) && !unorderedCorrectAnswers[j]) {
-                            unorderedCorrectAnswers[i] = true;
-                            grade++;
+                            unorderedCorrectAnswers[j] = true;
+                            grades.add(1);
                             break;
                         }
                     }
+                    if(grades.size() == i) grades.add(0);
                 }
             }
         }
 
-        return grade;
+        return List.copyOf(grades);
     }
 }

@@ -26,7 +26,7 @@ public class MultiAnswerQuestionTest {
         response.addAnswer("Sao paulo");
         response.addAnswer("MEXICO CITY");
 
-        assertEquals(5, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, 1, 1, 1, 1), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class MultiAnswerQuestionTest {
         response.addAnswer("Sao paulo");
         response.addAnswer("MEXICO CITY");
 
-        assertEquals(3, question.gradeResponse(answers, response));
+        assertEquals(List.of(0, 0, 1, 1, 1), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class MultiAnswerQuestionTest {
         response.addAnswer("MAYAN");
         response.addAnswer("greek ");
 
-        assertEquals(5, question.gradeResponse(answers, response));
+        assertEquals(List.of(1, 1, 1, 0, 0), question.gradeResponse(answers, response));
     }
 
     @Test
@@ -78,6 +78,6 @@ public class MultiAnswerQuestionTest {
         response.addAnswer("  american");
         response.addAnswer("greek");
 
-        assertEquals(3, question.gradeResponse(answers, response));
+        assertEquals(List.of(0, 1, 1, 0, 0), question.gradeResponse(answers, response));
     }
 }
