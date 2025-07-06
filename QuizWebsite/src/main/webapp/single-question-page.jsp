@@ -5,7 +5,8 @@
 <%@ page import="org.ja.model.OtherObjects.Answer" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
-<%@ page import="org.ja.dao.MatchesDao" %><%--
+<%@ page import="org.ja.dao.MatchesDao" %>
+<%@ page import="org.ja.model.quiz.Quiz" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 6/27/2025
@@ -20,6 +21,7 @@
     String type = question.getQuestionType();
     AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
     MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
+    Quiz quiz=(Quiz)session.getAttribute(Constants.SessionAttributes.QUIZ);
 %>
 
 <html>
@@ -136,6 +138,11 @@
     %>
 
     <input type="submit" value="Submit Question">
+
+</form>
+<form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">back to Quiz</button>
 </form>
 </body>
 </html>

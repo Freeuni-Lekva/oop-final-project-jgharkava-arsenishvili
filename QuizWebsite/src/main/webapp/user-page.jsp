@@ -6,6 +6,7 @@
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   AnnouncementsDao announcementsDao = (AnnouncementsDao)application.getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
@@ -59,8 +60,10 @@
     int cnt1 = 0;
     for(Quiz quiz : quizzes){
       if(cnt1 == 3) break;%>
-      <p><%=quiz.getName()%></p>
-      <p>Taken by <%=quiz.getParticipantCount()%> users.</p>
+  <form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%>, Taken by <%=quiz.getParticipantCount()%> users.</button>
+  </form>
   <%
     cnt1++;
     } %>
@@ -75,9 +78,10 @@
     int cnt2 = 0;
     for(Quiz quiz: recentlyCreated){
       if(cnt2 == 5) break;%>
-      <p><%=quiz.getName()%></p>
-      <p>Created By: <%=usersDao.getUserById(quiz.getCreatorId()).getUsername()%></p>
-      <p>On: <%=quiz.getCreationDate()%></p>
+  <form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%>, Created By: <%=usersDao.getUserById(quiz.getCreatorId()).getUsername()%> On: <%=quiz.getCreationDate()%></button>
+  </form>
   <%
     cnt2++;
     }%>
@@ -93,12 +97,18 @@
       <% int cnt3 = 0;
       for(History h: recentHistory){
         if(cnt3 == 5) break;%>
-        <p><%=quizDao.getQuizById(h.getQuizId()).getName()%></p>
-        <p>Your Score: <%=h.getScore()%></p>
-        <p>Your Time: <%=h.getCompletionTime()%></p>
-        <p>Taken On: <%=h.getCompletionDate()%></p>
+  <form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quizDao.getQuizById(h.getQuizId()).getId()%>">
+    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quizDao.getQuizById(h.getQuizId()).getName()%>,</button>
+    <p>Your Score: <%=h.getScore()%>, Your Time: <%=String.format("%.2f", h.getCompletionTime())%> Taken On: <%=h.getCompletionDate().toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))%></p>
+  </form>
       <%
           cnt3++;}
+      %>
+  <form action="history-page.jsp" method="get">
+    <button type="submit">Full History</button>
+  </form>
+  <%
     }else{%>
       <p>You have not taken any Quizzes yet.</p>
   <%}%>
