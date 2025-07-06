@@ -15,7 +15,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
-    QuestionDao questionDao = (QuestionDao) application.getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);
     CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
     QuizTagsDao quizTagsDao = (QuizTagsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
@@ -37,7 +36,6 @@
 </head>
 <body>
     <h2>Edit Quiz</h2>
-    <input type="hidden" id="quizId" value="<%=quizId%>">
 
 <%--    Title--%>
     <label for="quizTitle">Edit Quiz Title:</label>
@@ -139,7 +137,10 @@
         </select>
     </div>
 
-
+    <form id = "edit-question-form" action = "edit-question" method = "get">
+        <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" id="quizId" value="<%=quizId%>">
+        <button type="submit" id="edit-question-btn">Edit Question</button>
+    </form>
 
 </body>
 </html>
