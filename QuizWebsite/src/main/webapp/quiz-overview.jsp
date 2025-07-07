@@ -19,10 +19,8 @@
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
     QuizRatingsDao quizRatingsDao = (QuizRatingsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_RATING_DAO);
 
-//    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
-    User user = usersDao.getUserById(2);
-//    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
-    long quizId = 2;
+    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
+    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
 
     String quizName = quiz.getName();
