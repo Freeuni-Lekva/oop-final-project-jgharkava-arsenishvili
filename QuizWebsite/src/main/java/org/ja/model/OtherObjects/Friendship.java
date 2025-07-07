@@ -64,3 +64,4 @@ public class Friendship {
                 friendshipDate.equals(((Friendship) o).getFriendshipDate());
     }
 }
+

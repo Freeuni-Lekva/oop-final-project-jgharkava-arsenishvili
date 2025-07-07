@@ -66,3 +66,4 @@ public class Challenge {
                 quizId == ((Challenge) o).getQuizId();
     }
 }
+

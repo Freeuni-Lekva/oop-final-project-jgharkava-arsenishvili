@@ -226,3 +226,4 @@ public class FriendShipsDao {
                 rs.getTimestamp("friendship_date"), rs.getString("friendship_status"));
     }
 }
+

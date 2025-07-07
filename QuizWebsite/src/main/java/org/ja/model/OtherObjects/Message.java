@@ -79,3 +79,4 @@ public class Message {
                 messageSendDate.equals(((Message) o).messageSendDate);
     }
 }
+
