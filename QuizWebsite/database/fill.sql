@@ -40,7 +40,8 @@ insert into questions(quiz_id, question, image_url, question_type, num_answers, 
 (2, 'Select all noble gases', null, 'multi-choice-multi-answers', 3, 'ordered'),
 (2, 'Name first three elements of the periodic table', null, 'multi-answer', 3, 'ordered'),
 (2, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered'),
-(2, 'Who discovered penicillin?', null, 'question-response', 1, 'ordered');
+(2, 'Who discovered penicillin?', null, 'question-response', 1, 'ordered'),
+(2, 'WWI began in _', null, 'fill-in-the-blank', 1, 'ordered');
 
 insert into answers(question_id, answer_text, answer_order, answer_validity) values
 (1, '1939/39', 1, true),

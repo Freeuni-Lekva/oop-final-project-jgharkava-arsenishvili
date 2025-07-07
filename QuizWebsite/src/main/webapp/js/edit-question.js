@@ -16,15 +16,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         block.innerHTML = `
         <textarea class="answer-text">${answerText}</textarea>
-        <button class="save-answer-btn">Save</button>
+        <button class="save-answer-btn" disabled>Save</button>
         <button class="delete-answer-btn">Delete</button>`;
 
-        // Save
+        const textarea = block.querySelector(".answer-text");
+        const saveButton = block.querySelector(".save-answer-btn");
+
+        toggleSaveButtonState(textarea, saveButton);
+        textarea.addEventListener("input", () => {
+            toggleSaveButtonState(textarea, saveButton);
+        });
+
+        // Save handler
         block.querySelector(".save-answer-btn").addEventListener("click", () => {
-            const newText = block.querySelector(".answer-text").value.trim();
+            const newText = textarea.value.trim();
             const oldText = block.dataset.answerText || "";
             const answerId = block.dataset.answerId;
-
             const isNew = !oldText;
 
             const payload = {
@@ -51,8 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
 
-
-        // Delete
+        // Delete handler remains the same
         block.querySelector(".delete-answer-btn").addEventListener("click", () => {
             const answerId = block.dataset.answerId;
             const answerText = block.dataset.answerText;
@@ -82,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return block;
     }
+
 
     // Add Option button logic
     document.querySelectorAll(".add-answer-btn").forEach(button => {
@@ -374,26 +381,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Handle question-level inputs
+    document.querySelectorAll(".question-text").forEach(textarea => {
+        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
+        if (saveBtn) {
+            toggleSaveButtonState(textarea, saveBtn);
+            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+        }
+    });
+
+    document.querySelectorAll(".image-url").forEach(textarea => {
+        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
+        if (saveBtn){
+            toggleSaveButtonState(textarea, saveBtn);
+            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+        }
+    })
+
+    document.querySelectorAll(".question-picture-text").forEach(textarea => {
+        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-picture-btn");
+        if (saveBtn) {
+            toggleSaveButtonState(textarea, saveBtn);
+            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+        }
+    });
+
+    document.querySelectorAll(".edit-raw-question-input").forEach(textarea => {
+        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
+        if (saveBtn) {
+            toggleSaveButtonState(textarea, saveBtn);
+            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+        }
+    });
+
+    // Handle answer-level inputs separately
+    document.querySelectorAll(".answer-text").forEach(textarea => {
+        const block = textarea.closest(".answer-block");
+        const saveButton = block?.querySelector(".save-answer-btn");
+        if (saveButton) {
+            toggleSaveButtonState(textarea, saveButton);
+            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveButton));
+        }
+    });
+
 });
 
-const state = {};
-
-// Updated renderExistingQuestionWithBlanks to accept container element
-function renderExistingQuestionWithBlanks(questionText, container) {
-    container.innerHTML = "";
-
-    const words = questionText.trim().split(/\s+/);
-    words.forEach(word => {
-        const span = document.createElement("span");
-        if (word === "_") {
-            span.textContent = "_____";
-            span.style.fontWeight = "bold";
-        } else {
-            span.textContent = word + " ";
-        }
-        container.appendChild(span);
-    });
+function toggleSaveButtonState(textarea, saveButton) {
+    saveButton.disabled = textarea.value.trim() === "";
 }
+
+const state = {};
 
 function renderQuestionWithBlanks(questionId) {
     const inputElem = document.querySelector(`textarea.edit-raw-question-input[data-question-id='${questionId}']`);
@@ -423,23 +460,20 @@ function renderQuestionWithBlanks(questionId) {
 
     const words = input.trim().split(/\s+/);
 
-    // Add "+" button before first word
-    container.appendChild(createBlankButton(questionId, -1));
+    if (!blankInserted) {
+        container.appendChild(createBlankButton(questionId, 0));
+    }
 
     words.forEach((word, index) => {
         const wordSpan = document.createElement("span");
         wordSpan.textContent = " " + word + " ";
         container.appendChild(wordSpan);
 
-        if (!blankInserted && index < words.length - 1) {
+        if (!blankInserted) {
             container.appendChild(createBlankButton(questionId, index + 1));
         }
     });
 
-    // Add "+" button after last word
-    if (!blankInserted && words.length > 0) {
-        container.appendChild(createBlankButton(questionId, words.length));
-    }
 
     updateFinalQuestion(questionId);
 }
@@ -509,12 +543,12 @@ function updateFinalQuestion(questionId) {
     let words = input.trim().split(/\s+/);
 
     if (blankInserted) {
-        if (selectedIndex === -1) {
+        if (selectedIndex === 0) {
             words.unshift("_");
         } else if (selectedIndex === words.length) {
             words.push("_");
         } else {
-            words.splice(selectedIndex + 1, 0, "_");
+            words.splice(selectedIndex, 0, "_");
         }
     }
 
