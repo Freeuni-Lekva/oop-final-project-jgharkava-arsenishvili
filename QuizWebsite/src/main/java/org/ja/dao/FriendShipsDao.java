@@ -17,24 +17,51 @@ public class FriendShipsDao {
 
     /// if first and second user already exists in table throws RuntimeException
     /// sets status to 'pending'
-    public void insertFriendRequest(Friendship friendship){
+    public void insertFriendRequest(long firstUserId, long secondUserId) {
         String sql = "INSERT INTO friendships (first_user_id, second_user_id) VALUES (?, ?)";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setLong(1, friendship.getFirstUserId());
-            ps.setLong(2, friendship.getSecondUserId());
+            ps.setLong(1, firstUserId);
+            ps.setLong(2, secondUserId);
 
             ps.executeUpdate();
 
             cnt++;
+            Friendship friendship = getFriendshipByIds(firstUserId, secondUserId);
             friendship.setFriendshipStatus("pending");
 
             retrieveFriendshipDate(friendship);
 
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting friendship into database", e);
+        }
+    }
+
+    public Friendship getFriendshipByIds(long firstUserId, long secondUserId){
+        String sql = "SELECT * FROM friendships WHERE (first_user_id = ? AND second_user_id = ?) OR (first_user_id = ? AND second_user_id = ?)";
+
+        try(Connection c= dataSource.getConnection();
+            PreparedStatement ps=c.prepareStatement(sql)){
+            ps.setLong(1, firstUserId);
+            ps.setLong(2, secondUserId);
+            ps.setLong(3, secondUserId);
+            ps.setLong(4, firstUserId);
+
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    Friendship f = new Friendship();
+                    f.setFirstUserId(rs.getLong("first_user_id"));
+                    f.setSecondUserId(rs.getLong("second_user_id"));
+                    f.setFriendshipStatus(rs.getString("friendship_status"));
+                    f.setFriendshipDate(rs.getTimestamp("friendship_date"));
+                    return f;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -150,13 +177,15 @@ public class FriendShipsDao {
         if(f == null){
             return false;
         }
-        String sql = "SELECT COUNT(*) FROM friendships WHERE first_user_id = ? AND second_user_id = ?" +
-                "AND friendship_status=? ";
+        String sql = "SELECT COUNT(*) FROM friendships WHERE ((first_user_id = ? AND second_user_id = ?) OR (first_user_id = ? AND second_user_id = ?)) " +
+                "AND friendship_status = ? ";
         try(Connection c= dataSource.getConnection();
             PreparedStatement ps=c.prepareStatement(sql)){
             ps.setLong(1, f.getFirstUserId());
             ps.setLong(2, f.getSecondUserId());
-            ps.setString(3, f.getFriendshipStatus());
+            ps.setLong(3, f.getSecondUserId());
+            ps.setLong(4, f.getFirstUserId());
+            ps.setString(5, f.getFriendshipStatus());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -171,7 +200,7 @@ public class FriendShipsDao {
     }
 
     public boolean contains(long first_id, long second_id) {
-        String sql = "SELECT COUNT(*) FROM friendships WHERE first_user_id = ? AND second_user_id = ?";
+        String sql = "SELECT COUNT(*) FROM friendships WHERE ((first_user_id = ? AND second_user_id = ?) OR (first_user_id = ? AND second_user_id = ?))";
         try(Connection c= dataSource.getConnection();
             PreparedStatement ps=c.prepareStatement(sql)){
             ps.setLong(1, first_id);

@@ -1,7 +1,7 @@
 <%
     String err = (String) request.getAttribute("error");
     if(err != null){ %>
-        <div style="color:red;"><%=err%></div>
+        <div class="error-message"><%=err%></div>
 <%  } %>
 
 <!DOCTYPE html>
@@ -17,15 +17,17 @@
 
 <div class="login_field">
     <form action="login" method="post">
-        Username: <label>
-        <input type="text" name="username" required/>
-    </label><br /><br />
-        Password: <label>
-        <input type="password" name="password" required/>
-    </label>
+        <label>
+            Username:
+            <input type="text" name="username" required/>
+        </label>
+         <label>
+             Password:
+             <input type="password" name="password" required/>
+         </label>
         <input type="submit" value="Login" />
     </form>
-    <p style="text-align: center;"><a href="sign-up.jsp">Sign Up Here</a></p>
+    <p class="sign-up-link"><a href="sign-up.jsp">Sign Up Here</a></p>
 </div>
 </body>
 </html>

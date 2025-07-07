@@ -128,41 +128,6 @@ public class QuizzesDao {
 
             if (rs.next()) {
                 long id = rs.getLong("quiz_id");
-                try (PreparedStatement st1 = c.prepareStatement("DELETE FROM challenges WHERE quiz_id = ?")) {
-                    st1.setLong(1, id);
-                    st1.executeUpdate();
-                }
-
-                try (PreparedStatement st2 = c.prepareStatement("DELETE FROM history WHERE quiz_id = ?")) {
-                    st2.setLong(1, id);
-                    st2.executeUpdate();
-                }
-
-                try (PreparedStatement st3 = c.prepareStatement("DELETE FROM quiz_rating WHERE quiz_id = ?")) {
-                    st3.setLong(1, id);
-                    st3.executeUpdate();
-                }
-
-                try (PreparedStatement st4 = c.prepareStatement("DELETE FROM quiz_tag WHERE quiz_id = ?")) {
-                    st4.setLong(1, id);
-                    st4.executeUpdate();
-                }
-
-                try (PreparedStatement st5 = c.prepareStatement("DELETE FROM matches WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)")) {
-                    st5.setLong(1, id);
-                    st5.executeUpdate();
-                }
-
-                try (PreparedStatement st6 = c.prepareStatement("DELETE FROM answers WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)")) {
-                    st6.setLong(1, id);
-                    st6.executeUpdate();
-                }
-
-                try (PreparedStatement st7 = c.prepareStatement("DELETE FROM questions WHERE quiz_id = ?")) {
-                    st7.setLong(1, id);
-                    st7.executeUpdate();
-                }
-
                 try (PreparedStatement deleteQuiz = c.prepareStatement("DELETE FROM quizzes WHERE quiz_id = ?")) {
                     deleteQuiz.setLong(1, id);
                     deleteQuiz.executeUpdate();

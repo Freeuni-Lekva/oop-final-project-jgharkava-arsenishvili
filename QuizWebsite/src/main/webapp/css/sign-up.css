@@ -22,7 +22,7 @@ body {
     color: #007BFF;
 }
 
-.login_field {
+.signup_field {
     max-width: 300px;
     margin: 60px auto;
     padding: 20px;
@@ -31,8 +31,8 @@ body {
     background-color: #f9f9f9;
 }
 
-.login_field input[type="text"],
-.login_field input[type="password"] {
+.signup_field input[type="text"],
+.signup_field input[type="password"] {
     width: 90%;
     padding: 8px;
     margin-top: 4px;
@@ -41,7 +41,7 @@ body {
     border-radius: 4px;
 }
 
-.login_field input[type="submit"] {
+.signup_field input[type="submit"] {
     width: 95%;
     padding: 10px;
     background-color: #739cc8;
@@ -53,8 +53,8 @@ body {
     margin-top: 10px;
 }
 
-.login_field input[type="submit"]:hover {
-    background-color: #739cc8;
+.signup_field input[type="submit"]:hover {
+    background-color: #5a8bb3;
 }
 
 .error-message {
@@ -65,21 +65,21 @@ body {
     font-size: 14px;
 }
 
-.sign-up-link {
+.back-link {
     text-align: center;
     margin-top: 15px;
 }
 
-.sign-up-link a {
+.back-link a {
     color: #007BFF;
     text-decoration: none;
 }
 
-.sign-up-link a:hover {
+.back-link a:hover {
     text-decoration: underline;
 }
 
-h1, h3{
+h1 {
     text-align: center;
     color: #333;
     margin-bottom: 30px;

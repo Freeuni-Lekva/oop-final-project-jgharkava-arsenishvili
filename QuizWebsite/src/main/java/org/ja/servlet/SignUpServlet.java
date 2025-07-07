@@ -16,6 +16,7 @@ import java.sql.SQLException;
 
 @WebServlet("/signUp")
 public class SignUpServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");

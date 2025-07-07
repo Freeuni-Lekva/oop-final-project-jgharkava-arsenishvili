@@ -11,7 +11,7 @@
     UsersDao usersDao = (UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO);
     String name = request.getParameter("query");
     User visitedUser = usersDao.getUserByUsername(name);
-    User currentUser = (User) session.getAttribute(Constants.SessionAttributes.USER);
+    User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
     AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);
@@ -25,7 +25,6 @@
     <script src = "js/visit-user.js" defer></script>
 </head>
 <body>
-<div class="container">
     <!-- user info-->
     <div class="user-info">
         <h2><%=visitedUser.getUsername()%></h2>
@@ -33,19 +32,53 @@
     </div>
 
     <div class="action-row">
-        <%if(!friendsDao.contains(currentUser.getId(), visitedUser.getId())){%>
-            <form action="add-friend.jsp" method="post">
+        <%Friendship friendship = friendsDao.getFriendshipByIds(currentUser.getId(), visitedUser.getId());
+            if(friendship == null){%>
+            <!--no relationship yet -->
+            <form action="communication" method="post">
+                <input type="hidden" name="action" value="add-friend">
+                <input type="hidden" name="friendId" value="<%=visitedUser.getId()%>">
                 <button type="submit">Add friend</button>
             </form>
-        <%}else{%>
-        <form action="remove-friend.jsp" method="post">
-            <button type="submit">Remove friend</button>
-        </form>
-        <form action="challenge.jsp" method="get">
-            <button type="submit">Challenge</button>
-        </form>
-        <form action="send-message.jsp" method="get">
-        </form>
+        <%}else if("friends".equals(friendship.getFriendshipStatus())){%>
+            <!--friends -->
+            <form action="communication" method="post">
+                <input type="hidden" name="action" value="remove-friend">
+                <input type="hidden" name="friendId" value="<%=visitedUser.getId()%>">
+                <button type="submit">Remove friend</button>
+            </form>
+            <!-- send challenge -->
+            <form action="communication" method="post">
+                Quiz name: <label>
+                <input type="text" name="quiz-name" required/></label>
+                <input type="hidden" name="action" value="send-challenge">
+                <input type="hidden" name="friendId" value="<%=visitedUser.getId()%>" />
+                <button type="submit">Challenge</button>
+            </form>
+             <!-- send message -->
+            <form action="communication" method="post">
+                <input type="hidden" name="action" value="send-message">
+                <input type="hidden" name="recipient" value="<%=visitedUser.getUsername()%>">
+                <label>Message:</label><br>
+                <textarea name="message" rows="3" cols="30" placeholder="Write your message" required></textarea><br><br>
+                <button type="submit">Send</button>
+            </form>
+        <%}else if(("pending".equals(friendship.getFriendshipStatus()))){
+            if(friendship.getFirstUserId() == currentUser.getId()){%>
+            <!--curUser has sent the request -->
+                <form action="communication" method="post">
+                    <input type="hidden" name="action" value="remove-request">
+                    <input type="hidden" name="friendId" value="<%=visitedUser.getId()%>">
+                    <button type="submit">Remove request</button>
+                </form>
+            <%}else if(friendship.getSecondUserId() == currentUser.getId()){%>
+            <!--curUser has received request  -->
+                <form action="communication" method="post">
+                    <input type="hidden" name="friendId" value="<%=visitedUser.getId()%>">
+                    <button type="submit" name="action" value="accept">Accept</button>
+                    <button type="submit" name="action" value="delete">Delete</button>
+                </form>
+            <%}%>
         <%}%>
     </div>
 
@@ -72,8 +105,6 @@
         <p><%= name %> has no achievements yet.</p>
         <% } %>
     </div>
-
-</div>
 
 </body>
 </html>
