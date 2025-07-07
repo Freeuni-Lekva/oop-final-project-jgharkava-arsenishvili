@@ -34,4 +34,9 @@ public class Announcement {
                 announcementText.equals(((Announcement) o).getAnnouncementText()) &&
                 creationDate.equals(((Announcement) o).getCreationDate());
     }
+
+    @Override
+    public int hashCode() {
+        return announcementText.hashCode();
+    }
 }

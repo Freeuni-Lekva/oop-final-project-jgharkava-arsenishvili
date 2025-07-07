@@ -22,7 +22,7 @@ public class MultipleChoiceQuestionTest {
         Response response = new Response();
         response.addAnswer("OTTaWA");
 
-        assertEquals(1, question.gradeResponse(List.of(answer), response));
+        assertEquals(List.of(1), question.gradeResponse(List.of(answer), response));
     }
 
     @Test
@@ -34,8 +34,6 @@ public class MultipleChoiceQuestionTest {
         Response response = new Response();
         response.addAnswer("Montreal");
 
-        assertEquals(0, question.gradeResponse(List.of(answer), response));
+        assertEquals(List.of(0), question.gradeResponse(List.of(answer), response));
     }
-
-
 }

@@ -92,15 +92,39 @@ public class QuizRatingsDao {
         return quizRatings;
     }
 
+    // TODO: delete
     public ArrayList<QuizRating> getQuizRatingsByQuizId(long quizId){
         ArrayList<QuizRating> quizRatings = new ArrayList<>();
 
-        String sql = "SELECT * FROM quiz_rating WHERE quiz_id = ?";
+        String sql = "SELECT DISTINCT * FROM quiz_rating WHERE quiz_id = ?";
 
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next())
+                    quizRatings.add(retrieveQuizRating(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying quiz rating by quiz id from database", e);
+        }
+
+        return quizRatings;
+    }
+
+    public ArrayList<QuizRating> getQuizRatingsByQuizIdLimit(long quizId, int limit){
+        ArrayList<QuizRating> quizRatings = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT * FROM quiz_rating WHERE quiz_id = ? LIMIT ?";
+
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setLong(1, quizId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())

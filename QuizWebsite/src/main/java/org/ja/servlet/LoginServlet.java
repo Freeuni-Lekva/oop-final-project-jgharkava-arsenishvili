@@ -1,6 +1,5 @@
 package org.ja.servlet;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
 import org.ja.utils.Constants;
@@ -28,7 +27,7 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/index.jsp").forward(request, resp);
             }else{
                 request.getSession().setAttribute(Constants.SessionAttributes.USER, user);
-                request.getRequestDispatcher("/create-quiz.jsp").forward(request, resp);
+                request.getRequestDispatcher("/user-page.jsp").forward(request, resp);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

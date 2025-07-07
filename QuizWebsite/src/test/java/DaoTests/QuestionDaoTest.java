@@ -123,11 +123,11 @@ public class QuestionDaoTest {
             quizzesDao.insertQuiz(q4);
 
             qu11=new Question(1, 1, "historyQuizQuestion1", "sth.jpg",
-                    "question-response", 50,"ordered");
+                    "question-response", 1,"ordered");
             qu12=new Question(42, 1, "historyQuizQuestion2", "sth2.jpg",
-                    "question-response", 2,"ordered");
+                    "question-response", 1,"ordered");
             qu13=new Question(1, 1, "historyQuizQuestion3", "null",
-                    "question-response", 50,"ordered");
+                    "question-response", 1,"ordered");
         }
     }
     @Test
@@ -166,7 +166,7 @@ public class QuestionDaoTest {
         dao.insertQuestion(qu12);
         dao.insertQuestion(qu13);
         Question qu21=new Question(1, 2, "historyQuizQuestion3", "null",
-                "question-response", 50,"ordered");
+                "question-response", 1,"ordered");
         dao.insertQuestion(qu21);
         ArrayList<Question> arr=dao.getQuizQuestions(1);
         assertEquals(3, arr.size());

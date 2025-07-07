@@ -115,6 +115,7 @@ public class QuizzesDao {
         }
     }
 
+    // TODO remove unnecessary deletes
     public void removeQuizByName(String name) {
         if(!containsQuiz(name)){
             return;
