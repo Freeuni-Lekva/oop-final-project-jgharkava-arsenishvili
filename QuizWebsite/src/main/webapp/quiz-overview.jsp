@@ -357,6 +357,11 @@ No activity to show
     <button type = "submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
 </form>
 
+
+<br>
+<form action="user-page.jsp" method="get">
+    <button type="submit" >Home</button>
+</form>
 </body>
 </html>
 
