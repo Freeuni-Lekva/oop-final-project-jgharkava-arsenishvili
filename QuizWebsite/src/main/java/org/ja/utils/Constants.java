@@ -61,10 +61,17 @@ public class Constants {
         public static final String MATCHES = "current-matches";
         public static final String HAS_QUESTIONS = "hasQuestions";
 
+        public static final String QUIZ_MODE = "quiz-mode";
+        public static final String PRACTICE_QUESTIONS_MASTERY_MAP = "practice-question-mastery-map";
     }
 
     public static class RequestParameters {
         public static final String QUIZ_ID = "current-quiz-id";
         public static final String USER_ID = "current-quiz-id";
+    }
+
+    public enum QuizMode {
+        TAKING,
+        PRACTICE
     }
 }

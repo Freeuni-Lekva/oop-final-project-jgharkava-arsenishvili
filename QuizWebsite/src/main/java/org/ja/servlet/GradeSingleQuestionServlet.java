@@ -22,31 +22,64 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/grade-single-question")
 public class GradeSingleQuestionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Constants.QuizMode quizMode = (Constants.QuizMode) req.getSession().getAttribute(Constants.SessionAttributes.QUIZ_MODE);
+
+        if(Constants.QuizMode.TAKING == quizMode)
+            analyzeTakingMode(req, resp);
+        else analyzePracticeMode(req, resp);
+    }
+
+    private void analyzePracticeMode(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
 
         List<Response> responses = (List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES);
         List<Response> responseList = ResponseBuilder.buildResponse(req);
-        // if multi choice and not selected any
         Response response = responseList.isEmpty() ? new Response() : responseList.get(0);
+        responses.remove(0);
         responses.add(response);
 
         Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
-        session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, index+1);
         List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
+        Question question = questions.get(index);
+
+        // always of size 1;
         List<Integer> grades = (List<Integer>) session.getAttribute("grades");
         List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
 
-        Question question = questions.get(index);
+        grades.removeFirst();
+        responseGrades.removeFirst();
 
+        calculateGrade(response, question, grades, responseGrades);
+
+        int grade = grades.getFirst();
+
+        Map<Question, Integer> masteryMap = (Map<Question, Integer>) session.getAttribute(Constants.SessionAttributes.PRACTICE_QUESTIONS_MASTERY_MAP);
+
+        for(int i = 0; i < questions.size(); i++) {
+            index = (index + 1) % questions.size();
+            if(masteryMap.containsKey(questions.get(index))) break;
+        }
+
+        session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, index);
+
+        ///  if answered correctly
+        if(grade == question.getNumAnswers()) {
+            masteryMap.computeIfPresent(question, (q, val) -> val - 1);
+            if(masteryMap.get(question) == 0) masteryMap.remove(question);
+        }
+
+        req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
+    }
+
+    private void calculateGrade(Response response, Question question, List<Integer> grades, List<List<Integer>> responseGrades) {
         int grade = 0;
         List<Integer> respGrades;
-
-        // TODO response size is less than questions.size at the end is multi choice questions and not been selected any
 
         if(Constants.QuestionTypes.MATCHING_QUESTION.equals(question.getQuestionType())) {
             MatchesDao matchesDao = (MatchesDao) getServletContext().getAttribute(Constants.ContextAttributes.MATCHES_DAO);
@@ -64,13 +97,34 @@ public class GradeSingleQuestionServlet extends HttpServlet {
 
         grades.add(grade);
         responseGrades.add(respGrades);
+    }
+
+    private void analyzeTakingMode(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+
+        List<Response> responses = (List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES);
+        List<Response> responseList = ResponseBuilder.buildResponse(req);
+        // if multi choice and not selected any
+        Response response = responseList.isEmpty() ? new Response() : responseList.get(0);
+        responses.add(response);
+
+        Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
+        session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, index+1);
+        List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
+        List<Integer> grades = (List<Integer>) session.getAttribute("grades");
+        List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
+
+        Question question = questions.get(index);
+
+        calculateGrade(response, question, grades, responseGrades);
 
         Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
         long startTime = (long) session.getAttribute("start-time");
         long currTime = System.currentTimeMillis();
 
+        /// manage time limit
         if((quiz.getTimeInMinutes() != 0 && quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) ||
-            index + 1 == questions.size()) {
+                index + 1 == questions.size()) {
             long quizId = ((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId();
             long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
             double completionTime = (double) (currTime - startTime) / 60000;
