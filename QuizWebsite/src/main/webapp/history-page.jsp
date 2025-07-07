@@ -13,7 +13,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    long userId = (long) request.getAttribute(Constants.RequestParameters.USER_ID);
+    long userId = Long.parseLong(request.getParameter(Constants.RequestParameters.USER_ID));
     User user = ((UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO)).getUserById(userId);
     User sessionUser = (User) session.getAttribute(Constants.SessionAttributes.USER);
     HistoriesDao hd=(HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
@@ -36,8 +36,13 @@
             <h1>Your full history of quizzes:</h1><%
         } else { %>
             <h1>
-<%--                TODO test this--%>
-                <a href="visit-user.jsp?userId=<%=user.getId()%>"><%=user.getUsername()%></a>
+<%-- TODO test this--%>
+                <a href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=user.getId()%>"
+                   style="text-decoration: none; color: inherit; cursor: pointer;"
+                   onmouseover="this.style.textDecoration='underline';"
+                   onmouseout="this.style.textDecoration='none';">
+                    <%=user.getUsername()%>
+                </a>'s full history of quizzes:
             </h1><%
         }
     %>
@@ -45,7 +50,14 @@
 <%
     for(History h: arr){
         %>
-    <li><%=quizDao.getQuizById(h.getQuizId()).getName()%></li>
+    <li>
+        <a href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=h.getQuizId()%>"
+           style="text-decoration: none; color: inherit; cursor: pointer;"
+           onmouseover="this.style.textDecoration='underline';"
+           onmouseout="this.style.textDecoration='none';">
+            <%=quizDao.getQuizById(h.getQuizId()).getName()%>
+        </a>
+    </li>
     <p>Your Score: <%=h.getScore()%></p>
     <p>Your Time: <%=h.getCompletionTime()%></p>
     <p>Taken On: <%=h.getCompletionDate()%></p>

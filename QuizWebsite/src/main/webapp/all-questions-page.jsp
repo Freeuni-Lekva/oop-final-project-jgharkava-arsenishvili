@@ -148,7 +148,7 @@
 </form>
 <form action="quiz-overview.jsp" method="get">
     <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-    <button type="submit">Back To Quiz</button>
+    <button type="submit">Exit Quiz</button>
 </form>
 </body>
 </html>
