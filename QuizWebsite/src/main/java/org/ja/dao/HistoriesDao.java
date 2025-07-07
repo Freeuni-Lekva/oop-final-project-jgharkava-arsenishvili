@@ -1,13 +1,17 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ja.model.OtherObjects.History;
+import org.ja.utils.Constants;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class HistoriesDao {
+    private static final Log log = LogFactory.getLog(HistoriesDao.class);
     private final BasicDataSource dataSource;
     private long cnt = 0;
     public HistoriesDao(BasicDataSource dataSource) {
@@ -16,6 +20,7 @@ public class HistoriesDao {
 
     /// updates quiz's participant count in quizzes table
     public void insertHistory(History history) throws SQLException{
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaaa");
         String sql = "INSERT INTO history (user_id, quiz_id, score, completion_time) VALUES (?,?,?,?)";
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -45,13 +50,14 @@ public class HistoriesDao {
                 }
             }
 
-
-
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting history into database", e);
         }
 
+        System.out.println("aaaaaaaaaaaa");
+        checkAchievements(history);
         updateQuizParticipantCount(history.getQuizId());
+        System.out.println("modixar aq??");
     }
 
     public void removeHistory(long historyId){
@@ -401,7 +407,6 @@ public class HistoriesDao {
         return 0.0;
     }
 
-
     public long getCount(){
         return cnt;
     }
@@ -444,6 +449,107 @@ public class HistoriesDao {
         } catch (SQLException e){
             throw new RuntimeException("Error inserting number of participants into database", e);
         }
+    }
+
+    private void checkAchievements(History history) throws SQLException{
+        long userId = history.getUserId();
+
+        // 1. First step
+        if (!hasAchievement(userId, Constants.AchievementIds.FIRST_STEP)) {
+            System.out.println("xxxx");
+            grantAchievement(userId, Constants.AchievementIds.FIRST_STEP);
+        }
+
+        // 2. Quiz Addict (10 completed quizzes)
+        if (!hasAchievement(userId, Constants.AchievementIds.QUIZ_ADDICT) && getCompletedQuizCount(userId) >= 10) {
+            System.out.println("eee");
+            grantAchievement(userId, Constants.AchievementIds.QUIZ_ADDICT);
+        }
+
+        // 3. Flawless Victory
+        if (!hasAchievement(userId, Constants.AchievementIds.FLAWLESS_VICTORY) && getPerfectScoreCount(userId) > 0) {
+            System.out.println("ccc");
+            grantAchievement(userId, Constants.AchievementIds.FLAWLESS_VICTORY);
+        }
+
+        // 4. Quiz Master (5 perfect scores)
+        if (!hasAchievement(userId, Constants.AchievementIds.QUIZ_MASTER) && getPerfectScoreCount(userId) >= 5) {
+            System.out.println("bbb");
+            grantAchievement(userId, Constants.AchievementIds.QUIZ_MASTER);
+        }
+
+        // 5. Speed Demon
+        if (!hasAchievement(userId, Constants.AchievementIds.SPEED_DEMON) && history.getCompletionTime() <= 1) {
+            System.out.println("aaaa");
+            grantAchievement(userId, Constants.AchievementIds.SPEED_DEMON);
+        }
+
+        System.out.println(hasAchievement(userId, Constants.AchievementIds.SPEED_DEMON));
+        System.out.println( hasAchievement(userId, Constants.AchievementIds.QUIZ_MASTER));
+        System.out.println(hasAchievement(userId, Constants.AchievementIds.FLAWLESS_VICTORY));
+        System.out.println(hasAchievement(userId, Constants.AchievementIds.QUIZ_ADDICT));
+        System.out.println(hasAchievement(userId, Constants.AchievementIds.FIRST_STEP));
+    }
+
+    private void grantAchievement(long userId, long achievementId) throws SQLException{
+        String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setLong(1, userId);
+            ps.setLong(2, achievementId);
+
+            ps.executeUpdate();
+        }
+
+    }
+
+    private boolean hasAchievement(long userId, long achievementId) throws SQLException {
+        String sql = "SELECT 1 FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setLong(2, achievementId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private int getCompletedQuizCount(long userId) throws SQLException{
+        String sql = "SELECT COUNT(*) FROM history WHERE user_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setLong(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if(rs.next())
+                    return rs.getInt(1);
+            }
+        }
+
+        return -1;
+    }
+
+    private int getPerfectScoreCount(long userId) throws SQLException{
+        String sql = "SELECT COUNT(*) " +
+                     "FROM history h JOIN quizzes q on h.quiz_id = q.quiz_id " +
+                     "WHERE h.score = q.quiz_score AND h.user_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next())
+                    return rs.getInt(1);
+            }
+        }
+
+        return -1;
     }
 }
 
