@@ -75,7 +75,7 @@ create table questions(
     question_id bigint primary key auto_increment,
     quiz_id bigint not null,
     question text,
-    image_url varchar(256) default null,
+    image_url varchar(2048) default null,
     question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
        'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
 
@@ -209,6 +209,7 @@ create table challenges(
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
+-- TODO change score to int
 -- History table.
 -- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
 create table history(

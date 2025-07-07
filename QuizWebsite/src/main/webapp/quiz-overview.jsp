@@ -1,24 +1,367 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="org.ja.dao.QuizzesDao" %><%--
-  Created by IntelliJ IDEA.
-  User: tober
-  Date: 6/19/2025
-  Time: 1:26 PM
-  To change this template use File | Settings | File Templates.
---%>
+<%@ page import="java.util.*" %>
+<%@ page import="org.ja.model.OtherObjects.History" %>
+<%@ page import="org.ja.model.user.User" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="org.ja.dao.*" %>
+<%@ page import="org.ja.model.OtherObjects.QuizRating" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<%--TODO: add categories and tags--%>
+
 <%
+    QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
+    UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
+    HistoriesDao historiesDao = (HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
+    CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
+    QuizTagsDao quizTagsDao = (QuizTagsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
+    TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
+    QuizRatingsDao quizRatingsDao = (QuizRatingsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_RATING_DAO);
+
+    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
     long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
-    Quiz quiz = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizById(quizId);
+    Quiz quiz = quizzesDao.getQuizById(quizId);
+
+    String quizName = quiz.getName();
+    String quizDescription = quiz.getDescription();
+    int quizScore = quiz.getScore();
+    String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
+    String categoryName = categoriesDao.getCategoryById(quiz.getCategoryId()).getCategoryName();
+    List<Long> quizTagIds = quizTagsDao.getTagsByQuizId(quizId);
+    double averageRating = quiz.getAvgRating();
+    List<QuizRating> quizRatings = quizRatingsDao.getQuizRatingsByQuizIdLimit(quizId, 3);
+
+    List<String> quizTags = new ArrayList<String>();
+    for (Long quizTag: quizTagIds)
+        quizTags.add(tagsDao.getTagById(quizTag).getTagName());
+
+    Map<String, List<String>> userReviews = new HashMap<String, List<String>>();
+    for (QuizRating quizRating: quizRatings){
+        if (quizRating.getReview() != null){
+            String currUsername = usersDao.getUserById(quizRating.getUserId()).getUsername();
+            userReviews.putIfAbsent(currUsername, new ArrayList<String>());
+            List<String> reviews = userReviews.get(currUsername);
+            reviews.add(quizRating.getReview());
+        }
+    }
+
+    boolean isCreator = user.getId() == quiz.getCreatorId();
+
+    List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId);
+    List<History> topPerformers = historiesDao.getTopNDistinctHistoriesByQuizId(quizId, 3);
+    List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId);
+    List<History> recentPerformers = historiesDao.getHistoriesByQuizIdSortedByDate(quizId);
+
+    long totalAttempts = historiesDao.getTotalAttempts(quizId);
+    double averageScore = historiesDao.getAverageScore(quizId);
+    long maxScore = historiesDao.getMaximumScore(quizId);
+    long minScore = historiesDao.getMinimumScore(quizId);
+    double averageTime = historiesDao.getAverageTime(quizId);
+
+    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+
+    Map<String, List<History>> topByRange = new HashMap<String, List<History>>();
+    topByRange.put("last_day", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_day"));
+    topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week"));
+    topByRange.put("last_month", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_month"));
+    topByRange.put("last_year", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_year"));
+
 %>
 
 <html>
 <head>
     <title>Quiz Overview</title>
+    <link rel="stylesheet" href="css/quiz-overview.css" />
+    <script src="js/quiz-overview.js" defer></script>
 </head>
+
 <body>
-    <h1><%=quiz.getName()%></h1>
+<div class="information-container">
+    <h1 class="quiz-title"><%= quizName %></h1>
+
+    <%-- TODO: Hotlink to creator's profile --%>
+    <h2 class="creator-name">Creator: <%= creatorName %></h2>
+
+    <p class="quiz-description"><%= quizDescription %></p>
+
+    <div class="quiz-meta">
+        <p><strong>Max Score:</strong> <%= quizScore %></p>
+        <p><strong>Average Rating:</strong> <%= averageRating %></p>
+        <p><strong>Category:</strong> <%= categoryName %></p>
+        <p><strong>Tags:</strong> <%= String.join(", ", quizTags) %></p>
+    </div>
+
+    <div class="quiz-reviews">
+        <p><Strong>Reviews:</Strong></p>
+
+        <% for (String username : userReviews.keySet()) {
+            List<String> reviews = userReviews.get(username); %>
+
+        <div class="review-block">
+            <h4><%= username %></h4>
+            <ul>
+                <% for (String review : reviews) { %>
+                <li><%= review %></li>
+                <% } %>
+            </ul>
+        </div>
+
+        <% } %>
+    </div>
+</div>
+
+
+
+<h3>Your Attempts on this Quiz</h3>
+<% if (histories.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
+<label for="sortBy">Sort by:</label>
+<select id="sortBy" onchange="sortTable()">
+    <option value="date">Date</option>
+    <option value="time">Time taken</option>
+    <option value="percentage">Percent Correct</option>
+</select>
+<button id="sortDirectionBtn" onclick="toggleSortDirection()">Sort Ascending</button>
+
+<%--user's performance on quiz--%>
+<table id="historyTable" class="styled-table">
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Time (min)</th>
+        <th>Percent Correct</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for (History h : histories) {
+        double percentage = (double) (100 * h.getScore()) / quizScore;
+    %>
+    <tr data-date="<%= sdf.format(h.getCompletionDate()) %>"
+        data-time="<%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %>"
+        data-percentage="<%= String.format(Locale.US, "%.2f", percentage) %>">
+        <td><%= sdf.format(h.getCompletionDate()) %></td>
+        <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+        <td><%= String.format(Locale.US, "%.2f", percentage) %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>
+<%
+    }
+%>
+
+<%--top performers--%>
+<h3>Top Performers</h3>
+<% if (topPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
+<div>
+    <button id="showTopBtn" onclick="showTopPerformers()" style="display: none;">Show Top 3</button>
+    <button id="showAllBtn" onclick="showAllPerformers()">Show All</button>
+</div>
+
+<div id="topPerformersContainer">
+    <table id="topPerformersTable" class="styled-table">
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Score</th>
+            <th>Time (min)</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (History h : topPerformers) {
+            User performer = usersDao.getUserById(h.getUserId());
+        %>
+        <tr>
+            <td><%= performer.getUsername() %></td>
+            <td><%= h.getScore() %></td>
+            <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+            <td><%= sdf.format(h.getCompletionDate()) %></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
+
+<div id="allPerformersContainer">
+    <table id="allPerformersTable" class="styled-table">
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Score</th>
+            <th>Time (min)</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (History h : allPerformers) {
+            User performer = usersDao.getUserById(h.getUserId());
+        %>
+        <tr>
+            <td><%= performer.getUsername() %></td>
+            <td><%= h.getScore() %></td>
+            <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+            <td><%= sdf.format(h.getCompletionDate()) %></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
+<%
+    }
+%>
+
+<%--range--%>
+<h3>Top Performers by Range</h3>
+<% if (topByRange.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
+<select id = "timeFilter" onchange = "filterByRange()">
+    <option value = "last_day">Last Day</option>
+    <option value = "last_week">Last Week</option>
+    <option value = "last_month">Last Month</option>
+    <option value = "last_year">Last Year</option>
+</select>
+
+<div id = "rangeContainer">
+    <% for (String range: Arrays.asList("last_day", "last_week", "last_month", "last_year")){
+        List<History> list = topByRange.get(range);
+    %>
+
+    <div class = "range-table scrollable-pane" id = "range-<%=range%>" style = "<%="last_day".equals(range) ? "" : "display:none;"%>">
+        <table class = "styled-table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Score</th>
+                <th>Time (min)</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <% for (History history: list){
+                User performer = usersDao.getUserById(history.getUserId());
+            %>
+            <tr>
+                <td><%=performer.getUsername()%></td>
+                <td><%=history.getScore()%></td>
+                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                <td><%=sdf.format(history.getCompletionDate())%></td>
+
+            </tr>
+            <%
+                }
+            %>
+            </tbody>
+        </table>
+    </div>
+    <%
+        }
+    %>
+</div>
+<%
+    }
+%>
+
+<%--recent performers--%>
+<h3>Recent Performers</h3>
+<% if (recentPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
+<div>
+    <div class = "scrollable-pane">
+        <table class = "styled-table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Score</th>
+                <th>Time (min)</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <% for (History history: recentPerformers){
+                User performer = usersDao.getUserById(history.getUserId());
+            %>
+            <tr>
+                <td><%=performer.getUsername()%></td>
+                <td><%=history.getScore()%></td>
+                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                <td><%=sdf.format(history.getCompletionDate())%></td>
+
+            </tr>
+            <%
+                }
+            %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<%
+    }
+%>
+
+<%--statistics --%>
+<%--TODO: would be great to use chart.js--%>
+<h3>Summary Statistics</h3>
+<% if (recentPerformers.isEmpty()){
+%>
+No activity to show
+<%
+} else {
+%>
+<div class = "summary-statistics">
+    <ul>
+        <li>Total attempts: <%=totalAttempts%></li>
+        <li>Average Score: <%=averageScore%></li>
+        <li>Highest Score: <%=maxScore%></li>
+        <li>Lowest Score: <%=minScore%></li>
+        <li>Average Time: <%=averageTime%></li>
+    </ul>
+</div>
+<%
+    }
+%>
+
+<%--buttons--%>
+<form action = "start-quiz" method = "get">
+    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
+    <button type = "submit">Start Quiz</button>
+</form>
+
+<form action = "practice-quiz" method = "post">
+    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
+    <button type = "submit">Start Quiz in Practice Mode</button>
+</form>
+
+<form action="edit-quiz" method="post">
+    <input type = "hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value = "<%= quizId %>">
+    <button type = "submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
+</form>
+
+
+<br>
+<form action="user-page.jsp" method="get">
+    <button type="submit" >Home</button>
+</form>
 </body>
 </html>
+

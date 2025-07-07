@@ -1,6 +1,5 @@
 package org.ja.servlet;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
 import org.ja.utils.Constants;

@@ -10,12 +10,20 @@ public class History {
     private Timestamp completionDate;
 
     // Empty constructor
-    public History() {
-    }
+    public History() {}
 
     // Constructor with all parameters
     public History(long historyId, long userId, long quizId, long score, double completionTime, Timestamp completionDate) {
         this.historyId = historyId;
+        this.userId = userId;
+        this.quizId = quizId;
+        this.score = score;
+        this.completionTime = completionTime;
+        this.completionDate = completionDate;
+    }
+
+    public History(long userId, long quizId, long score, double completionTime, Timestamp completionDate) {
+        this.historyId = -1;
         this.userId = userId;
         this.quizId = quizId;
         this.score = score;

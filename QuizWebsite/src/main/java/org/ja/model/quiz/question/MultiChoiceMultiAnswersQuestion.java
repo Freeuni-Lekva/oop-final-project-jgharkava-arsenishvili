@@ -4,6 +4,7 @@ import org.ja.model.OtherObjects.Answer;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MultiChoiceMultiAnswersQuestion extends Question{
@@ -18,8 +19,8 @@ public class MultiChoiceMultiAnswersQuestion extends Question{
     }
 
     @Override
-    public int gradeResponse(List<?> correctAnswersList, Response response){
-        int grade = 0;
+    public List<Integer> gradeResponse(List<?> correctAnswersList, Response response){
+        List<Integer> grades = new ArrayList<>();
 
         if (!correctAnswersList.isEmpty() && correctAnswersList.get(0) instanceof Answer){
             @SuppressWarnings("unchecked")
@@ -31,17 +32,17 @@ public class MultiChoiceMultiAnswersQuestion extends Question{
 
                 for (int j = 0; j < correctAnswers.size(); j++){
                     if (correctAnswers.get(j).containsAnswer(currResponse)) {
-                        grade++;
+                        grades.add(1);
                         isCorrect = true;
                         break;
                     }
                 }
 
-                if (!isCorrect) grade--;
+                if (!isCorrect) grades.add(-1);
             }
         }
 
-        return Math.max(0, grade);
+        return List.copyOf(grades);
     }
 
 }

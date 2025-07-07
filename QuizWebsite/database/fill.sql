@@ -1,10 +1,10 @@
 use ja_project_db;
 
 insert into users (user_id, password_hashed, salt, username, user_status) values
-(1, 'hashed_password1', 'salt1', 'Nini', 'administrator'),
-(2, 'hashed_password2', 'salt2', 'Sandro', 'user'),
-(3, 'hashed_password3', 'salt3', 'Tornike', 'user'),
-(4, 'hashed_password1', 'salt1', 'Liza', 'user');
+(1, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Nini', 'administrator'),
+(2, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Sandro', 'user'),
+(3, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Tornike', 'user'),
+(4, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Liza', 'user');
 
 insert into categories (category_id, category_name) values
 (1, 'History'),
@@ -32,7 +32,7 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, time_limit
 'one-page', 'final-correction');
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values
-(1, 'WWII began in _', null, 'fill-in-the-blank', 1, 'ordered'),
+(1, 'WWII began in _____', null, 'fill-in-the-blank', 1, 'ordered'),
 (1, 'Who was the British Prime Minister during most of WWII?', null,'multiple-choice', 1, 'ordered'),
 (1, 'List 3 Axis powers during WWII', null, 'multi-answer', 3, 'unordered'),
 (2, 'Match the countries to their capitals', null, 'matching', 4, 'ordered'),
@@ -51,6 +51,7 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (3, 'Italy', 3, true),
 (3, 'Japan', 4, true),
 (3, 'USA', 5, false),
+(5, 'oslo', 1, true),
 (6, 'Neon', 1, true),
 (6, 'Helium', 2, true),
 (6, 'Argon', 3, true),
@@ -61,10 +62,10 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (7, 'Lithium/Li', 3, true);
 
 insert into matches(question_id, left_match, right_match) values
-(5, 'France', 'Paris'),
-(5, 'Germany', 'Berlin'),
-(5, 'Italy', 'Rome'),
-(5, 'Spain', 'Madrid'),
+(4, 'France', 'Paris'),
+(4, 'Germany', 'Berlin'),
+(4, 'Italy', 'Rome'),
+(4, 'Spain', 'Madrid'),
 (8, 'Hydrogen', '1'),
 (8, 'Helium', '2'),
 (8, 'Lithium', '3'),
@@ -109,7 +110,22 @@ insert into challenges(sender_user_id, recipient_user_id, quiz_id) values
 insert into history(user_id, quiz_id, score, completion_time) values
 (1, 2, 4, 8),
 (2, 1, 4, 4),
-(4, 3, 6, 0.5);
+(4, 3, 2, 0.5);
+
+insert into history(user_id, quiz_id, score, completion_time, completion_date) values
+(1, 2, 5, 8, '2025-06-28 14:45:00'),
+(1, 2, 3, 7, '2025-06-20 12:00:00'),
+(1, 2, 2, 10, '2025-05-28 14:04:00'),
+(2, 2, 4, 9, '2025-02-27 10:30:00'),
+(2, 2, 4, 8, '2025-06-25 09:00:00'),
+(2, 2, 3, 7, '2025-01-22 15:45:00'),
+(3, 2, 1, 10, '2025-06-27 11:00:00'),
+(3, 2, 1, 8, '2025-06-23 13:15:00'),
+(3, 2, 0, 9, '2025-06-20 16:00:00'),
+(4, 2, 5, 12, '2025-05-30 09:00:00'),
+(4, 2, 5, 10, '2025-03-26 14:00:00'),
+(4, 2, 2, 11, '2024-12-24 08:30:00');
+
 
 insert into quiz_rating(quiz_id, user_id, rating, review) values
 (2, 1, 5, 'tough one'),

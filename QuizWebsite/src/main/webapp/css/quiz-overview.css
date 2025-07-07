@@ -1,0 +1,43 @@
+.styled-table {
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+
+.styled-table th,
+.styled-table td {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.styled-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#allPerformersContainer {
+    margin-top: 10px;
+    max-height: 120px;
+    width: fit-content;
+    overflow-y: auto;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    display: none;
+}
+
+#topPerformersContainer {
+    margin-top: 15px;
+}
+
+.scrollable-pane{
+    max-height: 120px;
+    overflow-y: auto;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    margin-top: 10px;
+    width: fit-content;
+}
+
+
