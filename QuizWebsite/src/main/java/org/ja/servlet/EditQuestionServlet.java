@@ -47,6 +47,7 @@ public class EditQuestionServlet extends HttpServlet {
                 if (newText != null)
                     questionDao.updateQuestionText(questionId, newText);
 
+                // PICTURE-RESPONSE QUESTION
                 JsonElement imageElement = jsonObject.get("imageUrl");
                 String newImageUrl = (imageElement != null && !imageElement.isJsonNull()) ? imageElement.getAsString() : null;
 
@@ -60,13 +61,13 @@ public class EditQuestionServlet extends HttpServlet {
                 questionDao.updateQuestionText(questionIdText, null);
 
                 break;
-            case "delete":
+            case "deleteQuestion":
                 long deleteId = jsonObject.get("questionId").getAsLong();
 
                 questionDao.removeQuestion(deleteId);
 
                 break;
-            case "updateAnswer":
+            case "updateOption":
                 boolean isNew = jsonObject.has("isNew") && jsonObject.get("isNew").getAsBoolean();
                 String newAnswerOptionText = jsonObject.get("newText").getAsString();
                 String oldAnswerOptionText = jsonObject.get("oldText").getAsString();
@@ -82,9 +83,9 @@ public class EditQuestionServlet extends HttpServlet {
                     answersDao.updateAnswerOptionText(answerId, oldAnswerOptionText, newAnswerOptionText);
                 }
                 break;
-            case "removeAnswer":
+            case "removeOption":
                 long answerRemoveId = jsonObject.get("answerId").getAsLong();
-                String answerOptionText = jsonObject.get("answerText").getAsString();
+                String answerOptionText = jsonObject.get("optionText").getAsString();
 
                 answersDao.removeAnswerOption(answerRemoveId, answerOptionText);
 

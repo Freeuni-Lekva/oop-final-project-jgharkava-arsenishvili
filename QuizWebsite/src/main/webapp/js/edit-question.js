@@ -1,26 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    function updateDeleteButtonState(answersContainer) {
-        const answerBlocks = answersContainer.querySelectorAll(".answer-block");
-        const deleteButtons = answersContainer.querySelectorAll(".delete-answer-btn");
-        const shouldDisable = answerBlocks.length <= 1;
+    function updateDeleteButtonState(optionsContainer) {
+        const optionsBlock = optionsContainer.querySelectorAll(".option-block");
+        const deleteButtons = optionsContainer.querySelectorAll(".delete-option-btn");
+        const shouldDisable = optionsBlock.length <= 1;
 
         deleteButtons.forEach(btn => btn.disabled = shouldDisable);
     }
 
-    function createAnswerBlock(answerId = null, answerText = "") {
+    function createOptionBlock(answerId = null, optionText = "") {
         const block = document.createElement("div");
-        block.className = "answer-block";
+
+        block.className = "option-block";
         if (answerId) block.dataset.answerId = answerId;
-        block.dataset.answerText = answerText;
+
+        block.dataset.optionText = optionText;
 
         block.innerHTML = `
-        <textarea class="answer-text">${answerText}</textarea>
-        <button class="save-answer-btn" disabled>Save</button>
-        <button class="delete-answer-btn">Delete</button>`;
+        <textarea class="option-text">${optionText}</textarea>
+        <button class="save-option-btn" disabled>Save Option Text</button>
+        <button class="delete-option-btn">Delete Option</button>`;
 
-        const textarea = block.querySelector(".answer-text");
-        const saveButton = block.querySelector(".save-answer-btn");
+        const textarea = block.querySelector(".option-text");
+        const saveButton = block.querySelector(".save-option-btn");
 
         toggleSaveButtonState(textarea, saveButton);
         textarea.addEventListener("input", () => {
@@ -28,14 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Save handler
-        block.querySelector(".save-answer-btn").addEventListener("click", () => {
+        block.querySelector(".save-option-btn").addEventListener("click", () => {
             const newText = textarea.value.trim();
-            const oldText = block.dataset.answerText || "";
+            const oldText = block.dataset.optionText || "";
             const answerId = block.dataset.answerId;
             const isNew = !oldText;
 
             const payload = {
-                action: 'updateAnswer',
+                action: 'updateOption',
                 answerId: answerId,
                 newText: newText,
                 oldText: oldText,
@@ -50,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(res => res.json())
                 .then(json => {
                     if (json.success) {
-                        block.dataset.answerText = newText;
+                        block.dataset.optionText = newText;
                         alert("Saved!");
                     } else {
                         alert("Failed to save.");
@@ -58,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
 
-        // Delete handler remains the same
-        block.querySelector(".delete-answer-btn").addEventListener("click", () => {
+        // Delete handler
+        block.querySelector(".delete-option-btn").addEventListener("click", () => {
             const answerId = block.dataset.answerId;
-            const answerText = block.dataset.answerText;
-            const container = block.closest(".answers");
+            const optionText = block.dataset.optionText;
+            const container = block.closest(".options");
 
             if (!confirm("Are you sure you want to delete this answer?")) return;
 
@@ -70,9 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    action: 'removeAnswer',
+                    action: 'removeOption',
                     answerId: answerId,
-                    answerText: answerText
+                    optionText: optionText
                 })
             })
                 .then(res => res.json())
@@ -89,36 +91,34 @@ document.addEventListener("DOMContentLoaded", () => {
         return block;
     }
 
-
     // Add Option button logic
-    document.querySelectorAll(".add-answer-btn").forEach(button => {
+    document.querySelectorAll(".add-option-btn").forEach(button => {
         button.addEventListener("click", () => {
-            const container = button.closest(".answers");
+            const container = button.closest(".options");
 
-            const existingAnswerId = container.querySelector(".answer-block")?.dataset.answerId || null;
-            console.log(existingAnswerId);
+            const existingAnswerId = container.querySelector(".option-block")?.dataset.answerId || null;
 
-            const newBlock = createAnswerBlock(existingAnswerId);  // pass it here
+            const newBlock = createOptionBlock(existingAnswerId);
 
             container.insertBefore(newBlock, button);
             updateDeleteButtonState(container);
         });
     });
 
-    // Initialize Save/Delete for existing answers
-    document.querySelectorAll(".answer-block").forEach(block => {
-        const container = block.closest(".answers");
+    // Initialize Save/Delete for existing options
+    document.querySelectorAll(".option-block").forEach(block => {
+        const container = block.closest(".options");
 
-        block.querySelector(".save-answer-btn").addEventListener("click", () => {
-            const newText = block.querySelector(".answer-text").value.trim();
-            const oldText = block.dataset.answerText;
+        block.querySelector(".save-option-btn").addEventListener("click", () => {
+            const newText = block.querySelector(".option-text").value.trim();
+            const oldText = block.dataset.optionText;
             const answerId = block.dataset.answerId;
 
             fetch("edit-question", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    action: 'updateAnswer',
+                    action: 'updateOption',
                     answerId: answerId,
                     newText: newText,
                     oldText: oldText
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(res => res.json())
                 .then(json => {
                     if (json.success) {
-                        block.dataset.answerText = newText;
+                        block.dataset.optionText = newText;
                         alert("Saved!");
                     } else {
                         alert("Failed to save.");
@@ -135,9 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
 
-        block.querySelector(".delete-answer-btn").addEventListener("click", () => {
+        block.querySelector(".delete-option-btn").addEventListener("click", () => {
             const answerId = block.dataset.answerId;
-            const answerText = block.dataset.answerText;
+            const optionText = block.dataset.optionText;
 
             if (!confirm("Are you sure you want to delete this answer?")) return;
 
@@ -145,9 +145,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    action: 'removeAnswer',
+                    action: 'removeOption',
                     answerId: answerId,
-                    answerText: answerText
+                    optionText: optionText
                 })
             })
                 .then(res => res.json())
@@ -162,18 +162,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Disable delete if only one answer per question
-    document.querySelectorAll(".answers").forEach(container => {
+    // Disable delete if only one option per question
+    document.querySelectorAll(".options").forEach(container => {
         updateDeleteButtonState(container);
     });
 
     // Save question text/image logic
+    // For fill-in-the-blank uses final-question-text, for picture-response imageUrl and questionText
+    // Only questionText for other types
     document.querySelectorAll(".save-question-btn").forEach(button => {
         button.addEventListener("click", () => {
             const questionId = button.dataset.id;
             const block = document.querySelector(`.question-block[data-question-id='${questionId}']`);
 
-            let questionText = null;
+            let questionText;
 
             // If it's a fill-in-the-blank question, use hidden input
             const fillInBlank = block.querySelector(".final-question-text");
@@ -200,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(info)
             }).then(res => res.json())
                 .then(json => {
-                    console.log("Saved!");
+                    alert("Question Text Saved!")
                 })
                 .catch(err => {
                     console.error("Error saving question", err);
@@ -209,14 +211,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Delete question
+    // Delete question with all its information
     document.querySelectorAll(".delete-question-btn").forEach(button => {
         button.addEventListener("click", () => {
             const questionId = button.dataset.id;
             if (!confirm("Are you sure you want to delete this question?")) return;
 
             const info = {
-                action: 'delete',
+                action: 'deleteQuestion',
                 questionId: questionId
             };
 
@@ -243,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Save Text
+    // Save Question Text for PICTURE-RESPONSE QUESTION
     document.body.addEventListener("click", function(event) {
         if (event.target.classList.contains("save-question-picture-btn")) {
             const questionId = event.target.dataset.id;
@@ -271,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Delete Text
+    // Delete Question Text for PICTURE-RESPONSE QUESTION
     document.body.addEventListener("click", function(event) {
         if (event.target.classList.contains("delete-question-picture-btn")) {
             const questionId = event.target.dataset.id;
@@ -298,9 +300,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         addTextBtn.type = "button";
                         addTextBtn.className = "add-question-text-btn";
                         addTextBtn.dataset.id = questionId;
-                        addTextBtn.textContent = "Add Text";
+                        addTextBtn.textContent = "Add Question Text";
 
-                        questionBlock.insertBefore(addTextBtn, questionBlock.querySelector(".answers"));
+                        questionBlock.insertBefore(addTextBtn, questionBlock.querySelector(".options"));
                     } else {
                         alert("Failed to delete question text.");
                     }
@@ -308,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Add Text
+    // Add Question Text for PICTURE-RESPONSE QUESTION
     document.body.addEventListener("click", function(event) {
         if (event.target.classList.contains("add-question-text-btn")) {
             const questionId = event.target.dataset.id;
@@ -335,34 +337,46 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteBtn.dataset.id = questionId;
             deleteBtn.textContent = "Delete Text";
 
-            questionBlock.insertBefore(label, questionBlock.querySelector(".answers"));
-            questionBlock.insertBefore(saveBtn, questionBlock.querySelector(".answers"));
-            questionBlock.insertBefore(deleteBtn, questionBlock.querySelector(".answers"));
+            questionBlock.insertBefore(label, questionBlock.querySelector(".options"));
+            questionBlock.insertBefore(saveBtn, questionBlock.querySelector(".options"));
+            questionBlock.insertBefore(deleteBtn, questionBlock.querySelector(".options"));
         }
     });
 
+    // Initialize the state for each fill-in-the-blank question on the page
+    // Render the question preview (with the blank inserted visually)
+    // Update the preview live when the user types
     document.querySelectorAll(".fill-in-the-blank-block").forEach(block => {
         const questionId = block.dataset.questionId;
+
+        // input without blank
         const rawInput = block.querySelector(`textarea.edit-raw-question-input[data-question-id='${questionId}']`);
+
+        // input later sent to servlet
         const hiddenInput = block.querySelector(`input.final-question-text[data-question-id='${questionId}']`);
+
+        // what is visually visible on the page
         const preview = block.querySelector(`.interactive-edit-preview[data-question-id='${questionId}']`);
 
+        // if any block is missing, skip entirely (good for avoiding errors but won't happen)
         if (!rawInput || !hiddenInput || !preview) return;
 
         // Initialize state for this question
         if (!state[questionId]) {
-            state[questionId] = { blankInserted: false, selectedIndex: -1 };
+            state[questionId] = { blankInserted: false, selectedIndex: -1 }; //tracking blank insertion
         }
 
         // Check if there's an existing blank in the hidden input
         const hiddenText = hiddenInput.value;
         if (hiddenText.includes("_")) {
             // Extract the raw text (without blanks)
-            const rawText = hiddenText.replace(/_/g, "").replace(/\s+/g, " ").trim();
-            rawInput.value = rawText;
+            rawInput.value = hiddenText.replace(/_/g, "").replace(/\s+/g, " ").trim();
 
             // Find the position of the blank in the original text
+
+            // removes all whitespaces, newlines, tabs
             const words = hiddenText.trim().split(/\s+/);
+            // finds blank's index
             const blankIndex = words.indexOf("_");
             if (blankIndex !== -1) {
                 state[questionId].blankInserted = true;
@@ -382,42 +396,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Handle question-level inputs
-    document.querySelectorAll(".question-text").forEach(textarea => {
-        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
-        if (saveBtn) {
-            toggleSaveButtonState(textarea, saveBtn);
-            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
-        }
-    });
+    // enables/disables save area based on whether textarea has content
+    function setupToggleSaveButton(textareaSelector, saveButtonSelector) {
+        document.querySelectorAll(textareaSelector).forEach(textarea => {
+            const saveBtn = textarea.closest(".question-block")?.querySelector(saveButtonSelector);
+            if (saveBtn) {
+                toggleSaveButtonState(textarea, saveBtn);
+                textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+            }
+        });
+    }
 
-    document.querySelectorAll(".image-url").forEach(textarea => {
-        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
-        if (saveBtn){
-            toggleSaveButtonState(textarea, saveBtn);
-            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
-        }
-    })
-
-    document.querySelectorAll(".question-picture-text").forEach(textarea => {
-        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-picture-btn");
-        if (saveBtn) {
-            toggleSaveButtonState(textarea, saveBtn);
-            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
-        }
-    });
-
-    document.querySelectorAll(".edit-raw-question-input").forEach(textarea => {
-        const saveBtn = textarea.closest(".question-block")?.querySelector(".save-question-btn");
-        if (saveBtn) {
-            toggleSaveButtonState(textarea, saveBtn);
-            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
-        }
-    });
+    setupToggleSaveButton(".question-text", ".save-question-btn");
+    setupToggleSaveButton(".image-url", ".save-question-btn");
+    setupToggleSaveButton(".question-picture-text", ".save-question-picture-btn");
+    setupToggleSaveButton(".edit-raw-question-input", ".save-question-btn");
 
     // Handle answer-level inputs separately
-    document.querySelectorAll(".answer-text").forEach(textarea => {
-        const block = textarea.closest(".answer-block");
-        const saveButton = block?.querySelector(".save-answer-btn");
+    document.querySelectorAll(".option-text").forEach(textarea => {
+        const block = textarea.closest(".option-block");
+        const saveButton = block?.querySelector(".save-option-btn");
         if (saveButton) {
             toggleSaveButtonState(textarea, saveButton);
             textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveButton));
@@ -426,29 +424,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+// if textarea is empty, disables saveButton
 function toggleSaveButtonState(textarea, saveButton) {
     saveButton.disabled = textarea.value.trim() === "";
 }
 
-const state = {};
+const state = {}; // for fill-in-the-blank question's state
 
+//
 function renderQuestionWithBlanks(questionId) {
+    // textarea where the raw question text is typed
     const inputElem = document.querySelector(`textarea.edit-raw-question-input[data-question-id='${questionId}']`);
+
+    // shows preview
     const container = document.querySelector(`.interactive-edit-preview[data-question-id='${questionId}']`);
+
+    // good for avoiding errors
     if (!inputElem || !container) return;
 
     const input = inputElem.value;
 
+    // if state has not been initialized, initializes it
     if (!state[questionId]) {
         state[questionId] = { blankInserted: false, selectedIndex: -1 };
     }
+
     let { blankInserted, selectedIndex } = state[questionId];
 
+    // if text is empty, preview nothing
     if (input.trim() === "") {
         container.innerHTML = "";
         return;
     }
 
+    // If a blank was previously inserted, reset the blank state to "no blank inserted".
+    // before re-rendering the preview with updated text, clear blank state
     if (blankInserted) {
         state[questionId].blankInserted = false;
         state[questionId].selectedIndex = -1;
@@ -460,6 +470,8 @@ function renderQuestionWithBlanks(questionId) {
 
     const words = input.trim().split(/\s+/);
 
+
+    // inserting blank
     if (!blankInserted) {
         container.appendChild(createBlankButton(questionId, 0));
     }
@@ -478,6 +490,7 @@ function renderQuestionWithBlanks(questionId) {
     updateFinalQuestion(questionId);
 }
 
+// creates blank "+" button
 function createBlankButton(questionId, index) {
     const btn = document.createElement("button");
     btn.textContent = "+";
@@ -486,11 +499,15 @@ function createBlankButton(questionId, index) {
     return btn;
 }
 
+// inserts blank
 function insertBlank(questionId, index) {
+
+    // if state's object does not exist, initializes it
     if (!state[questionId]) {
         state[questionId] = { blankInserted: false, selectedIndex: -1 };
     }
 
+    // good for error checking but won't happen
     if (state[questionId].blankInserted) {
         alert("Only one blank is allowed.");
         return;
@@ -502,9 +519,12 @@ function insertBlank(questionId, index) {
     renderQuestionWithBlankApplied(questionId);
 }
 
+// dynamically updates the preview showing the question with a blank inserted exactly where the user wants.
 function renderQuestionWithBlankApplied(questionId) {
     const inputElem = document.querySelector(`textarea.edit-raw-question-input[data-question-id='${questionId}']`);
     const container = document.querySelector(`.interactive-edit-preview[data-question-id='${questionId}']`);
+
+    // good for error checking
     if (!inputElem || !container) return;
 
     const input = inputElem.value;
@@ -532,6 +552,7 @@ function renderQuestionWithBlankApplied(questionId) {
     updateFinalQuestion(questionId);
 }
 
+// updates hiddenInput which is later used for insertion into table
 function updateFinalQuestion(questionId) {
     const inputElem = document.querySelector(`textarea.edit-raw-question-input[data-question-id='${questionId}']`);
     const hiddenInput = document.querySelector(`input.final-question-text[data-question-id='${questionId}']`);

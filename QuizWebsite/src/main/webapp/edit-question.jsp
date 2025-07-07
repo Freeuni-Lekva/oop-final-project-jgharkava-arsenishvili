@@ -42,6 +42,8 @@
     String questionText = question.getQuestionText();
 %>
 <div class="question-block" data-question-id="<%=questionId%>">
+
+<%--    Question-text block--%>
     <h4>Type: <%=questionType%></h4>
     <% if (questionText != null && !questionType.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)
     && !questionType.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)){
@@ -50,32 +52,32 @@
         <textarea class="question-text"><%=questionText%></textarea>
     </label>
 
-    <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save</button>
-    <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete</button>
+    <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save Question Text</button>
+    <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete Question</button>
     <%
         }
     %>
 
-
+<%--    individual questions--%>
     <% if (questionType.equals(Constants.QuestionTypes.RESPONSE_QUESTION)) { %>
 
-    <div class="answers">
+    <div class="options">
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitAnswers = answers.getFirst().getAnswerText().split("/");
-            List<String> eachAnswer = new ArrayList<String>(Arrays.asList(splitAnswers));
-            for (String answer: eachAnswer){
+            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            List<String> options = new ArrayList<String>(Arrays.asList(splitOptions));
+            for (String option: options){
         %>
-        <div class="answer-block" data-answer-id="<%=answerId%>" data-answer-text="<%=answer%>">
-            <textarea class="answer-text"><%=answer%></textarea>
-            <button class="save-answer-btn">Save</button>
-            <button class="delete-answer-btn">Delete</button>
+        <div class="option-block" data-answer-id="<%=answerId%>" data-option-text="<%=option%>">
+            <textarea class="option-text"><%=option%></textarea>
+            <button class="save-option-btn">Save Option Text</button>
+            <button class="delete-option-btn">Delete Option</button>
         </div>
         <%
             }
         %>
-        <button type="button" class="add-answer-btn">Add Option</button>
+        <button type="button" class="add-option-btn">Add Option</button>
     </div>
 
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) { %>
@@ -90,6 +92,7 @@
         String rawText = String.join(" ", words);
     %>
 
+<%--    Fill-in-the-blank question text block--%>
     <div class="fill-in-the-blank-block" data-question-id="<%=questionId%>">
         <label>Raw Question (without blank):</label>
         <textarea class="edit-raw-question-input"
@@ -100,73 +103,74 @@
 
         <input type="hidden" class="final-question-text" data-question-id="<%=questionId%>" value="<%=questionText%>">
 
-        <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save</button>
-        <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete</button>
+        <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save Question Text</button>
+        <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete Question</button>
     </div>
 
-
-    <div class="answers">
+    <div class="options">
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitAnswers = answers.getFirst().getAnswerText().split("/");
-            List<String> eachAnswer = new ArrayList<String>(Arrays.asList(splitAnswers));
-            for (String answer: eachAnswer){
+            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            List<String> eachOption = new ArrayList<String>(Arrays.asList(splitOptions));
+            for (String option: eachOption){
         %>
-        <div class="answer-block" data-answer-id="<%=answerId%>" data-answer-text="<%=answer%>">
-            <textarea class="answer-text"><%=answer%></textarea>
-            <button class="save-answer-btn">Save</button>
-            <button class="delete-answer-btn">Delete</button>
+        <div class="option-block" data-answer-id="<%=answerId%>" data-option-text="<%=option%>">
+            <textarea class="option-text"><%=option%></textarea>
+            <button class="save-option-btn">Save Option Text</button>
+            <button class="delete-option-btn">Delete Option</button>
         </div>
         <%
             }
         %>
-        <button type="button" class="add-answer-btn">Add Option</button>
+        <button type="button" class="add-option-btn">Add Option</button>
     </div>
 
     <% } else if (questionType.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) { %>
 
+<%--    Image block--%>
     <label>
         <img src = "<%=question.getImageUrl()%>" alt="Image url" width="100">
         <textarea class="image-url" placeholder="Image URL"><%=question.getImageUrl()%></textarea>
     </label>
 
-    <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save</button>
-    <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete</button>
+    <button type="button" class="save-question-btn" data-id="<%=questionId%>">Save Image URL</button>
+    <button type="button" class="delete-question-btn" data-id="<%=questionId%>">Delete Question</button>
 
+<%--    Options question text block--%>
     <% if (question.getQuestionText() != null){
     %>
     <label>
         <textarea class="question-picture-text"><%=questionText%></textarea>
     </label>
 
-    <button type="button" class="save-question-picture-btn" data-id="<%=questionId%>">Save Text</button>
-    <button type="button" class="delete-question-picture-btn" data-id="<%=questionId%>">Delete Text</button>
+    <button type="button" class="save-question-picture-btn" data-id="<%=questionId%>">Save Question Text</button>
+    <button type="button" class="delete-question-picture-btn" data-id="<%=questionId%>">Delete Question Text</button>
     <%
         } else {
     %>
-    <button type="button" class="add-question-text-btn" data-id="<%=questionId%>">Add Text</button>
+    <button type="button" class="add-question-text-btn" data-id="<%=questionId%>">Add Question Text</button>
     <%
         }
     %>
 
-    <div class="answers">
+    <div class="options">
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitAnswers = answers.getFirst().getAnswerText().split("/");
-            List<String> eachAnswer = new ArrayList<String>(Arrays.asList(splitAnswers));
-            for (String answer: eachAnswer){
+            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            List<String> eachOption = new ArrayList<String>(Arrays.asList(splitOptions));
+            for (String option: eachOption){
         %>
-        <div class="answer-block" data-answer-id="<%=answerId%>" data-answer-text="<%=answer%>">
-            <textarea class="answer-text"><%=answer%></textarea>
-            <button class="save-answer-btn">Save</button>
-            <button class="delete-answer-btn">Delete</button>
+        <div class="option-block" data-answer-id="<%=answerId%>" data-option-text="<%=option%>">
+            <textarea class="option-text"><%=option%></textarea>
+            <button class="save-option-btn">Save Option Text</button>
+            <button class="delete-option-btn">Delete Option</button>
         </div>
         <%
             }
         %>
-        <button type="button" class="add-answer-btn">Add Option</button>
+        <button type="button" class="add-option-btn">Add Option</button>
     </div>
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) { %>
 
