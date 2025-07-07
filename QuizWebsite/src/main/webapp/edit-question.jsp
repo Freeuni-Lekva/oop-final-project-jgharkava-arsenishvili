@@ -81,6 +81,33 @@
     </div>
 
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) { %>
+    <div class="choices">
+        <h5>Choices:</h5>
+        <%  List<Answer> choices = answersDao.getQuestionAnswers(questionId);
+
+            for (Answer choice: choices){
+                long answerId = choice.getAnswerId();
+                String choiceText = choice.getAnswerText();
+                boolean isCorrect = choice.getAnswerValidity();
+        %>
+            <div class="choice-block" data-answer-id="<%=answerId%>">
+                <textarea class="choice-text"><%=choiceText%></textarea>
+
+                <button class="mark-as-true-btn">
+                    <%=isCorrect ? "Marked as true" : "Mark as true"%>
+                </button>
+
+                <button class="save-choice-btn">Save Choice Text</button>
+
+                <button class="delete-choice-btn">
+                    Delete Choice
+                </button>
+            </div>
+        <%
+            }
+        %>
+        <button type="button" class="add-choice-btn">Add Choice</button>
+    </div>
 
     <% } else if (questionType.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {
 

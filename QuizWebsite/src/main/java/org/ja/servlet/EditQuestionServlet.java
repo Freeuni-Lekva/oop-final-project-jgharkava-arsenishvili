@@ -90,7 +90,26 @@ public class EditQuestionServlet extends HttpServlet {
                 answersDao.removeAnswerOption(answerRemoveId, answerOptionText);
 
                 break;
+            case "setCorrectChoice":
+                long choiceId = jsonObject.get("answerId").getAsLong();
+                long questionChoiceId = jsonObject.get("questionId").getAsLong();
 
+                answersDao.setOneCorrectChoice(questionChoiceId, choiceId);
+
+                break;
+            case "updateAnswerText":
+                long updateAnswerId = jsonObject.get("answerId").getAsLong();
+                String updateAnswerText = jsonObject.get("newText").getAsString();
+
+                answersDao.updateAnswer(updateAnswerId, updateAnswerText);
+
+                break;
+            case "deleteAnswer":
+                long deleteAnswerId = jsonObject.get("answerId").getAsLong();
+
+                answersDao.removeAnswer(deleteAnswerId);
+
+                break;
         }
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");

@@ -249,6 +249,43 @@ public class AnswersDao {
 
     }
 
+    public void setOneCorrectChoice(long questionChoiceId, long choiceId){
+        String falsenChoices = "UPDATE answers SET answer_validity = false WHERE question_id = ?";
+        String setRightChoice = "UPDATE answers SET answer_validity = true WHERE answer_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement falsenStmt = connection.prepareStatement(falsenChoices);
+            PreparedStatement rightStmt = connection.prepareStatement(setRightChoice)){
+
+            falsenStmt.setLong(1, questionChoiceId);
+
+            falsenStmt.executeUpdate();
+
+            rightStmt.setLong(1, choiceId);
+
+            rightStmt.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating answer validity", e);
+        }
+    }
+
+    public void updateAnswer(long answerId, String newText){
+        String update = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement updateStmt = connection.prepareStatement(update)){
+
+            System.out.println(newText);
+
+            updateStmt.setString(1, newText);
+            updateStmt.setLong(2, answerId);
+
+            updateStmt.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating answer text", e);
+        }
+    }
+
     public long getCount(){
         return cnt;
     }
