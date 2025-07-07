@@ -1,42 +1,12 @@
 package org.ja.model.quiz.question;
 
 import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.QuizTag;
 import org.ja.model.quiz.response.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/*
-create table questions(
-    question_id bigint primary key auto_increment,
-    quiz_id bigint not null,
-    question text not null,
-    image_url varchar(256) default null,
-    question_type enum('question-response', 'fill-in-the-blank', 'multiple-choice', 'picture-response',
-       'multi-answer', 'multi-choice-multi-answers', 'matching') not null,
-
-    num_answers int not null default 1,
-    order_status enum('unordered', 'ordered') not null default 'ordered',
-
-    check (
-        question_type != 'picture-response'
-        or image_url is not null
-    ),
-
-    check (
-        question_type not in ('multi-answer', 'matching')
-        or num_answers > 1
-    ),
-
-    check (
-        question_type != 'multi-answer'
-        or order_status = 'unordered'
-    ),
-
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
-);
- */
 public class Question {
     protected long questionId;
     protected long quizId;
@@ -57,14 +27,17 @@ public class Question {
         this.quizId = quizId;
     }
 
-    public int gradeResponse (List<?> correctAnswersList, Response response){
+    // TODO response may not be great
+    /// returns immutable list
+    public List<Integer> gradeResponse (List<?> correctAnswersList, Response response){
         if (!correctAnswersList.isEmpty() && correctAnswersList.get(0) instanceof Answer){
             @SuppressWarnings("unchecked")
             List<Answer> correctAnswers = (List<Answer>) correctAnswersList;
 
-            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? 1 : 0;
+            if(response.size() == 0) return List.of(0);
+            return (correctAnswers.get(0)).containsAnswer(response.getAnswer(0)) ? List.of(1) : List.of(0);
         }
-        return 0;
+        return List.of();
     }
 
     public long getQuestionId(){

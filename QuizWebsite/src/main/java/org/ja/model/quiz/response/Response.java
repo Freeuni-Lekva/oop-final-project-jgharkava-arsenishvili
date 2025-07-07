@@ -1,12 +1,12 @@
 package org.ja.model.quiz.response;
 
 import org.ja.model.OtherObjects.Match;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Response {
-    List<Object> list;
+    // TODO make private
+    private final List<Object> list;
 
     public Response(){
         list = new ArrayList<Object>();

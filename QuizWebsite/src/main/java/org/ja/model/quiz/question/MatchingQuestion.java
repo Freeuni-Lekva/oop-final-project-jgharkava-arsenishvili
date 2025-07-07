@@ -4,6 +4,7 @@ import org.ja.model.OtherObjects.Match;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MatchingQuestion extends Question {
@@ -19,8 +20,8 @@ public class MatchingQuestion extends Question {
     }
 
     @Override
-    public int gradeResponse(List<?> correctMatchesList, Response response){
-        int grade = 0;
+    public List<Integer> gradeResponse(List<?> correctMatchesList, Response response){
+        List<Integer> grades = new ArrayList<>();
 
         if (!correctMatchesList.isEmpty() && correctMatchesList.get(0) instanceof Match) {
             @SuppressWarnings("unchecked")
@@ -29,11 +30,12 @@ public class MatchingQuestion extends Question {
             for (int i = 0; i < response.size(); i++) {
                 Match currResponse = response.getMatch(i);
 
-                if (correctMatches.contains(currResponse)) grade++;
+                if (correctMatches.contains(currResponse)) grades.add(1);
+                else grades.add(0);
             }
         }
 
-        return Math.max(0, grade);
+        return List.copyOf(grades);
     }
 
 }

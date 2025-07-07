@@ -71,14 +71,14 @@ public class Match {
         if (this == o) return true;
         if (!(o instanceof Match)) return false;
 
-        return matchId == ((Match) o).getMatchId() &&
-                questionId == ((Match) o).getQuestionId() &&
+        return //matchId == ((Match) o).getMatchId() &&
+                //questionId == ((Match) o).getQuestionId() &&
                 leftMatch.equals(((Match) o).getLeftMatch()) &&
                 rightMatch.equals(((Match) o).getRightMatch());
     }
 
     @Override
     public String toString(){
-        return leftMatch + ", " + rightMatch;
+        return "{" + leftMatch + ", " + rightMatch + "}";
     }
 }

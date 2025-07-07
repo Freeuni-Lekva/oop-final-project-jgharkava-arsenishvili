@@ -29,6 +29,7 @@ public class CreateQuizServlet extends HttpServlet {
         String correctionType = request.getParameter("correctionType");
 
         long categoryId = Integer.parseInt(category);
+        // TODO not required, if not written default 0
         int timeLimit = Integer.parseInt(time);
 
         Quiz quiz = new Quiz(title, description, timeLimit, categoryId, user.getId(), orderType, placementType, correctionType);
