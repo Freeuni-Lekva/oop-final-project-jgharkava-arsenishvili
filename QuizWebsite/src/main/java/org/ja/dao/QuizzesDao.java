@@ -398,12 +398,12 @@ public class QuizzesDao {
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, name); // Properly set the parameter
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return retrieveQuiz(rs); // Move to the first row and extract data
-            } else {
-                return null; // or throw an exception if appropriate
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return retrieveQuiz(rs); // Move to the first row and extract data
+                } else {
+                    return null; // or throw an exception if appropriate
+                }
             }
 
         } catch (SQLException e) {
