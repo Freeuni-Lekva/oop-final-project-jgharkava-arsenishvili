@@ -73,17 +73,11 @@ public class EditQuestionServlet extends HttpServlet {
             case "updateOption":
                 boolean isNew = jsonObject.has("isNew") && jsonObject.get("isNew").getAsBoolean();
                 String newAnswerOptionText = jsonObject.get("newText").getAsString();
-
-                System.out.println(newAnswerOptionText);
-
+                
                 String oldAnswerOptionText = jsonObject.get("oldText").getAsString();
-
-                System.out.println(oldAnswerOptionText);
 
                 if (isNew) {
                     long answerId = jsonObject.get("answerId").getAsLong();
-
-                    System.out.println(answerId);
 
                     answersDao.insertNewAnswerOption(answerId, newAnswerOptionText);
                 } else {
@@ -122,7 +116,6 @@ public class EditQuestionServlet extends HttpServlet {
                 long setChoiceValidityId = jsonObject.get("answerId").getAsLong();
                 boolean isChoiceCorrect = jsonObject.get("isCorrect").getAsBoolean();
 
-                System.out.println(isChoiceCorrect);
 
                 answersDao.setChoiceValidity(setChoiceValidityId, isChoiceCorrect);
 
@@ -155,6 +148,12 @@ public class EditQuestionServlet extends HttpServlet {
                 String newRightText = jsonObject.get("newRightText").getAsString();
 
                 matchesDao.updateRightMatch(rightMatchId, newRightText);
+
+                break;
+            case "deleteMatch":
+                long deleteMatchId = jsonObject.get("matchId").getAsLong();
+
+                matchesDao.removeMatch(deleteMatchId);
 
                 break;
         }

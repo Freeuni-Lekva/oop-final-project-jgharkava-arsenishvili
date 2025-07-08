@@ -40,6 +40,7 @@ public class MatchesDao {
 
     public void removeMatch(long matchId) {
         String sql = "delete from matches where match_id = ?";
+
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 

@@ -26,8 +26,7 @@
     AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
     MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
 
-//    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
-    long quizId = 2;
+    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
     List<Question> allQuestions = questionDao.getQuizQuestions(quizId);
 
@@ -297,7 +296,6 @@
                             String matchedRight = matches.get(i).getRightMatch();
                             long matchId = matches.get(i).getMatchId();
                     %>
-                    <p><%=matchId%></p>
                     <div class="left-group" data-match-id="<%=matchId%>">
                         <input type="text" class="left-match" value="<%=left%>" required>
                         <select class="right-select" required>

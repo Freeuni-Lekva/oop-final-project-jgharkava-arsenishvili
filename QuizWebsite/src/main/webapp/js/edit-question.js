@@ -441,8 +441,59 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelectorAll(".matching-question-block").forEach(questionBlock => {
+        // dropdown logic
+        questionBlock.querySelectorAll(".left-group").forEach(group => {
+            const rightSelect = group.querySelector("select.right-select");
+            if (!rightSelect) return;
+
+            rightSelect.addEventListener("change", () => {
+                const newRightText = rightSelect.value;
+                const matchId = group.dataset.matchId;
+
+                if (!matchId || matchId === "") {
+                    // If this left option is not saved yet, user should save left option first before changing right select
+                    alert("Please save the left option text first before changing the match.");
+                    // Optionally, reset dropdown value or disable it before save
+                    return;
+                }
+                console.log(matchId);
+
+
+                fetch("edit-question", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        action: "updateRightMatchText",
+                        matchId: matchId,
+                        newRightText: newRightText,
+                    })
+                })
+                    .then(res => res.json())
+                    .then(json => {
+                        if (json.success) {
+                            console.log("Right match updated successfully.");
+                        } else {
+                            alert("Failed to update right match.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Error updating right match.");
+                    });
+            });
+        });
 
         const leftOptionsContainer = questionBlock.querySelector(".left-options");
+
+        // if initially only one, disable delete
+        if (leftOptionsContainer) {
+            updateDeleteButtonStateLeftMatches(leftOptionsContainer);
+        }
+
+        const rightOptionContainer = questionBlock.querySelector(".right-options");
+        if (rightOptionContainer){
+            updateDeleteButtonStateRightOptions(rightOptionContainer);
+        }
 
         // Delegate click event for Save buttons inside leftOptionsContainer
         leftOptionsContainer.addEventListener("click", event => {
@@ -462,18 +513,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const selectedRightText = rightSelect ? rightSelect.value : null;
                 const questionId = questionBlock.dataset.questionId;
 
-                console.log("question id" , questionId);
+                console.log("question id", questionId);
 
                 if (!newLeftText) {
                     alert("Left option cannot be empty.");
                     return;
                 }
 
-                btn.disabled = true;
-
                 fetch("edit-question", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
                         action: "updateLeftMatch",
                         matchId: matchId,
@@ -490,10 +539,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (isNew) {
                                 group.dataset.matchId = json.matchId; // Save new matchId on group
                             }
-                            btn.disabled = true;
                         } else {
                             alert("Failed to save left option.");
-                            btn.disabled = false;
                         }
                     })
                     .catch(err => {
@@ -510,26 +557,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!confirm("Are you sure you want to delete this left option?")) return;
 
-                // Optionally send AJAX to delete from DB here if needed
-                // For example:
-                /*
                 const matchId = group.dataset.matchId;
+
                 if (matchId) {
                     fetch("edit-question", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            action: "deleteLeftMatch",
+                            action: "deleteMatch",
                             matchId: matchId
                         })
                     }).then(res => res.json())
                       .then(json => {
-                          if (!json.success) alert("Failed to delete left option from database.");
+                          if (!json.success) {
+                              alert("Failed to delete left option from database.");
+                          } else {
+                              alert("Deleted left option from database");
+                          }
                       }).catch(() => alert("Error deleting left option from database."));
                 }
-                */
 
                 group.remove();
+                updateDeleteButtonStateLeftMatches(leftOptionsContainer);
             }
         });
 
@@ -571,18 +620,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Right option save logic (unchanged)
-        questionBlock.querySelectorAll(".right-option-wrapper").forEach(wrapper => {
+        // right options listener
+        function bindRightOptionEvents(wrapper){
             const saveBtn = wrapper.querySelector(".save-right-option-btn");
             const input = wrapper.querySelector(".right-match");
 
             let originalValue = input.value;
 
             toggleSaveButtonState(input, saveBtn);
-
-            input.addEventListener("input", () => {
-                toggleSaveButtonState(input, saveBtn);
-            });
 
             saveBtn.addEventListener("click", () => {
                 const newRightText = input.value.trim();
@@ -602,7 +647,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const matchId = leftGroup.dataset.matchId;
                     return fetch("edit-question", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {"Content-Type": "application/json"},
                         body: JSON.stringify({
                             action: "updateRightMatchText",
                             matchId: matchId,
@@ -624,7 +669,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("Error updating matches.");
                 });
             });
-        });
+        }
+
+        // Right option save logic (unchanged)
+        questionBlock.querySelectorAll(".right-option-wrapper").forEach(wrapper =>
+            bindRightOptionEvents(wrapper)
+        );
 
         // Add Left Option button logic
         const addLeftBtn = questionBlock.querySelector(".add-left-option-btn");
@@ -672,13 +722,129 @@ document.addEventListener("DOMContentLoaded", () => {
                 leftOptionsContainer.appendChild(group);
 
                 bindSaveToggle(group);
+                updateDeleteButtonStateLeftMatches(leftOptionsContainer);
             });
         }
 
+        // Add Right Option button logic
+        const addRightBtn = questionBlock.querySelector(".add-right-option-btn");
+        if (addRightBtn) {
+            addRightBtn.addEventListener("click", () => {
+                // Create new input for right option
+                const rightOptionsContainer = questionBlock.querySelector(".right-options");
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "right-option-wrapper";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.className = "right-match";
+                input.placeholder = "Right option text";
+
+                // Save button disabled initially until user types
+                const saveBtn = document.createElement("button");
+                saveBtn.className = "save-right-option-btn";
+                saveBtn.textContent = "Save Text";
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-right-option-btn";
+                deleteBtn.textContent = "Delete";
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(saveBtn);
+                wrapper.appendChild(deleteBtn);
+                rightOptionsContainer.appendChild(wrapper);
+
+                toggleSaveButtonState(input, saveBtn);
+
+                input.addEventListener("input", () => {
+                    toggleSaveButtonState(input, saveBtn);
+                });
+
+                bindRightOptionEvents(wrapper);
+                updateDeleteButtonStateRightOptions(rightOptionsContainer);
+            });
+        }
+
+        const rightOptionsContainer = questionBlock.querySelector(".right-options");
+
+        rightOptionsContainer.addEventListener("click", event => {
+            const btn = event.target;
+
+            if (btn.classList.contains("delete-right-option-btn")) {
+                const wrapper = btn.closest(".right-option-wrapper");
+                const input = wrapper.querySelector(".right-match");
+                const rightTextToDelete = input.value.trim();
+                const questionId = questionBlock.dataset.questionId;
+
+                if (!confirm("Are you sure you want to delete this right option?")) return;
+
+                const rightInputs = Array.from(questionBlock.querySelectorAll(".right-match"));
+                const allRightValues = rightInputs.map(inp => inp.value.trim());
+
+                // Find fallback (first right option that isn't the one being deleted)
+                const fallbackRight = allRightValues.find(text => text && text !== rightTextToDelete);
+
+                if (!fallbackRight) {
+                    alert("Cannot delete the last remaining right option.");
+                    return;
+                }
+
+                const leftGroups = Array.from(questionBlock.querySelectorAll(".left-group"));
+                const updateRequests = [];
+
+                leftGroups.forEach(group => {
+                    const matchId = group.dataset.matchId;
+                    const select = group.querySelector("select.right-select");
+
+                    if (select.value === rightTextToDelete) {
+                        // Change selection to fallback before saving
+                        select.value = fallbackRight;
+
+                        if (matchId) {
+                            updateRequests.push(
+                                fetch("edit-question", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        action: "updateRightMatchText",
+                                        matchId: matchId,
+                                        newRightText: fallbackRight,
+                                        questionId: questionId
+                                    })
+                                }).then(res => res.json())
+                            );
+                        }
+                    }
+                });
+
+                Promise.all(updateRequests).then(results => {
+                    if (!results.every(r => r.success)) {
+                        alert("Some left matches may not have updated successfully.");
+                    }
+
+                    // Remove the deleted option from all dropdowns
+                    questionBlock.querySelectorAll("select.right-select").forEach(select => {
+                        Array.from(select.options).forEach(option => {
+                            if (option.value === rightTextToDelete) {
+                                option.remove();
+                            }
+                        });
+                    });
+
+                    // Remove from DOM
+                    wrapper.remove();
+
+                    // Update delete button state
+                    updateDeleteButtonStateRightOptions(rightOptionsContainer);
+                }).catch(() => {
+                    alert("Error while updating left matches before deleting.");
+                });
+            }
+
+
+        });
     });
-
-
-
 });
 
 // creates new option for multi-answer's answer
@@ -1084,6 +1250,25 @@ function createOptionBlock(answerId = null, optionText = "") {
     });
 
     return block;
+}
+
+function updateDeleteButtonStateRightOptions(rightOptionsContainer) {
+    const wrappers = rightOptionsContainer.querySelectorAll(".right-option-wrapper");
+    const deleteButtons = rightOptionsContainer.querySelectorAll(".delete-right-option-btn");
+    const shouldDisable = wrappers.length <= 1;
+
+    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+}
+
+function updateDeleteButtonStateLeftMatches(leftOptionsContainer) {
+    const leftGroups = leftOptionsContainer.querySelectorAll(".left-group");
+    const deleteButtons = leftOptionsContainer.querySelectorAll(".delete-left-option-btn");
+
+    const shouldDisable = leftGroups.length <= 1;
+
+    deleteButtons.forEach(btn => {
+        btn.disabled = shouldDisable;
+    });
 }
 
 // if only one option is left, disable its delete button

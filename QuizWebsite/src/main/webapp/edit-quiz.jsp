@@ -19,8 +19,7 @@
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
     QuizTagsDao quizTagsDao = (QuizTagsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
 
-//    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
-    long quizId = 2;
+    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
     List<Category> allCategories = categoriesDao.getAllCategories();
     List<Tag> allTags = tagsDao.getAllTags();
@@ -139,7 +138,12 @@
 
     <form id = "edit-question-form" action = "edit-question" method = "get">
         <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" id="quizId" value="<%=quizId%>">
-        <button type="submit" id="edit-question-btn">Edit Question</button>
+        <button type="submit" id="edit-question-btn">Edit Questions</button>
+    </form>
+
+    <form action="quiz-overview.jsp" method="get">
+        <input type="hidden" name="quizId" value="<%=quizId%>">
+        <button type="submit">Finish Editing Quiz</button>
     </form>
 
 </body>
