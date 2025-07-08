@@ -50,7 +50,7 @@ public class FriendShipsDao {
 
             try(ResultSet rs = ps.executeQuery()){
                 if (rs.next()) {
-                    Friendship f = new Friendship();
+                    Friendship f = new Friendship(firstUserId, secondUserId);
                     f.setFirstUserId(rs.getLong("first_user_id"));
                     f.setSecondUserId(rs.getLong("second_user_id"));
                     f.setFriendshipStatus(rs.getString("friendship_status"));

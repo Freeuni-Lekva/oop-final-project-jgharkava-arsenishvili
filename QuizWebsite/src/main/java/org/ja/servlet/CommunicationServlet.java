@@ -35,7 +35,7 @@ public class CommunicationServlet extends HttpServlet {
             fr = friendShipsDao.getFriendshipByIds(curUser.getId(), friendId);
         }
         if("add-friend".equals(action)) {
-            friendShipsDao.insertFriendRequest(fr);
+            friendShipsDao.insertFriendRequest(new Friendship(curUser.getId(), friendId));
         } else if ("remove-friend".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
         } else if("send-challenge".equals(action)) {
