@@ -519,7 +519,7 @@ public class HistoriesDao {
     }
 
     private int getCompletedQuizCount(long userId) throws SQLException{
-        String sql = "SELECT COUNT(*) FROM history WHERE user_id = ?";
+        String sql = "SELECT COUNT(DISTINCT quiz_id) FROM history WHERE user_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)){
@@ -535,7 +535,7 @@ public class HistoriesDao {
     }
 
     private int getPerfectScoreCount(long userId) throws SQLException{
-        String sql = "SELECT COUNT(*) " +
+        String sql = "SELECT COUNT(DISTINCT q.quiz_id) " +
                      "FROM history h JOIN quizzes q on h.quiz_id = q.quiz_id " +
                      "WHERE h.score = q.quiz_score AND h.user_id = ?";
 
