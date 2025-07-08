@@ -94,7 +94,7 @@ public class AnswersDao {
     }
 
     public ArrayList<Answer> getQuestionAnswers(long questionId) {
-        String sql = "SELECT * FROM answers WHERE question_id = ?";
+        String sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY answer_order";
 
         ArrayList<Answer> answers = new ArrayList<>();
 
