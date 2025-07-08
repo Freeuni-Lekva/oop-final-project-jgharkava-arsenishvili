@@ -30,10 +30,8 @@ public class MessageDao {
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
                     cnt++;
-
                     long messageId = rs.getLong(1);
                     message.setMessageId(messageId);
-
                     String s = "SELECT message_send_date FROM messages where message_id = ?";
 
                     try (PreparedStatement preparedStatement = c.prepareStatement(s)){
@@ -173,3 +171,4 @@ public class MessageDao {
     }
 
 }
+

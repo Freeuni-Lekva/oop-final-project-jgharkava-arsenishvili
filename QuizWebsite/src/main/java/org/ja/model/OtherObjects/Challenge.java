@@ -7,7 +7,10 @@ public class Challenge {
     private long quizId;
 
     // Empty constructor
-    public Challenge() {
+    public Challenge(long senderUserId, long recipientUserId, long quizId) {
+        this.senderUserId = senderUserId;
+        this.recipientUserId = recipientUserId;
+        this.quizId = quizId;
     }
 
     // Constructor with all parameters
@@ -69,3 +72,4 @@ public class Challenge {
                 quizId == ((Challenge) o).getQuizId();
     }
 }
+

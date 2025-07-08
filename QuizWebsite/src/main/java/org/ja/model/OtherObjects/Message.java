@@ -10,7 +10,10 @@ public class Message {
     private Timestamp messageSendDate;
 
     // Empty constructor
-    public Message() {
+    public Message(long senderUserId, long recipientUserId, String messageText) {
+        this.senderUserId = senderUserId;
+        this.recipientUserId = recipientUserId;
+        this.messageText = messageText;
     }
 
     // Constructor with all parameters
@@ -76,3 +79,4 @@ public class Message {
                 messageSendDate.equals(((Message) o).messageSendDate);
     }
 }
+

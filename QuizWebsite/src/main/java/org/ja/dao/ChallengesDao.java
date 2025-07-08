@@ -157,3 +157,4 @@ public class ChallengesDao {
                 rs.getLong("recipient_user_id"), rs.getLong("quiz_id"));
     }
 }
+

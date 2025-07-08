@@ -381,7 +381,7 @@ public class HistoriesDao {
     public double getAverageTime(long quizId){
         String sql = "SELECT AVG(completion_time) FROM history WHERE quiz_id = ?";
 
-        return (long) statisticsCalculations(quizId, sql);
+        return statisticsCalculations(quizId, sql);
     }
 
     private double statisticsCalculations(long quizId, String sql) {
@@ -391,7 +391,7 @@ public class HistoriesDao {
             ps.setLong(1, quizId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getLong(1);
+                    return rs.getDouble(1);
                 }
             }
         } catch (SQLException e){
