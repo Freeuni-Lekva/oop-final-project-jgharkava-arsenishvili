@@ -1,4 +1,63 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll(".answer-save-text-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            const answerBlock = button.closest(".answer-block");
+            const answerId = answerBlock.dataset.answerId;
+            const textarea = answerBlock.querySelector(".main-answer-text");
+            const newText = textarea.value.trim();
+            const oldText = answerBlock.dataset.mainAnswerText;
+
+            toggleSaveButtonState(textarea ,button);
+
+            // won't happen but good for error checking
+            if (!newText) {
+                alert("Main answer cannot be empty.");
+                return;
+            }
+
+            fetch("edit-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "updateOption",
+                    answerId: answerId,
+                    newText: newText,
+                    oldText: oldText,
+                    isNew: false
+                })
+            })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.success) {
+                        alert("Main answer saved.");
+                    } else {
+                        alert("Failed to save main answer.");
+                    }
+                })
+                .catch(err => {
+                    alert("Error while saving main answer.");
+                    console.error(err);
+                });
+        });
+    });
+
+    // Add multi answer option button logic
+    document.querySelectorAll(".answer-add-option-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            const answerBlock = button.closest(".answer-block");
+            const optionsContainer = answerBlock.querySelector(".answer-options");
+            const answerId = answerBlock.dataset.answerId;
+
+            const newBlock = createAnswerOptionBlock(answerId, "");
+
+            optionsContainer.appendChild(newBlock);
+        });
+    });
+
+    // Initialize Save/Delete for existing multi-answer options
+    document.querySelectorAll(".answer-option-block").forEach(block => setupOptionBlockListeners(block));
+
     // Add Option button logic
     document.querySelectorAll(".add-option-btn").forEach(button => {
         button.addEventListener("click", () => {
@@ -382,6 +441,89 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// creates new option for multi-answer's answer
+function createAnswerOptionBlock(answerId, optionText) {
+    const block = document.createElement("div");
+    block.className = "answer-option-block";
+    block.dataset.answerId = answerId;
+    block.dataset.optionText = optionText;
+
+    block.innerHTML = `
+        <textarea class="answer-option-text">${optionText}</textarea>
+        <button type="button" class="answer-save-option-btn">Save Option Text</button>
+        <button type="button" class="answer-delete-option-btn">Delete Option</button>
+    `;
+
+    const textarea = block.querySelector(".answer-option-text");
+    const saveButton = block.querySelector(".answer-save-option-btn");
+
+    toggleSaveButtonState(textarea, saveButton);
+    textarea.addEventListener("input", () => {
+        toggleSaveButtonState(textarea, saveButton);
+    });
+
+    setupOptionBlockListeners(block);
+    return block;
+}
+
+// setup listeners for multi-answer-choices
+function setupOptionBlockListeners(block) {
+    const container = block.closest(".answer-options");
+
+    block.querySelector(".answer-save-option-btn").addEventListener("click", () => {
+        const newText = block.querySelector(".answer-option-text").value.trim();
+        const oldText = block.dataset.optionText || "";
+        const answerId = block.dataset.answerId;
+        const isNew = !oldText;
+
+        if (!newText) return;
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "updateOption",
+                answerId: answerId,
+                newText: newText,
+                oldText: oldText,
+                isNew: isNew
+            })
+        }).then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    block.dataset.optionText = newText;
+                    alert("Option saved.");
+                } else {
+                    alert("Failed to save.");
+                }
+            });
+    });
+
+    block.querySelector(".answer-delete-option-btn").addEventListener("click", () => {
+        const answerId = block.dataset.answerId;
+        const optionText = block.dataset.optionText;
+
+        if (!confirm("Delete this option?")) return;
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "removeOption",
+                answerId: answerId,
+                optionText: optionText
+            })
+        }).then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    block.remove();
+                } else {
+                    alert("Failed to delete.");
+                }
+            });
+    });
+}
+
 // sets up multiple-choice-multi-answer container
 function setupMultipleChoiceContainer(container){
     updateDeleteButtonStateMultipleChoices(container);
@@ -620,6 +762,7 @@ function setupChoiceContainer(container){
     });
 }
 
+// creates option blocks for basic questions
 function createOptionBlock(answerId = null, optionText = "") {
     const block = document.createElement("div");
 

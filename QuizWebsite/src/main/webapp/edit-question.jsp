@@ -108,7 +108,8 @@
         %>
     </div>
 
-    <% } else if (questionType.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {
+    <% }
+    else if (questionType.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {
 
         List<String> words = new ArrayList<String>(Arrays.asList(questionText.split("\\s+")));
         int blankIndex = words.indexOf("_");
@@ -200,6 +201,39 @@
     </div>
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) { %>
 
+    <div class="multi-answer-block" data-question-id="<%=questionId%>">
+        <%
+            List<Answer> multiAnswers = answersDao.getQuestionAnswers(questionId);
+            for (Answer answer : multiAnswers) {
+                long answerId = answer.getAnswerId();
+                String[] splitOptions = answer.getAnswerText().split("/");
+                List<String> options = new ArrayList<String>(Arrays.asList(splitOptions));
+        %>
+
+        <div class="answer-block" data-answer-id="<%=answerId%>" data-main-answer-text="<%=options.getFirst().trim()%>">
+            <label>Main Answer:</label>
+            <textarea class="main-answer-text"><%=options.getFirst().trim()%></textarea>
+            <button type="button" class="answer-save-text-btn">Save Answer Text</button>
+
+            <div class="answer-options" data-answer-id="<%=answerId%>">
+                <% for (int i = 1; i < options.size(); i++) {
+                    String optionText = options.get(i).trim();
+                %>
+                <div class="answer-option-block" data-option-text="<%=optionText%>" data-answer-id="<%=answerId%>">
+                    <textarea class="answer-option-text"><%=optionText%></textarea>
+                    <button type="button" class="answer-save-option-btn">Save Option Text</button>
+                    <button type="button" class="answer-delete-option-btn">Delete Option</button>
+                </div>
+                <% } %>
+            </div>
+
+            <button type="button" class="answer-add-option-btn">Add Option</button>
+        </div>
+
+        <% } %>
+    </div>
+
+
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) { %>
 
     <div class="multiple-choices">
@@ -228,7 +262,6 @@
             }
         %>
     </div>
-
 
     <% } else if (questionType.equals(Constants.QuestionTypes.MATCHING_QUESTION)) { %>
 

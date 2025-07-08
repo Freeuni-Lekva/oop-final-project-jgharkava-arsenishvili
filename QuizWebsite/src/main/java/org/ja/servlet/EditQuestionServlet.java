@@ -70,7 +70,12 @@ public class EditQuestionServlet extends HttpServlet {
             case "updateOption":
                 boolean isNew = jsonObject.has("isNew") && jsonObject.get("isNew").getAsBoolean();
                 String newAnswerOptionText = jsonObject.get("newText").getAsString();
+
+                System.out.println(newAnswerOptionText);
+
                 String oldAnswerOptionText = jsonObject.get("oldText").getAsString();
+
+                System.out.println(oldAnswerOptionText);
 
                 if (isNew) {
                     long answerId = jsonObject.get("answerId").getAsLong();
