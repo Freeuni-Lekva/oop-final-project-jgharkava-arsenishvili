@@ -387,6 +387,7 @@ public class QuizzesDao {
                 } else {
                     return null; // or throw an exception if appropriate
                 }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving quiz by ID", e);
         }
