@@ -17,9 +17,6 @@ public class CategoriesDao {
     }
 
     public void insertCategory(Category category) {
-        if(containsCategory(category.getCategoryName())){
-            return;
-        }
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
@@ -42,9 +39,6 @@ public class CategoriesDao {
     }
 
     public void removeCategory(Category category) {
-        if(!containsCategory(category.getCategoryName())){
-            return;
-        }
         String sql = "DELETE FROM categories WHERE category_id = ?";
 
         try(Connection c = dataSource.getConnection();
