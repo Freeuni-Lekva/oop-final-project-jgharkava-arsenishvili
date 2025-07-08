@@ -54,9 +54,8 @@ public class QuizzesDao {
                 "creator_id, question_order_status, question_placement_status," +
                 "question_correction_status ) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection c = dataSource.getConnection()){
-
-            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
             ps.setString(1, quiz.getName());
             ps.setString(2, quiz.getDescription());
             ps.setInt(3, quiz.getScore());
