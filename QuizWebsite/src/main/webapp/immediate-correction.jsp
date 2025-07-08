@@ -7,6 +7,7 @@
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -86,6 +87,7 @@
     <%
         String type = question.getQuestionType();
 
+
         if(Constants.QuestionTypes.MATCHING_QUESTION.equals(type)) {
             MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
             List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
@@ -143,7 +145,7 @@
         <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
         <% } %>
     </div>
-
+  
     <div class="answer-block">
         <div class="label">Correct Answer(s):</div>
         <% for(Answer answer : answers) {
@@ -178,5 +180,9 @@
     }
 %>
 
+<form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId()%>">
+    <button type="submit" >Exit Quiz</button>
+</form>
 </body>
 </html>

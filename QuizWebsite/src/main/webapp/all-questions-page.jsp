@@ -7,9 +7,11 @@
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
+    Quiz quiz=(Quiz)session.getAttribute(Constants.SessionAttributes.QUIZ);
     ArrayList<Question> questions = (ArrayList<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
     AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
     MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
@@ -143,6 +145,10 @@
         }%>
     <br><br>
     <input type="submit" value="Submit Quiz">
+</form>
+<form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+    <button type="submit">Exit Quiz</button>
 </form>
 </body>
 </html>
