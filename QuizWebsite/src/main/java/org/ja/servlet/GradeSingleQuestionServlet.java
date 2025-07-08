@@ -69,8 +69,7 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         long startTime = (long) session.getAttribute("start-time");
         long currTime = System.currentTimeMillis();
 
-        if((quiz.getTimeInMinutes() != 0 && quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) ||
-            index + 1 == questions.size()) {
+        if(quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000 || index + 1 == questions.size()) {
             long quizId = ((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId();
             long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
             double completionTime = (double) (currTime - startTime) / 60000;

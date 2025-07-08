@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,6 +87,19 @@ public class HistoryDaoTest {
         User nini=new User(4, "Nini", "123", "2025-6-14",null, "sth.jpg", "administrator");
         usersDao.insertUser(nini);
 
+        String sql = """
+                    insert into achievements(achievement_name, achievement_description) values
+                    ('First step', 'Complete your first quiz'),
+                    ('Quiz Addict', 'Complete 10 quizzes'),
+                    ('Flawless Victory', 'Complete a quiz with no wrong answers'),
+                    ('Quiz Master', 'Score 100% on 5 quizzes'),
+                    ('Speed Demon', 'Finish a quiz in under 1 minute');
+                    """;
+        try (Connection connection = basicDataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.executeUpdate();
+        }
 
         categoriesDao=new CategoriesDao(basicDataSource);
         Category h=new Category(1, "history");
@@ -126,6 +136,8 @@ public class HistoryDaoTest {
         h2=new History(-1, 1, 2,8,60,null);
         h3=new History(-1, 2, 3,7,56,null);
         h4=new History(-1, 2, 4,7,56,null);
+
+
 
     }
     private History h1;
