@@ -10,6 +10,7 @@ import org.ja.model.quiz.question.Question;
 import org.ja.utils.Constants;
 
 import java.util.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class FinishQuizServlet extends HttpServlet {
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
 
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
@@ -93,5 +94,8 @@ public class FinishQuizServlet extends HttpServlet {
                         matchesDao.insertMatch(match);
                     });
                 }));
+
+
+        request.getRequestDispatcher("quiz-overview.jsp?"+Constants.RequestParameters.QUIZ_ID+"="+quiz.getId()).forward(request, response);
     }
 }

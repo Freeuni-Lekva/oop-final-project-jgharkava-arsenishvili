@@ -28,6 +28,11 @@ function showQuestionForm() {
             addLeftOption();
         }
     }
+
+    if (selectedType === "multi-answer"){
+        console.log("here");
+        addAnswerGroup();
+    }
 }
 
 window.addEventListener("DOMContentLoaded", function (){
@@ -38,13 +43,6 @@ window.addEventListener("DOMContentLoaded", function (){
 })
 
 document.addEventListener("DOMContentLoaded", function () {
-    const selectedType = document.getElementById("questionType").value;
-
-    if (selectedType === "multi-answer"){
-        addAnswerGroup();
-        return;
-    }
-
     const firstMarkButtonMultiChoice = document.querySelector("#multiple-choice-answer-container .mark-button");
     if (firstMarkButtonMultiChoice) {
         const hiddenInput = firstMarkButtonMultiChoice.closest(".option-block").querySelector("input[name='isCorrect']");

@@ -25,8 +25,8 @@ public class CreateQuizServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User user = (User) request.getSession().getAttribute(Constants.SessionAttributes.USER);
 
-        String title = request.getParameter("quizTitle");
-        String description = request.getParameter("quizDescription");
+        String title = request.getParameter("quizTitle").trim();
+        String description = request.getParameter("quizDescription").trim();
         String category = request.getParameter("category");
         String[] tags = request.getParameterValues("tags");
         String time = request.getParameter("quizDuration");
@@ -35,7 +35,6 @@ public class CreateQuizServlet extends HttpServlet {
         String correctionType = request.getParameter("correctionType");
 
         long categoryId = Integer.parseInt(category);
-        // TODO not required, if not written default 0
         int timeLimit = Integer.parseInt(time);
 
         Quiz quiz = new Quiz(title, description, timeLimit, categoryId, user.getId(), orderType, placementType, correctionType);

@@ -33,10 +33,10 @@ public class CreateQuestionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         this.request = request;
-        questionText = request.getParameter("questionText");
+        questionText = request.getParameter("questionText").trim();
         String questionType = request.getParameter("questionType");
 
-        imageUrl = request.getParameter("imageUrl");
+        imageUrl = request.getParameter("imageUrl") != null ? request.getParameter("imageUrl").trim() : null;
         answers = request.getParameterValues("answer");
 
         questionAnswerMap = (Map<Question, List<Answer>>) request.getSession().getAttribute(Constants.SessionAttributes.QUESTIONS);
