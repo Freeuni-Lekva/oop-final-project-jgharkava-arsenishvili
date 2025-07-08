@@ -288,8 +288,6 @@ public class AnswersDao {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement updateStmt = connection.prepareStatement(update)){
 
-            System.out.println(newText);
-
             updateStmt.setString(1, newText);
             updateStmt.setLong(2, answerId);
 

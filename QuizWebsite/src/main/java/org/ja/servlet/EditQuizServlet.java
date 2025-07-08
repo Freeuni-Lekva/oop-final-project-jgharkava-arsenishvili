@@ -34,39 +34,32 @@ public class EditQuizServlet extends HttpServlet {
                 break;
             case "limit":
                 int newLimit = Integer.parseInt(request.getParameter("limit"));
-                System.out.println(newLimit);
                 quizzesDao.updateQuizTimeLimit(quizId, newLimit);
                 response.setStatus(HttpServletResponse.SC_OK);
                 break;
             case "category":
                 long newCategory = Long.parseLong(request.getParameter("category"));
-                System.out.println(newCategory);
                 quizzesDao.updateQuizCategory(quizId, newCategory);
                 response.setStatus(HttpServletResponse.SC_OK);
                 break;
             case "removeTag":
                 long tagToRemove = Long.parseLong(request.getParameter("tagId"));
-                System.out.println(tagToRemove);
                 quizTagsDao.removeQuizTag(quizId, tagToRemove);
                 break;
             case "addTag":
                 long tagToAdd = Long.parseLong(request.getParameter("tagId"));
-                System.out.println(tagToAdd);
                 quizTagsDao.insertQuizTag(new QuizTag(quizId, tagToAdd));
                 break;
             case "orderStatus":
                 String newOrderStatus = request.getParameter("questionOrderStatus");
-                System.out.println(newOrderStatus);
                 quizzesDao.updateQuizQuestionOrderStatus(quizId, newOrderStatus);
                 break;
             case "placementStatus":
                 String newPlacementStatus = request.getParameter("questionPlacementStatus");
-                System.out.println(newPlacementStatus);
                 quizzesDao.updateQuizQuestionPlacementStatus(quizId, newPlacementStatus);
                 break;
             case "correctionStatus":
                 String newCorrectionStatus = request.getParameter("questionCorrectionStatus");
-                System.out.println(newCorrectionStatus);
                 quizzesDao.updateQuizQuestionCorrectionStatus(quizId, newCorrectionStatus);
                 break;
             default:
