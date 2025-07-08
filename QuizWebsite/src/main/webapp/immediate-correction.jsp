@@ -12,7 +12,10 @@
 <%
     Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
     List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
-    Question question = questions.get((index - 1 + questions.size()) % questions.size());
+
+    /// question amomaqvs arasworad
+    Question question = (Question) request.getAttribute("question");
+
     Constants.QuizMode quizMode = (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
     List<Integer> respGrades = ((List<List<Integer>>) session.getAttribute("responseGrades"))
@@ -42,33 +45,31 @@
         startTime = (Long) session.getAttribute("start-time");
         duration = (Integer) session.getAttribute("time-limit-in-seconds");
         now = System.currentTimeMillis();
-        timeLeft = duration - (now - startTime) / 1000;
-%>
+        timeLeft = duration - (now - startTime) / 1000;%>
 
-<script>
-    let timeLeft = <%= timeLeft %>;
+        <script>
+            let timeLeft = <%= timeLeft %>;
 
-    function formatTime(secs) {
-        const m = Math.floor(secs / 60);
-        const s = secs % 60;
-        return m + ":" + (s < 10 ? "0" + s : s);
-    }
+            function formatTime(secs) {
+                const m = Math.floor(secs / 60);
+                const s = secs % 60;
+                return m + ":" + (s < 10 ? "0" + s : s);
+            }
 
-    function updateTimer() {
-        if (timeLeft <= 0) {
-            document.getElementById("question-form").submit();
-        } else {
-            document.getElementById("timer").textContent = formatTime(timeLeft);
-            timeLeft--;
-            setTimeout(updateTimer, 1000);
-        }
-    }
+            function updateTimer() {
+                if (timeLeft <= 0) {
+                    document.getElementById("question-form").submit();
+                } else {
+                    document.getElementById("timer").textContent = formatTime(timeLeft);
+                    timeLeft--;
+                    setTimeout(updateTimer, 1000);
+                }
+            }
 
-    window.onload = updateTimer;
-</script>
+            window.onload = updateTimer;
+        </script>
 
-<div>Time left: <span id="timer"></span></div>
-<%
+        <div>Time left: <span id="timer"></span></div><%
     }
 %>
 

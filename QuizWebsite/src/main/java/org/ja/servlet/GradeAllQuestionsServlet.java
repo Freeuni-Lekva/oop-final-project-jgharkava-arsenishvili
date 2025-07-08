@@ -75,7 +75,7 @@ public class GradeAllQuestionsServlet extends HttpServlet {
         long endTime = System.currentTimeMillis();
         long startTime = (long) session.getAttribute("start-time");
         double completionTime = (double) (endTime - startTime) / 60000;
-        if(quiz.getTimeInMinutes() != 0 && completionTime >= quiz.getTimeInMinutes())
+        if(completionTime >= quiz.getTimeInMinutes())
             completionTime = quiz.getTimeInMinutes();
 
         session.setAttribute("time-spent-in-minutes", completionTime);

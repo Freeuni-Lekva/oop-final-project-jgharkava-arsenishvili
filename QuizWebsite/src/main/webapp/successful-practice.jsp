@@ -8,9 +8,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Practice Mode Completed</title>
 </head>
 <body>
-    <h1> SUCCESSFUL PRACTICE</h1>
+    <h1>🎉 Well done!</h1>
+    <p>You successfully completed all your practice questions!</p>
+
+    <a href="user-page.jsp">
+        <button>Back To Homepage</button>
+    </a>
 </body>
 </html>
