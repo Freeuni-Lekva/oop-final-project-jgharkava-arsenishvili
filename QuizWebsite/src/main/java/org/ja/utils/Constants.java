@@ -61,6 +61,8 @@ public class Constants {
         public static final String MATCHES = "current-matches";
         public static final String HAS_QUESTIONS = "hasQuestions";
 
+        public static final String QUIZ_MODE = "quiz-mode";
+        public static final String PRACTICE_QUESTIONS_MASTERY_MAP = "practice-question-mastery-map";
     }
 
     public static class RequestParameters {
@@ -74,5 +76,10 @@ public class Constants {
         public static final long FLAWLESS_VICTORY = 3;
         public static final long QUIZ_MASTER = 4;
         public static final long SPEED_DEMON = 5;
+    }
+
+    public enum QuizMode {
+        TAKING,
+        PRACTICE
     }
 }

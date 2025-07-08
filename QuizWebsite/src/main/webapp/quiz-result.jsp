@@ -6,7 +6,11 @@
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Answer" %>
-<%@ page import="org.ja.dao.AnswersDao" %><%--
+<%@ page import="org.ja.dao.AnswersDao" %>
+<%@ page import="org.ja.model.user.User" %>
+<%@ page import="org.ja.dao.FriendShipsDao" %>
+<%@ page import="org.ja.model.OtherObjects.Friendship" %>
+<%@ page import="org.ja.dao.UsersDao" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/1/2025
@@ -173,11 +177,68 @@
 <% } %>
 
 
+<%--challenge friend--%>
+<%
+    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
+    UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
+    FriendShipsDao friendShipsDao = (FriendShipsDao) application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
+    List<Friendship> friends = friendShipsDao.getFriends(user.getId());
+%>
+
+<%--TODO make pretty--%>
+<div id="user-list-panel"><%
+    if(!friends.isEmpty()) {
+            for(Friendship friendship : friends) {
+                User friend = usersDao.getUserById(friendship.getFirstUserId() == user.getId() ? friendship.getSecondUserId() : friendship.getFirstUserId());%>
+
+    <div class="user-entry">
+        <span>
+            <a href="visit-user?<%=Constants.RequestParameters.USER_ID%>=<%=friend.getId()%>"
+               style="text-decoration: none; color: inherit; cursor: pointer;"
+               onmouseover="this.style.textDecoration='underline';"
+               onmouseout="this.style.textDecoration='none';">
+                <%= friend.getUsername() %>
+            </a>
+        </span>
+
+        <button onclick="sendChallenge(this, <%=friend.getId()%>)">Challenge</button>
+    </div><%
+            }
+    } else {%>
+    <p>No users available to challenge</p><%
+    }%>
+</div>
 
 
-<%--Some other things--%>
-<form action="user-page.jsp" method="get">
-    <button type="submit" >Home</button>
-</form>
+<script>
+    function sendChallenge(button, friendId) {
+        fetch("challenge-servlet", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "challenged-id=" + encodeURIComponent(friendId) +
+                  "&<%=Constants.RequestParameters.QUIZ_ID%>=" + encodeURIComponent(<%=quiz.getId()%>)
+        });
+
+        button.disabled = true;
+    }
+</script>
+
+<style>
+    #user-list-panel {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc; /* Optional: adds a visual boundary */
+        padding: 10px;
+    }
+</style>
+
+<%--retunt to homepage--%>
+<br><br><br>
+<a href="user-page.jsp">
+    <button>Back To Homepage</button>
+</a>
+
 </body>
 </html>

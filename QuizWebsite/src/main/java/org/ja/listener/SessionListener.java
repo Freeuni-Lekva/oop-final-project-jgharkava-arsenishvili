@@ -21,13 +21,6 @@ public class SessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        se.getSession().setAttribute(Constants.SessionAttributes.HAS_QUESTIONS, false);
-
-        questionAnswerMap = new HashMap<>();
-        se.getSession().setAttribute(Constants.SessionAttributes.QUESTIONS, questionAnswerMap);
-
-        questionMatchMap = new HashMap<>();
-        se.getSession().setAttribute(Constants.SessionAttributes.MATCHES, questionMatchMap);
     }
 
     @Override
