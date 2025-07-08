@@ -439,6 +439,246 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = `quiz-overview.jsp?current-quiz-id=${quizId}`;
         }
     });
+
+    document.querySelectorAll(".matching-question-block").forEach(questionBlock => {
+
+        const leftOptionsContainer = questionBlock.querySelector(".left-options");
+
+        // Delegate click event for Save buttons inside leftOptionsContainer
+        leftOptionsContainer.addEventListener("click", event => {
+            const btn = event.target;
+
+            // Save Left Option button
+            if (btn.classList.contains("save-left-option-btn")) {
+                const group = btn.closest(".left-group");
+                if (!group) return;
+
+                const leftInput = group.querySelector(".left-match");
+                const rightSelect = group.querySelector("select.right-select");
+
+                const newLeftText = leftInput.value.trim();
+                const matchId = group.dataset.matchId;
+                const isNew = !matchId || matchId === "";
+                const selectedRightText = rightSelect ? rightSelect.value : null;
+                const questionId = questionBlock.dataset.questionId;
+
+                console.log("question id" , questionId);
+
+                if (!newLeftText) {
+                    alert("Left option cannot be empty.");
+                    return;
+                }
+
+                btn.disabled = true;
+
+                fetch("edit-question", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "updateLeftMatch",
+                        matchId: matchId,
+                        newLeftText: newLeftText,
+                        isNew: isNew,
+                        questionId: questionId,
+                        rightText: selectedRightText
+                    })
+                })
+                    .then(res => res.json())
+                    .then(json => {
+                        if (json.success) {
+                            alert(isNew ? "Left option created successfully." : "Left option updated successfully.");
+                            if (isNew) {
+                                group.dataset.matchId = json.matchId; // Save new matchId on group
+                            }
+                            btn.disabled = true;
+                        } else {
+                            alert("Failed to save left option.");
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Error while saving left option.");
+                        btn.disabled = false;
+                    });
+            }
+
+            // Delete Left Option button
+            if (btn.classList.contains("delete-left-option-btn")) {
+                const group = btn.closest(".left-group");
+                if (!group) return;
+
+                if (!confirm("Are you sure you want to delete this left option?")) return;
+
+                // Optionally send AJAX to delete from DB here if needed
+                // For example:
+                /*
+                const matchId = group.dataset.matchId;
+                if (matchId) {
+                    fetch("edit-question", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            action: "deleteLeftMatch",
+                            matchId: matchId
+                        })
+                    }).then(res => res.json())
+                      .then(json => {
+                          if (!json.success) alert("Failed to delete left option from database.");
+                      }).catch(() => alert("Error deleting left option from database."));
+                }
+                */
+
+                group.remove();
+            }
+        });
+
+        // Enable/disable Save button on input event (also on initial load)
+        function bindSaveToggle(group) {
+            const leftInput = group.querySelector(".left-match");
+            const saveBtn = group.querySelector(".save-left-option-btn");
+            if (!leftInput || !saveBtn) return;
+
+            toggleSaveButtonState(leftInput, saveBtn);
+
+            leftInput.addEventListener("input", () => {
+                toggleSaveButtonState(leftInput, saveBtn);
+            });
+        }
+
+        // Bind toggle on existing groups
+        questionBlock.querySelectorAll(".left-group").forEach(bindSaveToggle);
+
+        // Update dropdowns helper
+        function updateDropdowns(oldVal = null, newVal = null) {
+            const rightInputs = questionBlock.querySelectorAll(".right-match");
+            const dropdowns = questionBlock.querySelectorAll(".right-select");
+
+            dropdowns.forEach(select => {
+                let currentValue = select.value;
+                if (oldVal && currentValue === oldVal) currentValue = newVal;
+
+                select.innerHTML = "";
+
+                rightInputs.forEach(input => {
+                    const option = document.createElement("option");
+                    option.value = input.value;
+                    option.textContent = input.value || "(empty)";
+                    select.appendChild(option);
+                });
+
+                select.value = currentValue;
+            });
+        }
+
+        // Right option save logic (unchanged)
+        questionBlock.querySelectorAll(".right-option-wrapper").forEach(wrapper => {
+            const saveBtn = wrapper.querySelector(".save-right-option-btn");
+            const input = wrapper.querySelector(".right-match");
+
+            let originalValue = input.value;
+
+            toggleSaveButtonState(input, saveBtn);
+
+            input.addEventListener("input", () => {
+                toggleSaveButtonState(input, saveBtn);
+            });
+
+            saveBtn.addEventListener("click", () => {
+                const newRightText = input.value.trim();
+
+                if (!newRightText) {
+                    alert("Right option cannot be empty.");
+                    return;
+                }
+
+                // Find all left-groups with dropdown value == originalValue
+                const affectedLeftGroups = Array.from(questionBlock.querySelectorAll(".left-group")).filter(leftGroup => {
+                    const select = leftGroup.querySelector("select.right-select");
+                    return select.value === originalValue;
+                });
+
+                const updates = affectedLeftGroups.map(leftGroup => {
+                    const matchId = leftGroup.dataset.matchId;
+                    return fetch("edit-question", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            action: "updateRightMatchText",
+                            matchId: matchId,
+                            newRightText: newRightText
+                        })
+                    }).then(res => res.json());
+                });
+
+                Promise.all(updates).then(results => {
+                    if (results.every(r => r.success)) {
+                        alert("Right option updated and linked matches updated successfully.");
+
+                        updateDropdowns(originalValue, newRightText);
+                        originalValue = newRightText;
+                    } else {
+                        alert("Failed to update some matches.");
+                    }
+                }).catch(() => {
+                    alert("Error updating matches.");
+                });
+            });
+        });
+
+        // Add Left Option button logic
+        const addLeftBtn = questionBlock.querySelector(".add-left-option-btn");
+        if (addLeftBtn) {
+            addLeftBtn.addEventListener("click", () => {
+                const rightInputs = questionBlock.querySelectorAll(".right-match");
+                const defaultRightValue = rightInputs.length > 0 ? rightInputs[0].value : "";
+
+                const group = document.createElement("div");
+                group.className = "left-group";
+                group.dataset.matchId = ""; // new match has no id yet
+
+                const leftInput = document.createElement("input");
+                leftInput.type = "text";
+                leftInput.className = "left-match";
+                leftInput.placeholder = "Left option";
+                leftInput.required = true;
+
+                const select = document.createElement("select");
+                select.className = "right-select";
+                select.required = true;
+
+                rightInputs.forEach(input => {
+                    const option = document.createElement("option");
+                    option.value = input.value;
+                    option.textContent = input.value || "(empty)";
+                    select.appendChild(option);
+                });
+                select.value = defaultRightValue;
+
+                const saveBtn = document.createElement("button");
+                saveBtn.className = "save-left-option-btn";
+                saveBtn.textContent = "Save Text";
+                saveBtn.disabled = true;
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-left-option-btn";
+                deleteBtn.textContent = "Delete";
+
+                group.appendChild(leftInput);
+                group.appendChild(select);
+                group.appendChild(saveBtn);
+                group.appendChild(deleteBtn);
+
+                leftOptionsContainer.appendChild(group);
+
+                bindSaveToggle(group);
+            });
+        }
+
+    });
+
+
+
 });
 
 // creates new option for multi-answer's answer

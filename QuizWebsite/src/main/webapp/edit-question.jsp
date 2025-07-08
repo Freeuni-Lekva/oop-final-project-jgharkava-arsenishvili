@@ -9,7 +9,9 @@
 <%@ page import="org.ja.model.OtherObjects.Answer" %>
 <%@ page import="java.lang.reflect.Array" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Arrays" %><%--
+<%@ page import="java.util.Arrays" %>
+<%@ page import="org.ja.dao.MatchesDao" %>
+<%@ page import="org.ja.model.OtherObjects.Match" %><%--
   Created by IntelliJ IDEA.
   User: lizamarsagishvili
   Date: 04.07.25
@@ -22,6 +24,7 @@
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
     QuestionDao questionDao = (QuestionDao) application.getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);
     AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
+    MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
 
 //    long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     long quizId = 2;
@@ -263,7 +266,69 @@
         %>
     </div>
 
-    <% } else if (questionType.equals(Constants.QuestionTypes.MATCHING_QUESTION)) { %>
+    <% } else if (questionType.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
+
+        ArrayList<Match> matches = matchesDao.getQuestionMatches(questionId);
+
+        ArrayList<String> leftMatches = new ArrayList<String>();
+
+        for (Match match: matches){
+            leftMatches.add(match.getLeftMatch());
+        }
+
+        ArrayList<String> rightMatches = new ArrayList<String>();
+
+        for (Match match: matches){
+            String right = match.getRightMatch();
+            if (!rightMatches.contains(right))
+                rightMatches.add(right);
+        }
+    %>
+
+    <div class="matching-question-block" data-question-id="<%=questionId%>">
+
+        <div class="matching-columns">
+            <div class="left-column">
+                <h4>Left Options</h4>
+                <div class="left-options">
+                    <%
+                        for (int i = 0; i < leftMatches.size(); i++) {
+                            String left = leftMatches.get(i);
+                            String matchedRight = matches.get(i).getRightMatch();
+                            long matchId = matches.get(i).getMatchId();
+                    %>
+                    <p><%=matchId%></p>
+                    <div class="left-group" data-match-id="<%=matchId%>">
+                        <input type="text" class="left-match" value="<%=left%>" required>
+                        <select class="right-select" required>
+                            <% for (String right : rightMatches) { %>
+                            <option value="<%=right%>" <%=matchedRight.equals(right) ? "selected" : ""%>><%=right%></option>
+                            <% } %>
+                        </select>
+                        <button class="save-left-option-btn">Save Text</button>
+                        <button class="delete-left-option-btn">Delete</button>
+                    </div>
+                    <% } %>
+                </div>
+                <button type="button" class="add-left-option-btn">Add Left Option</button>
+            </div>
+
+            <div class="right-column">
+                <h4>Right Options</h4>
+                <div class="right-options">
+                    <% for (String right : rightMatches) { %>
+                    <div class="right-option-wrapper">
+                        <input type="text" class="right-match" value="<%=right%>" required>
+                        <button class="save-right-option-btn">Save Text</button>
+                        <button class="delete-right-option-btn">Delete</button>
+                    </div>
+                    <% } %>
+                </div>
+                <button type="button" class="add-right-option-btn">Add Right Option</button>
+            </div>
+        </div>
+
+    </div>
 
     <% } %>
 </div>

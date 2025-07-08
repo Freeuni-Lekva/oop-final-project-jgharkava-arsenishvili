@@ -72,6 +72,40 @@ public class MatchesDao {
         return matches;
     }
 
+    public void updateLeftMatch(long matchId, String newLeft){
+        String sql = "UPDATE matches SET left_match = ? WHERE match_id = ?";
+
+        System.out.println(newLeft + "newLeft");
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setString(1, newLeft);
+            ps.setLong(2, matchId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating left match text", e);
+        }
+    }
+
+    public void updateRightMatch(long matchId, String newRight){
+        String sql = "UPDATE matches SET right_match = ? WHERE match_id = ?";
+
+        System.out.println(newRight);
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setString(1, newRight);
+            ps.setLong(2, matchId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating left match text", e);
+        }
+    }
+
     public boolean contains(Match match) {
         String sql = "SELECT COUNT(*) FROM matches WHERE match_id = ? AND question_id=?" +
                 "AND left_match=? AND right_match = ?";

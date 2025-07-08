@@ -5,8 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import netscape.javascript.JSObject;
 import org.ja.dao.AnswersDao;
+import org.ja.dao.MatchesDao;
 import org.ja.dao.QuestionDao;
 import org.ja.dao.QuizzesDao;
+import org.ja.model.OtherObjects.Match;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -30,6 +32,7 @@ public class EditQuestionServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuestionDao questionDao = (QuestionDao) getServletContext().getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);
         AnswersDao answersDao = (AnswersDao) getServletContext().getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
+        MatchesDao matchesDao = (MatchesDao) getServletContext().getAttribute(Constants.ContextAttributes.MATCHES_DAO);
 
         BufferedReader bufferedReader = request.getReader();
         Gson gson = new Gson();
@@ -122,6 +125,36 @@ public class EditQuestionServlet extends HttpServlet {
                 System.out.println(isChoiceCorrect);
 
                 answersDao.setChoiceValidity(setChoiceValidityId, isChoiceCorrect);
+
+                break;
+            case "updateLeftMatch":
+                String newLeftText = jsonObject.get("newLeftText").getAsString();
+                boolean isNewMatch = jsonObject.get("isNew").getAsBoolean();
+
+                if (isNewMatch){
+                    long matchQuestionId = jsonObject.get("questionId").getAsLong();
+                    String newRightText = jsonObject.get("rightText").getAsString();
+                    Match newMatch = new Match(-1, matchQuestionId, newLeftText, newRightText);
+                    matchesDao.insertMatch(newMatch);
+
+                    JsonObject jsonResponse = new JsonObject();
+                    jsonResponse.addProperty("success", true);
+                    jsonResponse.addProperty("matchId", newMatch.getMatchId());
+
+                    response.setContentType("application/json");
+                    response.getWriter().write(new Gson().toJson(jsonResponse));
+                    return;
+                } else {
+                    long updateLeftMatchId = jsonObject.get("matchId").getAsLong();
+                    matchesDao.updateLeftMatch(updateLeftMatchId, newLeftText);
+                }
+
+                break;
+            case "updateRightMatchText":
+                long rightMatchId = jsonObject.get("matchId").getAsLong();
+                String newRightText = jsonObject.get("newRightText").getAsString();
+
+                matchesDao.updateRightMatch(rightMatchId, newRightText);
 
                 break;
         }
