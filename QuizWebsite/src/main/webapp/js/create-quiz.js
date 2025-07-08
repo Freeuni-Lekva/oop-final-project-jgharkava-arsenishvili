@@ -26,15 +26,16 @@ const durationInput = document.getElementById("quizDuration");
 const otherTagInput = document.getElementById("otherTagInput");
 const quizDescriptionInput = document.getElementById("quizDescription");
 
+/*TODO change this*/
 form.addEventListener("submit", function (e) {
-    e.preventDefault();
-
     const quizTitle = quizTitleInput.value.trim();
     const duration = durationInput.value.trim();
     const otherTag = otherTagInput.value.trim();
     const quizDescription = quizDescriptionInput.value.trim();
 
     if (quizTitle === "") {
+        e.preventDefault();
+
         quizTitleInput.setCustomValidity("Quiz title cannot be empty");
         quizTitleInput.reportValidity();
         return;
@@ -115,20 +116,16 @@ function enforceCorrectionOptions() {
     const finalRadio = Array.from(correctionRadios).find(r => r.value === "final-correction");
 
     if (selectedPlacement === "one-page") {
-        immediateRadio.disabled = true;
-
         if (immediateRadio.checked) {
             immediateRadio.checked = false;
             finalRadio.checked = true;
         }
+
+        immediateRadio.disabled = true;
     } else {
         immediateRadio.disabled = false;
     }
 }
-
-document.getElementsByName("placementType").forEach(radio => {
-    radio.addEventListener("change", enforceCorrectionOptions);
-});
 
 function getSelectedValue(radioNodeList) {
     for (let r of radioNodeList) {
@@ -136,6 +133,10 @@ function getSelectedValue(radioNodeList) {
     }
     return null;
 }
+
+document.getElementsByName("placementType").forEach(radio => {
+    radio.addEventListener("change", enforceCorrectionOptions);
+});
 
 quizTitleInput.addEventListener("input", function () {
     quizTitleInput.setCustomValidity("");

@@ -338,6 +338,70 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
         }
     }
+
+    const container = document.getElementById(`${selectedType}-form`);
+
+    const answers = [...container.querySelectorAll(`[name="answer"]`)];
+    const allAnswersFilled = answers.every(input => input.value.trim() !== "");
+
+    if(!allAnswersFilled){
+        e.preventDefault();
+        const firstTextarea = container.querySelector("textarea[name='answer']");
+        firstTextarea.setCustomValidity("Please fill in all answer fields");
+        firstTextarea.reportValidity();
+
+        setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+    }
+
+    if(selectedType === "picture-response") {
+        const imageUrl = container.querySelector(`[name="imageUrl"]`);
+
+        if(imageUrl.value.trim() === "") {
+            e.preventDefault();
+
+            imageUrl.setCustomValidity("Please fill in image link field");
+            imageUrl.reportValidity();
+
+            setTimeout(() => imageUrl.setCustomValidity(""), 1000);
+        }
+    } else {
+        const questionText = container.querySelector(`[name="questionText"]`);
+
+        if(questionText.value.trim() === "") {
+            e.preventDefault();
+
+            questionText.setCustomValidity("Please fill in question text field");
+            questionText.reportValidity();
+
+            setTimeout(() => questionText.setCustomValidity(""), 1000);
+        }
+    }
+
+    if(selectedType === "multi-answer") {
+        const textAreas = document.querySelectorAll
+        ("#multi-answer-form .answer-group textarea, #multi-answer-form .answer-group input[type='text']");
+
+        let allFilled = true;
+
+        textAreas.forEach(textarea => {
+            if (textarea.value.trim() === "") {
+                allFilled = false;
+            }
+        });
+
+        if(!allFilled) {
+            e.preventDefault();
+
+            const firstTextArea = textAreas[0];
+
+            firstTextArea.setCustomValidity("Please fill in all answer fields");
+            firstTextArea.reportValidity();
+
+
+            setTimeout(() => firstTextArea.setCustomValidity(""), 1000);
+        }
+    }
+
 });
 
 let multiAnswerCount = 0;
@@ -393,23 +457,6 @@ function insertAnswerBelow(button) {
     const group = button.closest(".answer-group");
     addAnswerGroup(group);
 }
-
-document.getElementById("create-question-form").addEventListener("submit", function (e) {
-    const container = document.getElementById("multi-answer-container");
-
-    if (!container) return;
-
-    const order = Array.from(container.querySelectorAll(".answer-group"))
-        .map(group => group.dataset.groupId); // collect order of groupIds
-
-    let hidden = document.createElement("input");
-    hidden.type = "hidden";
-    hidden.name = "answerOrder";
-    hidden.id = "answerOrderInput";
-    hidden.value = order.join(",");
-
-    this.appendChild(hidden);
-});
 
 let rightOptionId = 0;
 let leftOptionId = 0;
@@ -493,4 +540,21 @@ function confirmDiscard(){
 function confirmQuestionDiscard(){
     return confirm("Are you sure you want to discard this question?");
 }
+
+document.getElementById("create-question-form").addEventListener("submit", function (e) {
+    const container = document.getElementById("multi-answer-container");
+
+    if (!container) return;
+
+    const order = Array.from(container.querySelectorAll(".answer-group"))
+        .map(group => group.dataset.groupId); // collect order of groupIds
+
+    let hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "answerOrder";
+    hidden.id = "answerOrderInput";
+    hidden.value = order.join(",");
+
+    this.appendChild(hidden);
+});
 
