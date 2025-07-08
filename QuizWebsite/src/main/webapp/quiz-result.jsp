@@ -185,6 +185,7 @@
     List<Friendship> friends = friendShipsDao.getFriends(user.getId());
 %>
 
+<%--TODO make pretty--%>
 <div id="user-list-panel"><%
     if(!friends.isEmpty()) {
             for(Friendship friendship : friends) {
@@ -192,7 +193,6 @@
 
     <div class="user-entry">
         <span>
-            <%--TODO make href stylish--%>
             <a href="visit-user?<%=Constants.RequestParameters.USER_ID%>=<%=friend.getId()%>"
                style="text-decoration: none; color: inherit; cursor: pointer;"
                onmouseover="this.style.textDecoration='underline';"

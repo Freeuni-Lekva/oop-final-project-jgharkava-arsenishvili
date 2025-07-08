@@ -125,16 +125,22 @@ public class GradeSingleQuestionServlet extends HttpServlet {
 
         /// manage time limit
         // TODO better conditioning
-        if(quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000) {
+
+        boolean isTimedOut = quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000;
+        boolean isLastQuestion = index + 1 == questions.size();
+        boolean isImmediateCorrection = quiz.getQuestionCorrection().equals("immediate-correction");
+
+        if (isTimedOut || isLastQuestion) {
             long quizId = ((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId();
             long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
+
             double completionTime = (double) (currTime - startTime) / 60000;
-            if(completionTime >= quiz.getTimeInMinutes())
+            if (completionTime >= quiz.getTimeInMinutes()) {
                 completionTime = quiz.getTimeInMinutes();
+            }
 
             session.setAttribute("time-spent-in-minutes", completionTime);
             long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
-
             Timestamp completionDate = new Timestamp(currTime);
 
             History newHistory = new History(userId, quizId, totalScore, completionTime, completionDate);
@@ -146,39 +152,22 @@ public class GradeSingleQuestionServlet extends HttpServlet {
                 throw new RuntimeException("Error Inserting New History In Database");
             }
 
-            req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
-
-        } else if (index + 1 == questions.size()) {
-            long quizId = ((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId();
-            long userId = ((User) session.getAttribute(Constants.SessionAttributes.USER)).getId();
-            double completionTime = (double) (currTime - startTime) / 60000;
-            if(completionTime >= quiz.getTimeInMinutes())
-                completionTime = quiz.getTimeInMinutes();
-
-            session.setAttribute("time-spent-in-minutes", completionTime);
-            long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
-
-            Timestamp completionDate = new Timestamp(currTime);
-
-            History newHistory = new History(userId, quizId, totalScore, completionTime, completionDate);
-            HistoriesDao historiesDao = (HistoriesDao) getServletContext().getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
-
-            try {
-                historiesDao.insertHistory(newHistory);
-            } catch (SQLException e) {
-                throw new RuntimeException("Error Inserting New History In Database");
-            }
-
-            if(quiz.getQuestionCorrection().equals("immediate-correction")) {
+            if (isLastQuestion && isImmediateCorrection) {
                 req.setAttribute("question", question);
                 req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
-            } else
+            } else {
                 req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
-        } else if(quiz.getQuestionCorrection().equals("immediate-correction")) {
-            /// solves indexing problem
+            }
+
+        } else if (isImmediateCorrection) {
+            // Show immediate correction after each question
             req.setAttribute("question", question);
             req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
-        } else
+
+        } else {
+            // Proceed to next question normally
             req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
+        }
+
     }
 }
