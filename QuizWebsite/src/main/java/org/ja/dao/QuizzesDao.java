@@ -46,9 +46,6 @@ public class QuizzesDao {
     }
 
     public void insertQuiz(Quiz quiz) {
-        /*if(containsQuiz(quiz.getName())){
-            return;
-        }*/
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, quiz_score, average_rating, " +
                 "participant_count, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
@@ -97,9 +94,6 @@ public class QuizzesDao {
     }
 
     public void removeQuizById(long id) {
-        if(!containsQuiz(id)){
-            return;
-        }
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -354,6 +348,7 @@ public class QuizzesDao {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public boolean containsQuiz(long id) {
         String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_id = ?";
 
@@ -371,6 +366,7 @@ public class QuizzesDao {
             throw new RuntimeException("Error checking user existence", e);
         }
     }
+
     public long getCount(){
         return cnt;
     }
