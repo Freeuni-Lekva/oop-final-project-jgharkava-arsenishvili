@@ -117,8 +117,8 @@ public class AnswersDao {
         if(answer==null){
             return false;
         }
-        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=?" +
-                "AND answer_text=? AND answer_order = ?" +
+        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=? " +
+                "AND answer_text=? AND answer_order = ? " +
                 " AND answer_validity = ?";
 
         try (Connection connection = dataSource.getConnection();
