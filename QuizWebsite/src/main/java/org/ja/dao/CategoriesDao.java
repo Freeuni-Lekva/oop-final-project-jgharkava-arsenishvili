@@ -119,42 +119,6 @@ public class CategoriesDao {
         return null;
     }
 
-    public boolean containsCategory(long id) {
-        String sql = "SELECT COUNT(*) FROM categories WHERE category_id = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-    public boolean containsCategory(String name) {
-        String sql = "SELECT COUNT(*) FROM categories WHERE category_name = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
     private Category retrieveCategory(ResultSet rs) throws SQLException {
         return new Category(rs.getLong("category_id"), rs.getString("category_name"));
     }
