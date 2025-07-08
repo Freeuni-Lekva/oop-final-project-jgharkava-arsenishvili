@@ -12,9 +12,14 @@
 <html>
 <head>
   <title>Welcome <%=username%>!</title>
+  <link rel="stylesheet" type="text/css" href="css/sign-up-success.css">
 </head>
 <body>
-<h1>You have signed up successfully!</h1>
-<p><a href="user-page.jsp">Go To Your Page</a></p>
+<div class="success-container">
+  <h1>You have signed up successfully!</h1>
+  <p class="welcome-message">Welcome to the Quiz Website</p>
+  <a href="user-page.jsp" class="success-link">go to your page</a>
+</div>
 </body>
 </html>
+

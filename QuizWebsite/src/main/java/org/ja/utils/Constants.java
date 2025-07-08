@@ -70,6 +70,14 @@ public class Constants {
         public static final String USER_ID = "current-quiz-id";
     }
 
+    public static class AchievementIds {
+        public static final long FIRST_STEP = 1;
+        public static final long QUIZ_ADDICT = 2;
+        public static final long FLAWLESS_VICTORY = 3;
+        public static final long QUIZ_MASTER = 4;
+        public static final long SPEED_DEMON = 5;
+    }
+
     public enum QuizMode {
         TAKING,
         PRACTICE
