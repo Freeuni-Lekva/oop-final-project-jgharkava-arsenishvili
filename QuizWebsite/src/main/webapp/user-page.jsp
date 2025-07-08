@@ -18,256 +18,365 @@
   AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);
   FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
   User user = (User)session.getAttribute(Constants.SessionAttributes.USER);
+  String query = request.getParameter("query");
+  String errorMessage = null;
+
+  if (query != null && !query.trim().isEmpty()) {
+    User foundUser = usersDao.getUserByUsername(query.trim());
+
+    if (foundUser != null && foundUser.getId() != user.getId()) {
+      response.sendRedirect("visit-user.jsp?query=" + foundUser.getUsername());
+      return;
+    } else {
+      errorMessage = "User \"" + query + "\" not found.";
+    }
+  }
 %>
 <!DOCTYPE html>
 <html>
 <head>
   <title><%=user.getUsername() %></title>
+  <link rel="stylesheet" type="text/css" href="css/user-page.css">
+  <script src="js/user-page.js" defer></script>
 </head>
+
 <body>
+<div class="dashboard-container">
 
-<!--Announcements -->
-<div>
-  <h2>Recent Announcements by Administrators</h2>
-  <%
-    ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
-    Map<Announcement, String> announcements = new HashMap<Announcement, String>();
-    for (Announcement a : ann) {
-      User administrator = usersDao.getUserById(a.getAdministratorId());
-      announcements.put(a, administrator.getUsername());
-      if(announcements.size() == 3) break;
-    }
-    if(!announcements.isEmpty()){
-      for(Announcement an : announcements.keySet()){ %>
-          <div>
-              <h3>Posted By: <%=announcements.get(an) %></h3>
-              <p>Date: <%=an.getCreationDate() %></p>
-              <p><%=an.getAnnouncementText() %></p>
-          </div>
-  <%  }
-  } else { %>
-  <p>No recent announcements found.</p>
-  <% } %>
-</div>
+  <!-- Profile Section -->
+  <div class="card profile-card">
+    <h1><%=user.getUsername()%></h1>
+    <img src="<%=user.getPhoto()%>" alt="Profile Picture">
+  </div>
 
+  <!-- Quiz Highlights Section -->
+  <div class="card quiz-highlights">
+    <h3>Quiz Highlights</h3>
 
-<!-- Popular Quizzes-->
-<div>
-  <h3>The Most Popular Quizzes: </h3>
-  <%
-    ArrayList<Quiz> quizzes = quizDao.getQuizzesSortedByParticipantCount();
-    int cnt1 = 0;
-    for(Quiz quiz : quizzes){
-      if(cnt1 == 3) break;%>
-      <p><%=quiz.getName()%></p>
-      <p>Taken by <%=quiz.getParticipantCount()%> users.</p>
-  <%
-    cnt1++;
-    } %>
-</div>
-
-
-<!--Recently Created Quizzes-->
-<div>
-  <h3>Recently Created Quizzes:</h3>
-  <%
-    ArrayList<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
-    int cnt2 = 0;
-    for(Quiz quiz: recentlyCreated){
-      if(cnt2 == 5) break;%>
-      <p><%=quiz.getName()%></p>
-      <p>Created By: <%=usersDao.getUserById(quiz.getCreatorId()).getUsername()%></p>
-      <p>On: <%=quiz.getCreationDate()%></p>
-  <%
-    cnt2++;
-    }%>
-</div>
-
-<!--History if quizzes taken by user -->
-<div>
-  <h2>History of Your Quizzes</h2>
-  <%
-    ArrayList<History> recentHistory = historiesDao.getHistoriesByUserIdSortedByDate(user.getId());
-    if(!recentHistory.isEmpty()){ %>
-      <h3>The Last <%=recentHistory.size()%> Quizzes taken by You:</h3>
-      <% int cnt3 = 0;
-      for(History h: recentHistory){
-        if(cnt3 == 5) break;%>
-        <p><%=quizDao.getQuizById(h.getQuizId()).getName()%></p>
-        <p>Your Score: <%=h.getScore()%></p>
-        <p>Your Time: <%=h.getCompletionTime()%></p>
-        <p>Taken On: <%=h.getCompletionDate()%></p>
+    <!-- Popular Quizzes -->
+    <div class="quiz-section popular">
+      <h4>Most Popular</h4>
       <%
-          cnt3++;}
-    }else{%>
-      <p>You have not taken any Quizzes yet.</p>
-  <%}%>
-</div>
-
-
-<!--History of user created quizzes-->
-<div>
-  <%
-    ArrayList<Quiz> creationHistory = quizDao.getQuizzesByCreatorId(user.getId());
-    int cnt4 = 0;
-    if(!creationHistory.isEmpty()){ %>
-      <h2>History of Your Quizzes</h2>
-      <h3>The Last Quizzes created by You:</h3>
-      <%for(Quiz q: creationHistory){
-        if(cnt4 == 5) break;%>
-        <p><%=q.getName()%></p>
-        <p> <%=q.getDescription()%></p>
-        <p>Average Rating: <%=q.getAvgRating()%></p>
-        <p>Taken By: <%=q.getParticipantCount()%> Users.</p>
+        ArrayList<Quiz> quizzes = quizDao.getQuizzesSortedByParticipantCount();
+        int cnt1 = 0;
+        for (Quiz quiz : quizzes) {
+          if (cnt1 == 3) break;
+      %>
+      <div class="quiz-item">
+        <strong><%=quiz.getName()%></strong>
+        <p class="text-small">Taken by <%=quiz.getParticipantCount()%> users</p>
+      </div>
       <%
-      cnt4++;}%>
-  <%}%>
-</div>
+          cnt1++;
+        }
+      %>
+    </div>
 
-<!--lookup -->
-<div>
-  <h2>Lookup</h2>
-  <form action="friends.jsp" method="get">
-    <label>
-      <input type="text" name="query">
-    </label>
-    <button type="submit">Search</button>
-  </form> <br>
-</div>
+    <!-- Recently Created -->
+    <div class="quiz-section recent">
+      <h4>Recently Created</h4>
+      <%
+        ArrayList<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
+        int cnt2 = 0;
+        for (Quiz quiz : recentlyCreated) {
+          if (cnt2 == 3) break;
+      %>
+      <div class="quiz-item">
+        <strong><%=quiz.getName()%></strong>
+        <p class="text-small">By: <%=usersDao.getUserById(quiz.getCreatorId()).getUsername()%></p>
+        <p class="text-small"><%=quiz.getCreationDate()%></p>
+      </div>
+      <%
+          cnt2++;
+        }
+      %>
+    </div>
+  </div>
 
-<!-- Create/take quiz -->
-<div>
-  <form action="create-quiz.jsp" method="get">
-    <button type="submit">Create Quiz</button>
-  </form> <br>
+  <!-- Lookup Section -->
+  <div class="card lookup">
+    <h3>Lookup People</h3>
+    <form action="user-page.jsp" method="get">
+      <input type="text" name="query" placeholder="Search for users..." value="<%= query != null ? query : "" %>">
+      <button type="submit">Search</button>
+    </form>
+    <% if (errorMessage != null) { %>
+    <p style="color: red; margin-top: 10px;"><%= errorMessage %></p>
+    <% } %>
+  </div>
 
-  <form action="take-quiz.jsp" method="get">
-    <button type="submit">Take Quiz</button>
-  </form>
-</div>
+  <!-- My History Section -->
+  <div class="card my-history">
+    <h3>My History</h3>
 
-<!-- messages TODO link to see more-->
-<div>
-  <h2>Your Messages</h2>
-  <%
-    ArrayList<Message> messages = messageDao.getMessagesForUserSorted(user.getId());
-    if(messages != null && !messages.isEmpty()){ %>
-      <p>You have <%=messages.size()%> new message(s).</p>
+    <!-- Last Taken -->
+    <div class="history-section">
+      <h4>Last Taken</h4>
+      <%
+        ArrayList<History> recentHistory = historiesDao.getHistoriesByUserIdSortedByDate(user.getId());
+        if(!recentHistory.isEmpty()){
+          int cnt3 = 0;
+          for(History h: recentHistory){
+            if(cnt3 == 3) break;
+      %>
+      <div class="history-item">
+        <strong><%=quizDao.getQuizById(h.getQuizId()).getName()%></strong>
+        <p class="text-small">Score: <%=h.getScore()%> | Time: <%=h.getCompletionTime()%></p>
+        <p class="text-small"><%=h.getCompletionDate()%></p>
+      </div>
+      <%
+          cnt3++;
+        }
+      } else {
+      %>
+      <p class="text-small">No quizzes taken yet.</p>
+      <% } %>
+    </div>
+
+    <!-- Last Created -->
+    <div class="history-section">
+      <h4>Last Created</h4>
+      <%
+        ArrayList<Quiz> creationHistory = quizDao.getQuizzesByCreatorId(user.getId());
+        int cnt4 = 0;
+        if(!creationHistory.isEmpty()){
+          for(Quiz q: creationHistory){
+            if(cnt4 == 3) break;
+      %>
+      <div class="history-item">
+        <strong><%=q.getName()%></strong>
+        <p class="text-small">Rating: <%=q.getAvgRating()%> | Taken by: <%=q.getParticipantCount()%> users</p>
+      </div>
+      <%
+          cnt4++;
+        }
+      } else {
+      %>
+      <p class="text-small">No quizzes created yet.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Friends History Section -->
+  <div class="card friends-history">
+    <h3>Friends History</h3>
+
+    <!-- Last Taken by Friends -->
+    <div class="history-section">
+      <h4>Last Taken</h4>
+      <%
+        ArrayList<History> friendsQuizzes = historiesDao.getUserFriendsHistorySortedByCompletionDate(user.getId());
+        if(friendsQuizzes != null && !friendsQuizzes.isEmpty()) {
+          int cnt8 = 0;
+          for(History h: friendsQuizzes){
+            if(cnt8 == 3) break;
+      %>
+      <div class="history-item">
+        <strong><%=quizDao.getQuizById(h.getQuizId()).getName()%></strong>
+        <p class="text-small">By: <%=usersDao.getUserById(h.getUserId()).getUsername()%></p>
+        <p class="text-small"><%=h.getCompletionDate()%></p>
+      </div>
+      <%
+          cnt8++;
+        }
+      } else {
+      %>
+      <p class="text-small">No friend activity yet.</p>
+      <% } %>
+    </div>
+
+    <!-- Last Created by Friends -->
+    <div class="history-section">
+      <h4>Last Created</h4>
+      <%
+        ArrayList<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
+        if(quizzesByFriends != null && !quizzesByFriends.isEmpty()) {
+          int cnt9 = 0;
+          for(Quiz q: quizzesByFriends){
+            if(cnt9 == 3) break;
+      %>
+      <div class="history-item">
+        <strong><%=q.getName()%></strong>
+        <p class="text-small">By: <%=usersDao.getUserById(q.getCreatorId()).getUsername()%></p>
+      </div>
+      <%
+          cnt9++;
+        }
+      } else {
+      %>
+      <p class="text-small">No friend creations yet.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="full-history">
+    <h4>Full history</h4>
+    <a href="history.jsp">view your full history</a>
+  </div>
+
+  <!-- Achievements Section -->
+  <div class="card achievements">
+    <h3>Latest Achievement</h3>
+    <%
+      ArrayList<UserAchievement> achievements = userAchievementDao.getUserAchievements(user.getId());
+      if (achievements != null && !achievements.isEmpty()) {
+        Achievement latest = achievementDao.getAchievement(achievements.get(0).getAchievementId());
+    %>
+    <div class="achievement-badge">
+      <strong><%=latest.getAchievementName()%></strong>
+    </div>
+    <%}else{%>
+      <p class="text-small">No achievements yet</p>
+    <%}%>
+  </div>
+
+  <!-- Take Quiz Button -->
+  <div class="card take-quiz">
+    <form action="take-quiz.jsp" method="get">
+      <button class="quiz-button" type="submit">Take Quiz</button>
+    </form>
+  </div>
+
+  <!-- Create Quiz Button -->
+  <div class="card create-quiz">
+    <form action="create-quiz.jsp" method="get">
+      <button class="quiz-button" type="submit">Create Quiz</button>
+    </form>
+  </div>
+
+  <!-- Messages Section -->
+  <div class="card messages">
+    <h3>Messages</h3>
+    <%
+      ArrayList<Message> messages = messageDao.getMessagesForUserSorted(user.getId());
+      if(messages != null && !messages.isEmpty()){
+    %>
+    <p class="mb-10">You have <%=messages.size()%> new message(s).</p>
     <%
       int cnt5 = 0;
       for(Message m: messages){
-        if(cnt5 == 3) break;%>
-        <p>Sent From <%=usersDao.getUserById(m.getSenderUserId()).getUsername()%></p>
-      <%cnt5++;
-      }%>
-      <a href="messages.jsp">See all messages</a>
-  <% }else{%>
-      <p>No new messages.</p>
-     <%}%>
-</div>
+        if(cnt5 == 3) break;
+    %>
+    <div class="message-item">
+      From: <%=usersDao.getUserById(m.getSenderUserId()).getUsername()%>
+    </div>
+    <%
+        cnt5++;
+      }
+    %>
+    <a href="messages.jsp">See all messages</a> <br></br>
+    <div class="mb-15">
+      <label>Send a message:</label>
+      <input type="text" id="recipient" placeholder="Recipient username" required>
+      <textarea id="message" rows="2" placeholder="Write your message" required></textarea>
+      <button onclick="sendMessage()">Send</button>
+      <p id="message-status"></p>
+    </div>
 
-<!-- challenges  TODO link to see more -->
-<div>
-  <h2>Your Challenges</h2>
-  <%
-    ArrayList<Challenge> challenges = challengeDao.challengesAsReceiver(user.getId());
-    if(challenges != null && !challenges.isEmpty()){ %>
-      <p>You have <%=challenges.size()%> new challenge(s).</p>
-      <%
+    <%
+    } else {
+    %>
+    <p class="text-small">No new messages.</p>
+    <% } %>
+  </div>
+
+  <!-- Challenges Section -->
+  <div class="card challenges">
+    <h3>Challenges</h3>
+    <%
+      ArrayList<Challenge> challenges = challengeDao.challengesAsReceiver(user.getId());
+      if(challenges != null && !challenges.isEmpty()){
+    %>
+    <p class="mb-10">You have <%=challenges.size()%> new challenge(s).</p>
+    <%
       int cnt6 = 0;
       for(Challenge c: challenges){
-        if(cnt6 == 3) break;%>
-        <p>Sent From <%=usersDao.getUserById(c.getSenderUserId()).getUsername()%></p>
-      <%cnt6++;
-      }%>
-      <a href="challenges.jsp">See all challenges</a>
-  <%}else{%>
-    <p>No new challenges.</p>
-  <%}%>
-</div>
-
-<!-- achievements TODO link to see more -->
-<div>
-  <h2>Your Achievements</h2>
-  <%
-    ArrayList<UserAchievement> achievements = userAchievementDao.getUserAchievements(user.getId());
-    if(achievements != null && !achievements.isEmpty()) {
-      int cnt7 = 0;
-      for(UserAchievement a: achievements){
-        if(cnt7 == 3) break; %>
-        <p><%=achievementDao.getAchievement(a.getAchievementId()).getAchievementName()%></p>
-     <%   cnt7++;
-      } %>
-        <a href="achievements.jsp">See all achievements</a>
-   <% }else{ %>
-      <p>You have no achievements yet</p>
-   <%  }
-   %>
-</div>
-
-<!--friends activity (taken quizzes) -->
-<div>
-  <h2>Recent quizzes taken by your friends.</h2>
-  <%
-    ArrayList<History> friendsQuizzes = historiesDao.getUserFriendsHistorySortedByCompletionDate(user.getId());
-    if(friendsQuizzes != null && !friendsQuizzes.isEmpty()) {
-      int cnt8 = 0;
-      for(History h: friendsQuizzes){
-        if(cnt8 == 3) break; %>
-        <p><%=quizDao.getQuizById(h.getQuizId()).getName()%></p>
-        <p>Taken by: <%=usersDao.getUserById(h.getUserId()).getUsername()%></p>
-        <p>Taken on: <%=h.getCompletionDate()%></p>
-      <% cnt8++;
+        if(cnt6 == 3) break;
+    %>
+    <div class="challenge-item">
+      <strong><%=quizDao.getQuizById(c.getQuizId()).getName()%></strong>
+      <p class="text-small">From: <%=usersDao.getUserById(c.getSenderUserId()).getUsername()%></p>
+    </div>
+    <%
+        cnt6++;
       }
-    }else{%>
-      <p>None of your friends have taken quizzes yet.</p>
-    <%}%>
-</div>
+    %>
+    <a href="challenges.jsp">See all challenges</a>
+    <%
+    } else {
+    %>
+    <p class="text-small">No new challenges.</p>
+    <% } %>
+  </div>
 
-<!--friends activity (created quizzes) -->
-<div>
-  <h2>Recent quizzes created by your friends.</h2>
-  <%
-    ArrayList<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
-    if(quizzesByFriends != null && !quizzesByFriends.isEmpty()) {
-      int cnt9 = 0;
-      for(Quiz q: quizzesByFriends){
-        if(cnt9 == 3) break; %>
-        <p><%=q.getName()%></p>
-        <p>Created by: <%=usersDao.getUserById(q.getCreatorId()).getUsername()%></p>
-        <% cnt9++;
+  <!-- Announcements Section -->
+  <div class="card announcements">
+    <h3>Announcements by Administrators</h3>
+    <%
+      ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
+      Map<Announcement, String> announcements = new HashMap<Announcement, String>();
+      for (Announcement a : ann) {
+        User administrator = usersDao.getUserById(a.getAdministratorId());
+        announcements.put(a, administrator.getUsername());
+        if(announcements.size() == 3) break;
       }
-    }else{%>
-    <p>None of your friends have created quizzes yet.</p>
-  <%}%>
-</div>
+      if(!announcements.isEmpty()){
+        for(Announcement an : announcements.keySet()){
+    %>
+    <div class="announcement-item">
+      <strong><%=an.getAnnouncementText() %></strong>
+      <p class="text-small">By: <%=announcements.get(an) %> | <%=an.getCreationDate() %></p>
+    </div>
+    <%
+      }
+    } else {
+    %>
+    <p class="text-small">No recent announcements found.</p>
+    <% } %>
+  </div>
 
-<!-- requests  TODO link to see more -->
-<div>
-  <h2>Friend Requests</h2>
-  <%
-    ArrayList<Friendship> requests = friendsDao.getFriendRequests(user.getId());
-    if(requests != null && !requests.isEmpty()){ %>
-    <p>You have <%=requests.size()%> friend request(s).</p>
+  <!-- Friend Requests Section || Show All friend requests-->
+  <div class="card friend-requests">
+    <h3>Friend Requests</h3>
+    <%
+      ArrayList<Friendship> requests = friendsDao.getFriendRequests(user.getId());
+      if(requests != null && !requests.isEmpty()){
+        int num = requests.size();
+    %>
+    <p class="mb-10" id="request-count">You have <%=num%> friend request(s).</p>
     <%
       int cnt10 = 0;
       for(Friendship f: requests){
-        if(cnt10 == 3) break;%>
-        <p>Sent From <%=usersDao.getUserById(f.getFirstUserId()).getUsername()%></p>
-        <%cnt10++;
-      } %> <a href="friend-requests.jsp">See all requests</a>
-  <%}else{%>
-  <p>No new friend requests.</p>
-  <%}%>
-</div>
+        if(cnt10 == 3) break;
+    %>
+    <div class="friend-request" data-user-id="<%=f.getFirstUserId()%>">
+      <span><%=usersDao.getUserById(f.getFirstUserId()).getUsername()%></span>
+      <div>
+        <button class="accept" data-user-id="<%=f.getFirstUserId()%>">Accept</button>
+        <button class="delete" data-user-id="<%=f.getFirstUserId()%>">Delete</button>
+      </div>
+    </div>
 
-<!-- administrator-->
-<div>
+    <%
+        cnt10++;
+      }
+    } else {
+    %>
+    <p class="text-small">No new friend requests.</p>
+    <% } %>
+  </div>
+
+  <!-- Administrator Switch Section -->
   <%
-    if(user.getStatus().equals("administrator")){ %>
-    <a href="administrator.jsp">Switch to Your Administrator Page</a>
-  <%}%>
+    if(user.getStatus().equals("administrator")){
+  %>
+  <div class="card admin-switch">
+    <a href="administrator.jsp">Switch to Administrator Mode</a>
+  </div>
+  <%
+    }
+  %>
+
 </div>
 </body>
 </html>
-

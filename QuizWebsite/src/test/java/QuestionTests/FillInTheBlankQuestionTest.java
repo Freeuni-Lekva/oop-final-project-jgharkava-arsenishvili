@@ -22,7 +22,8 @@ public class FillInTheBlankQuestionTest {
         Response response = new Response();
         response.addAnswer("0");
 
-        assertEquals(1, question.gradeResponse(List.of(answer), response));
+        assertEquals(List.of(1), question.gradeResponse(List.of(answer), response));
+
     }
 
     @Test
@@ -34,6 +35,6 @@ public class FillInTheBlankQuestionTest {
         Response response = new Response();
         response.addAnswer("1");
 
-        assertEquals(0, question.gradeResponse(List.of(answer), response));
+        assertEquals(List.of(0), question.gradeResponse(List.of(answer), response));
     }
 }

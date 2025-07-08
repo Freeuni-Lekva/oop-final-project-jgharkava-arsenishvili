@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 
 @WebServlet("/administrator")
 public class AdministratorServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AdministratorsDao adminsDao = (AdministratorsDao) getServletContext().getAttribute(Constants.ContextAttributes.ADMINISTRATORS_DAO);
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);

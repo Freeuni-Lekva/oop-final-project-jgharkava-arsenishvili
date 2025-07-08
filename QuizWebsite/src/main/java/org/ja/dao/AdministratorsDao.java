@@ -42,7 +42,7 @@ public class AdministratorsDao {
             st.setLong(1, userId);
             st.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error promoting user to administrator", e);
         }
     }
 
@@ -55,7 +55,7 @@ public class AdministratorsDao {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting user count", e);
         }
         return 0;
     }
@@ -69,52 +69,19 @@ public class AdministratorsDao {
             if (rs.next()) return rs.getInt(1);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error getting count of taken quizzes", e);
         }
         return 0;
     }
 
     public void removeUserById(long id) {
         try(Connection c = ds.getConnection()){
-            try (PreparedStatement st1 = c.prepareStatement("DELETE FROM challenges WHERE sender_user_id = ? OR recipient_user_id = ?")) {
-                st1.setLong(1, id);
-                st1.setLong(2, id);
-                st1.executeUpdate();
-            }
-    
-            try (PreparedStatement st2 = c.prepareStatement("DELETE FROM messages WHERE sender_user_id = ? OR recipient_user_id = ?")) {
-                st2.setLong(1, id);
-                st2.setLong(2, id);
-                st2.executeUpdate();
-            }
-    
-            try (PreparedStatement st3 = c.prepareStatement("DELETE FROM history WHERE user_id = ?")) {
-                st3.setLong(1, id);
-                st3.executeUpdate();
-            }
-    
-            try (PreparedStatement st4 = c.prepareStatement("DELETE FROM user_achievement WHERE user_id = ?")) {
-                st4.setLong(1, id);
-                st4.executeUpdate();
-            }
-    
-            try (PreparedStatement st5 = c.prepareStatement("DELETE FROM friendships WHERE first_user_id = ? OR second_user_id = ?")) {
-                st5.setLong(1, id);
-                st5.setLong(2, id);
-                st5.executeUpdate();
-            }
-    
-            try (PreparedStatement st6 = c.prepareStatement("DELETE FROM quiz_rating WHERE user_id = ?")) {
-                st6.setLong(1, id);
-                st6.executeUpdate();
-            }
-
-            try (PreparedStatement st7 = c.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
-                st7.setLong(1, id);
-                st7.executeUpdate();
+            try (PreparedStatement st = c.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+                st.setLong(1, id);
+                st.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error removing user from database", e);
         }
     }
 
@@ -136,7 +103,7 @@ public class AdministratorsDao {
             st.setLong(1, quizId);
             st.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error clearing quiz history", e);
         }
     }
 }

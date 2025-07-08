@@ -44,8 +44,9 @@ public class ResponseBuilder {
             int questionIndex = extractMiddleNumber(currParameter);
             String suffix = extractSuffix(currParameter);
 
-            if (questionIndex > responses.size())
+            while (questionIndex > responses.size()) {
                 responses.add(new Response());
+            }
 
             if (isNumeric(suffix))
                 responses.get(responses.size() - 1).addAnswer(request.getParameter(currParameter));

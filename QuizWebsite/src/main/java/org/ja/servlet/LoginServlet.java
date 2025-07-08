@@ -1,6 +1,5 @@
 package org.ja.servlet;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
 import org.ja.utils.Constants;
@@ -16,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -28,7 +28,7 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/index.jsp").forward(request, resp);
             }else{
                 request.getSession().setAttribute(Constants.SessionAttributes.USER, user);
-                request.getRequestDispatcher("/create-quiz.jsp").forward(request, resp);
+                request.getRequestDispatcher("/user-page.jsp").forward(request, resp);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

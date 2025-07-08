@@ -1,27 +1,33 @@
 <%
   String err = (String) request.getAttribute("error");
   if(err != null){ %>
-<div style="color:red;"><%=err%></div>
+<div class="error-message"><%=err%></div>
 <%  } %>
 
 <!DOCTYPE html>
 <html>
 <head>
   <title>Sign-Up</title>
+  <link rel="stylesheet" type="text/css" href="css/sign-up.css">
 </head>
 
 <body>
 <h1>Create a New Account</h1>
 
-<form action="signUp" method="post">
-  Username: <label>
-  <input type="text" name="username" required/>
-</label><br /><br />
-  Password: <label>
-  <input type="password" name="password" required/>
-</label>
-  <input type="submit" value="Sign Up" />
-</form>
-<p><a href="index.jsp">Back To Log In</a></p>
+<div class="signup_field">
+  <form action="signUp" method="post">
+    <label>
+      Username:
+      <input type="text" name="username" required/>
+    </label>
+    <label>
+      Password:
+      <input type="password" name="password" required/>
+    </label>
+    <input type="submit" value="Sign Up" />
+  </form>
+  <p class="back-link"><a href="index.jsp">Back To Log In</a></p>
+</div>
+
 </body>
 </html>

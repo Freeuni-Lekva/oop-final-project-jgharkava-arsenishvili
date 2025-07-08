@@ -1,10 +1,10 @@
 use ja_project_db;
 
 insert into users (user_id, password_hashed, salt, username, user_status) values
-(1, 'hashed_password1', 'salt1', 'Nini', 'administrator'),
-(2, 'hashed_password2', 'salt2', 'Sandro', 'user'),
-(3, 'hashed_password3', 'salt3', 'Tornike', 'user'),
-(4, 'hashed_password1', 'salt1', 'Liza', 'user');
+(1, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Nini', 'administrator'),
+(2, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Sandro', 'user'),
+(3, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Tornike', 'user'),
+(4, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Liza', 'user');
 
 insert into categories (category_id, category_name) values
 (1, 'History'),
@@ -32,16 +32,14 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, time_limit
 'one-page', 'final-correction');
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values
-(2, 'WWII began in _', null, 'fill-in-the-blank', 1, 'ordered'),
-(2, 'Who was the British Prime Minister during most of WWII?', null,'multiple-choice', 1, 'ordered'),
-(2, 'List 3 Axis powers during WWII', null, 'multi-answer', 3, 'unordered'),
+(1, 'WWII began in _____', null, 'fill-in-the-blank', 1, 'ordered'),
+(1, 'Who was the British Prime Minister during most of WWII?', null,'multiple-choice', 1, 'ordered'),
+(1, 'List 3 Axis powers during WWII', null, 'multi-answer', 3, 'unordered'),
 (2, 'Match the countries to their capitals', null, 'matching', 4, 'ordered'),
 (2, null, 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Flag_of_Norway.svg/2560px-Flag_of_Norway.svg.png','picture-response', 1, 'ordered'),
-(2, 'Select all noble gases', null, 'multi-choice-multi-answers', 3, 'ordered'),
-(2, 'Name first three elements of the periodic table', null, 'multi-answer', 3, 'ordered'),
-(2, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered'),
-(2, 'Who discovered penicillin?', null, 'question-response', 1, 'ordered'),
-(2, 'WWI began in _', null, 'fill-in-the-blank', 1, 'ordered');
+(3, 'Select all noble gases', null, 'multi-choice-multi-answers', 3, 'ordered'),
+(3, 'Name first three elements of the periodic table', null, 'multi-answer', 3, 'ordered'),
+(3, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered');
 
 insert into answers(question_id, answer_text, answer_order, answer_validity) values
 (1, '1939/39', 1, true),
@@ -53,7 +51,7 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (3, 'Italy', 3, true),
 (3, 'Japan', 4, true),
 (3, 'USA', 5, false),
-(5, 'Oslo/oslo/Paris/Berlin/Reykjavik', 1, true),
+(5, 'oslo', 1, true),
 (6, 'Neon', 1, true),
 (6, 'Helium', 2, true),
 (6, 'Argon', 3, true),
@@ -61,13 +59,11 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (6, 'Nitrogen', 5, false),
 (7, 'Hydrogen/H', 1, true),
 (7, 'Helium/He', 2, true),
-(7, 'Lithium/Li', 3, true),
-(9, 'Alexander Fleming/Fleming', 1, true),
-(10, '1914/14', 1, true);
+(7, 'Lithium/Li', 3, true);
 
 insert into matches(question_id, left_match, right_match) values
 (4, 'France', 'Paris'),
-(4, 'Normandy', 'Paris'),
+(4, 'Germany', 'Berlin'),
 (4, 'Italy', 'Rome'),
 (4, 'Spain', 'Madrid'),
 (8, 'Hydrogen', '1'),

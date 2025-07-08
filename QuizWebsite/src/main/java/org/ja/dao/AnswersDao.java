@@ -24,14 +24,15 @@ create table answers(
  */
 public class AnswersDao {
     private final BasicDataSource dataSource;
-    private long cnt = 0;
-
+    private long cnt=0;
     public AnswersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    /// throws RuntimeException if already exists question with same quizId and answerOrder
     public void insertAnswer(Answer answer) {
+//        if(contains(answer)) {
+//            return;
+//        }
         String sql = "INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
@@ -57,6 +58,9 @@ public class AnswersDao {
     }
 
     public void removeAnswer(long answerId) {
+        if(getAnswerById(answerId)==null){
+            return;
+        }
         String sql = "DELETE FROM answers WHERE answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -64,15 +68,14 @@ public class AnswersDao {
 
             ps.setLong(1, answerId);
 
-            if(ps.executeUpdate() > 0)
-                cnt--;
+            ps.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing answer from database", e);
         }
     }
 
-    // TODO DELETE
-    /// returns null if answer is not present in table
+    // TO DELETE
     public Answer getAnswerById(long id) {
         String sql = "SELECT * FROM answers where answer_id = ?";
 
@@ -92,7 +95,6 @@ public class AnswersDao {
         return null;
     }
 
-    /// returns empty list if no answers found
     public ArrayList<Answer> getQuestionAnswers(long questionId) {
         String sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY answer_order";
 
@@ -113,12 +115,10 @@ public class AnswersDao {
 
         return answers;
     }
-
     public boolean contains(Answer answer) {
-        if(answer == null){
+        if(answer==null){
             return false;
         }
-
         String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=? " +
                 "AND answer_text=? AND answer_order = ? " +
                 "AND answer_validity = ?";
@@ -131,13 +131,11 @@ public class AnswersDao {
             ps.setString(3, answer.getAnswerText());
             ps.setInt(4, answer.getAnswerOrder());
             ps.setBoolean(5, answer.getAnswerValidity());
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
                 }
-            }
-
+            } 
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);

@@ -11,14 +11,15 @@ import java.util.ArrayList;
 
 public class CategoriesDao {
     private final BasicDataSource dataSource;
-    private long cnt = 0;
-
+    private long cnt=0;
     public CategoriesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    /// throws RuntimeException if category name is already in use
     public void insertCategory(Category category) {
+        if(containsCategory(category.getCategoryName())){
+            return;
+        }
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
@@ -32,7 +33,7 @@ public class CategoriesDao {
                 if (keys.next()) {
                     cnt++;
                     long newId = keys.getLong(1);
-                    category.setCategoryId(newId);
+                    category.setCategoryId(newId); // if you want to store it in your object
                 }
             }
         } catch (SQLException e) {
@@ -41,6 +42,9 @@ public class CategoriesDao {
     }
 
     public void removeCategory(Category category) {
+        if(!containsCategory(category.getCategoryName())){
+            return;
+        }
         String sql = "DELETE FROM categories WHERE category_id = ?";
 
         try(Connection c = dataSource.getConnection();
@@ -48,14 +52,13 @@ public class CategoriesDao {
 
             preparedStatement.setLong(1, category.getCategoryId());
 
-            if(preparedStatement.executeUpdate() > 0)
-                cnt--;
+            preparedStatement.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing category from database", e);
         }
     }
 
-    ///  returns null if category is not present in table
     public Category getCategoryById(long id) {
         String sql = "SELECT * FROM categories WHERE category_id = ?";
 
@@ -96,10 +99,10 @@ public class CategoriesDao {
         return categories;
     }
 
-    ///  returns null if category is not present in table
+
+    // TO DELETE
     public Category getCategoryByName(String categoryName) {
         String sql = "SELECT * FROM categories WHERE category_name=?";
-
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -113,14 +116,12 @@ public class CategoriesDao {
         }catch (SQLException e){
             throw new RuntimeException("Error querying category by name from database", e);
         }
-
         return null;
     }
 
     private Category retrieveCategory(ResultSet rs) throws SQLException {
         return new Category(rs.getLong("category_id"), rs.getString("category_name"));
     }
-
     public long getCount(){
         return cnt;
     }
