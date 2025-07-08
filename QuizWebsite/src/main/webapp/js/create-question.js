@@ -29,11 +29,17 @@ function showQuestionForm() {
         }
     }
 
-    if (selectedType === "multi-answer"){
-        console.log("here");
+    if (selectedType === "multi-answer") {
+        addAnswerGroup();
         addAnswerGroup();
     }
+    else if (selectedType === "multiple-choice")
+        addAnswerOption('multiple-choice-answer-container');
+    else if (selectedType === "multi-choice-multi-answers")
+        addAnswerOption('multi-choice-multi-answer-container');
+
 }
+
 
 window.addEventListener("DOMContentLoaded", function (){
     const finishButton = document.getElementById("finishQuizButton");
@@ -61,6 +67,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function addAnswerOption(containerId) {
     answerCount++;
+
+    if(answerCount === 6) {
+        document.getElementById("multiple-choice-add-button").disabled = true;
+        document.getElementById("multi-choice-multi-answer-add-button").disabled = true;
+    }
+
+    if(answerCount === 11) {
+        document.getElementById("fill-in-the-blank-add-button").disabled = true;
+        document.getElementById("picture-response-add-button").disabled = true;
+        document.getElementById("question-response-add-button").disabled = true;x
+    }
 
     const container = document.getElementById(containerId);
     const isMultipleChoice = containerId === "multiple-choice-answer-container";
@@ -329,6 +346,11 @@ function addAnswerGroup(afterElement = null) {
     const container = document.getElementById("multi-answer-container");
     const groupId = multiAnswerCount++;
 
+    if (multiAnswerCount === 10) {
+        document.getElementById("multi-answer-add-button").disabled = true;
+        Array.from(document.getElementsByClassName("insert-below-button")).forEach(btn => btn.disabled = true);
+    }
+
     const group = document.createElement("div");
     group.className = "answer-group";
     group.dataset.groupId = groupId.toString();
@@ -340,7 +362,7 @@ function addAnswerGroup(afterElement = null) {
         <div class = "options-container" id = "options-${groupId}"></div>
 
         <button type="button" onclick="addOption(${groupId})">Add Option</button>
-        <button type="button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
+        <button type="button" class="insert-below-button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
         <hr/>
     `;
 

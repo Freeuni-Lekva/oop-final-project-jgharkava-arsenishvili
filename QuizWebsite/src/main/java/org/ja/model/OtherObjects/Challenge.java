@@ -21,12 +21,6 @@ public class Challenge {
         this.quizId = quizId;
     }
 
-    public Challenge(long senderUserId, long recipientUserId, long quizId) {
-        this.senderUserId = senderUserId;
-        this.recipientUserId = recipientUserId;
-        this.quizId = quizId;
-    }
-
     // Getters and Setters
 
     public long getChallengeId() {

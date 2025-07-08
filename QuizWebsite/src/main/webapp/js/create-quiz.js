@@ -143,4 +143,12 @@ quizTitleInput.addEventListener("input", function () {
 
 otherTagInput.addEventListener("input", function() {
     otherTagInput.setCustomValidity("");
-})
+});
+
+quizDescriptionInput.addEventListener("input", function() {
+    quizDescriptionInput.setCustomValidity("");
+});
+
+durationInput.addEventListener("input", function () {
+    durationInput.setCustomValidity("");
+});
