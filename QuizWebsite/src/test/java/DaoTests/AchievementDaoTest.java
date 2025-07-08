@@ -1,104 +1,75 @@
 package DaoTests;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
 import org.ja.model.OtherObjects.Achievement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.sql.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AchievementDaoTest {
+/**
+ * Unit tests for the AchievementsDao class using an in-memory H2 database.
+ */
+public class AchievementDaoTest extends BaseDaoTest{
     private AchievementsDao dao;
-    private BasicDataSource basicDataSource;
+    private Achievement a1, a2, a3;
 
-    private Achievement a1;
-    private Achievement a2;
-    private Achievement a3;
-
+    /**
+     * Sets up a fresh in-memory database and test DAO before each test.
+     */
     @BeforeEach
     public void setUp() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        setUpDataSource();
 
-        // Initializing Achievements
-        a1=new Achievement(2, "master", "master", "master.jpg");
-        a2=new Achievement(2, "beginner", "beginner", "beginner.jpg");
-        a3=new Achievement(2, "grandMaster", "grandMaster", "grandMaster.jpg");
-
-        try (Connection connection = basicDataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/drop.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-        }
-        try (Connection connection = basicDataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/schema.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-        }
+        executeSqlFile("database/drop.sql");
+        executeSqlFile("database/schema.sql");
 
         dao = new AchievementsDao(basicDataSource);
+
+        // Initializing Achievements
+        a1 = new Achievement(0L, "master", "master", "master.jpg");
+        a2 = new Achievement(0L, "beginner", "beginner", "beginner.jpg");
+        a3 = new Achievement(0L, "grandMaster", "grandMaster", "grandMaster.jpg");
     }
 
+    /**
+     * Tests that achievements are inserted correctly and assigned IDs.
+     */
     @Test
-    public void testInsert() {
-        dao.insertAchievement(a1);
-        assertEquals(1, a1.getAchievementId());
-        dao.insertAchievement(a2);
-        assertEquals(2, a2.getAchievementId());
-        assertTrue(dao.contains(a1));
-        dao.insertAchievement(a3);
-        assertEquals(3, a3.getAchievementId());
-        assertEquals(3, dao.getCount());
-        assertThrows(RuntimeException.class, () -> {
-            dao.insertAchievement(a3);
-        });
-        assertEquals(3, dao.getCount());
-
+    public void testInsertAchievement(){
+        assertTrue(dao.insertAchievement(a1));
+        assertTrue(a1.getAchievementId() > 0);
+        assertTrue(dao.insertAchievement(a2));
+        assertTrue(dao.insertAchievement(a3));
     }
-    @Test
-    public void testRemove() {
-        dao.insertAchievement(a1);
-        dao.insertAchievement(a2);
-        dao.insertAchievement(a3);
 
-        dao.removeAchievement(1);
-        assertEquals(2, dao.getCount());
-        assertFalse(dao.contains(a1));
-        dao.removeAchievement(1);
-        assertEquals(2, dao.getCount());
-        assertEquals(dao.getAchievement(2), a2);
+
+    /**
+     * Tests that duplicate inserts (same name, description, photo) fail gracefully.
+     */
+    @Test
+    public void testInsertDuplicate() {
+        assertTrue(dao.insertAchievement(a1));
+        Achievement duplicate = new Achievement(0, a1.getAchievementName(), a1.getAchievementDescription(), a1.getAchievementPhoto());
+
+        assertThrows(RuntimeException.class, () -> dao.insertAchievement(duplicate));
+    }
+
+
+    /**
+     * Tests retrieval of existing and non-existing achievements by ID.
+     */
+    @Test
+    public void testGetAchievement() {
+        assertTrue(dao.insertAchievement(a2));
+        long id = a2.getAchievementId();
+
+        Achievement retrieved = dao.getAchievement(id);
+        assertNotNull(retrieved);
+        assertEquals(a2.getAchievementName(), retrieved.getAchievementName());
+        assertEquals(a2.getAchievementDescription(), retrieved.getAchievementDescription());
+        assertEquals(a2.getAchievementPhoto(), retrieved.getAchievementPhoto());
+
+        assertNull(dao.getAchievement(1225)); // Should not exist
     }
 }

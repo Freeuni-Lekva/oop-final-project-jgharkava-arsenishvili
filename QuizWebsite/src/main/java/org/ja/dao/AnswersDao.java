@@ -11,28 +11,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/*
-create table answers(
-    answer_id bigint primary key auto_increment,
-    question_id bigint not null,
-    answer_text text not null,
-    answer_order int not null default 1,
-    answer_validity boolean not null default true,
-
-    foreign key (question_id) references questions(question_id) on delete cascade
-);
+/**
+ * Data Access Object for managing answers in the quiz system.
  */
 public class AnswersDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+
+    /**
+     * Constructs a new AnswersDao with the given data source.
+     *
+     * @param dataSource the data source for database connections
+     */
     public AnswersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void insertAnswer(Answer answer) {
-//        if(contains(answer)) {
-//            return;
-//        }
+
+    /**
+     * Inserts an answer into the database.
+     *
+     * @param answer the Answer object to insert
+     * @return true if the answer was inserted successfully and ID generated; false otherwise
+     * @throws RuntimeException if id was not returned or other kind of sql error
+     */
+    public boolean insertAnswer(Answer answer) {
         String sql = "INSERT INTO answers (question_id, answer_text, answer_order, answer_validity) VALUES (?,?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
@@ -43,24 +45,33 @@ public class AnswersDao {
             ps.setInt(3, answer.getAnswerOrder());
             ps.setBoolean(4, answer.getAnswerValidity());
 
-            ps.executeUpdate();
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) return false;
 
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
-                    cnt++;
                     answer.setAnswerId(rs.getLong(1));
+                } else {
+                    throw new RuntimeException("Insert succeeded but no ID was returned.");
                 }
-
             }
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting answer into database", e);
         }
     }
 
-    public void removeAnswer(long answerId) {
-        if(getAnswerById(answerId)==null){
-            return;
-        }
+
+    /**
+     * Removes an answer from the database by its ID.
+     * Does nothing if the answer does not exist.
+     *
+     * @param answerId the ID of the answer to remove
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean removeAnswer(long answerId) {
         String sql = "DELETE FROM answers WHERE answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -68,37 +79,23 @@ public class AnswersDao {
 
             ps.setLong(1, answerId);
 
-            ps.executeUpdate();
-            cnt--;
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing answer from database", e);
         }
     }
 
-    // TO DELETE
-    public Answer getAnswerById(long id) {
-        String sql = "SELECT * FROM answers where answer_id = ?";
-
-        try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setLong(1, id);
-
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next())
-                    return retrieveAnswer(rs);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error querying answer by id from database", e);
-        }
-
-        return null;
-    }
-
-    public ArrayList<Answer> getQuestionAnswers(long questionId) {
+    /**
+     * Retrieves all answers for a given question, ordered by answer order.
+     *
+     * @param questionId the question ID
+     * @return a list of answers for the question
+     * @throws RuntimeException if a database error occurs
+     */
+    public List<Answer> getQuestionAnswers(long questionId) {
         String sql = "SELECT * FROM answers WHERE question_id = ? ORDER BY answer_order";
 
-        ArrayList<Answer> answers = new ArrayList<>();
+        List<Answer> answers = new ArrayList<>();
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -115,131 +112,153 @@ public class AnswersDao {
 
         return answers;
     }
-    public boolean contains(Answer answer) {
-        if(answer==null){
-            return false;
+
+    /**
+     * Adds a new option text to an existing answer, appending it with a '/' separator.
+     *
+     * @param answerId the ID of the answer to update
+     * @param text     the new option text to append
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean insertNewAnswerOption(long answerId, String text){
+        if (text == null || text.trim().isEmpty()) {
+            throw new IllegalArgumentException("Option text cannot be null or empty.");
         }
-        String sql = "SELECT COUNT(*) FROM answers WHERE answer_id = ? AND question_id=? " +
-                "AND answer_text=? AND answer_order = ? " +
-                "AND answer_validity = ?";
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, answer.getAnswerId());
-            ps.setLong(2, answer.getQuestionId());
-            ps.setString(3, answer.getAnswerText());
-            ps.setInt(4, answer.getAnswerOrder());
-            ps.setBoolean(5, answer.getAnswerValidity());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            } 
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-
-    public void insertNewAnswerOption(long answerId, String text){
         String selectAnswers = "SELECT answer_text FROM answers WHERE answer_id = ?";
-        String answers = "";
+        String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectAnswers)){
 
             preparedStatement.setLong(1, answerId);
 
+            String answers = "";
+
             try (ResultSet resultSet = preparedStatement.executeQuery()){
                 if (resultSet.next()){
                     answers  = resultSet.getString(1);
+                } else {
+                    throw new IllegalArgumentException("Answer with ID " + answerId + " does not exist.");
                 }
             }
 
             answers += "/" + text;
 
-            String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
-
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
                 ps.setString(1, String.join("/", answers));
                 ps.setLong(2, answerId);
 
-                ps.executeUpdate();
+                return ps.executeUpdate() > 0;
             }
-        } catch(SQLException e){
-            throw new RuntimeException("Error updating answer option text by id", e);
+        } catch (SQLException e){
+            throw new RuntimeException("Database error while updating answer option text for answer ID: " + answerId, e);
         }
     }
 
-    public void updateAnswerOptionText(long answerId, String oldAnswerText, String newAnswerText){
+
+    /**
+     * Updates an existing answer option text for a given answer.
+     *
+     * @param answerId      the ID of the answer to update
+     * @param oldAnswerText the existing option text to replace
+     * @param newAnswerText the new option text
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean updateAnswerOptionText(long answerId, String oldAnswerText, String newAnswerText){
         String selectAnswers = "SELECT answer_text FROM answers WHERE answer_id = ?";
-        String answers = "";
+        String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
+
 
         try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectAnswers)){
 
             preparedStatement.setLong(1, answerId);
 
+            String answers = "";
+
             try (ResultSet resultSet = preparedStatement.executeQuery()){
                 if (resultSet.next()){
                     answers  = resultSet.getString(1);
+                } else {
+                    throw new IllegalArgumentException("Answer with ID " + answerId + " does not exist.");
                 }
             }
 
             List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("/")));
 
+            boolean found = false;
+
             for (int i = 0; i < eachAnswer.size(); i++) {
                 if (eachAnswer.get(i).equalsIgnoreCase(oldAnswerText)) {
                     eachAnswer.set(i, newAnswerText);
+                    found = true;
                     break;
                 }
             }
 
-            String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
+            if (!found) {
+                throw new IllegalArgumentException("Old answer text '" + oldAnswerText + "' not found in answer options.");
+            }
 
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
                 ps.setString(1, String.join("/", eachAnswer));
                 ps.setLong(2, answerId);
 
-                ps.executeUpdate();
+                return ps.executeUpdate() > 0;
             }
-        } catch(SQLException e){
+        } catch (SQLException e){
             throw new RuntimeException("Error updating answer option text by id", e);
         }
     }
 
-    public void removeAnswerOption(long answerId, String answerText){
+    /**
+     * Removes a specific answer option from an answer.
+     *
+     * @param answerId   the ID of the answer to update
+     * @param answerText the option text to remove
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean removeAnswerOption(long answerId, String answerText){
         String selectAnswers = "SELECT answer_text FROM answers WHERE answer_id = ?";
-        String answers = "";
+        String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectAnswers)){
 
             preparedStatement.setLong(1, answerId);
 
+            String answers = "";
+
             try (ResultSet resultSet = preparedStatement.executeQuery()){
                 if (resultSet.next()){
                     answers  = resultSet.getString(1);
+                } else {
+                    throw new IllegalArgumentException("Answer with ID " + answerId + " does not exist.");
                 }
             }
 
             List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("/")));
 
+            boolean found = false;
+
             for (int i = 0; i < eachAnswer.size(); i++) {
                 if (eachAnswer.get(i).equalsIgnoreCase(answerText)) {
                     eachAnswer.remove(i);
+                    found = true;
                     break;
                 }
             }
 
-            String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
+            if (!found) {
+                throw new IllegalArgumentException("Option '" + answerText + "' not found in answer options.");
+            }
 
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
                 ps.setString(1, String.join("/", eachAnswer));
                 ps.setLong(2, answerId);
 
-                ps.executeUpdate();
+                return ps.executeUpdate() > 0;
             }
         } catch(SQLException e){
             throw new RuntimeException("Error removing answer option text by id", e);
@@ -247,6 +266,13 @@ public class AnswersDao {
 
     }
 
+    /**
+     * Sets exactly one answer as correct for a question by resetting all others.
+     *
+     * @param questionChoiceId the question ID to update
+     * @param choiceId   the answer ID to mark as correct
+     * @throws RuntimeException if a database error occurs
+     */
     public void setOneCorrectChoice(long questionChoiceId, long choiceId){
         String falseChoices = "UPDATE answers SET answer_validity = false WHERE question_id = ?";
         String setRightChoice = "UPDATE answers SET answer_validity = true WHERE answer_id = ?";
@@ -267,7 +293,15 @@ public class AnswersDao {
         }
     }
 
-    public void setChoiceValidity(long choiceId, boolean isCorrect){
+
+    /**
+     * Sets the validity of an answer choice.
+     *
+     * @param choiceId  the answer ID to update
+     * @param isCorrect true to mark as correct, false otherwise
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean setChoiceValidity(long choiceId, boolean isCorrect){
         String updateValidity = "UPDATE answers SET answer_validity = ? WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -276,13 +310,21 @@ public class AnswersDao {
             updateStmt.setBoolean(1, isCorrect);
             updateStmt.setLong(2, choiceId);
 
-            updateStmt.executeUpdate();
+            return updateStmt.executeUpdate() > 0;
         } catch(SQLException e) {
             throw new RuntimeException("Error setting choice's validity", e);
         }
     }
 
-    public void updateAnswer(long answerId, String newText){
+
+    /**
+     * Updates the text of an answer by its ID.
+     *
+     * @param answerId the ID of the answer to update
+     * @param newText  the new answer text
+     * @throws RuntimeException if a database error occurs
+     */
+    public boolean updateAnswer(long answerId, String newText){
         String update = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -291,15 +333,19 @@ public class AnswersDao {
             updateStmt.setString(1, newText);
             updateStmt.setLong(2, answerId);
 
-            updateStmt.executeUpdate();
+            return updateStmt.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating answer text", e);
         }
     }
 
-    public long getCount(){
-        return cnt;
-    }
+    /**
+     * Converts the current row of the ResultSet to an Answer object.
+     *
+     * @param rs the ResultSet positioned at the current row
+     * @return an Answer object populated with the ResultSet data
+     * @throws SQLException if a database access error occurs
+     */
     private Answer retrieveAnswer(ResultSet rs) throws SQLException {
         return new Answer(rs.getLong("answer_id"), rs.getLong("question_id"),
                 rs.getString("answer_text"), rs.getInt("answer_order"),

@@ -6,6 +6,7 @@
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   AnnouncementsDao announcementsDao = (AnnouncementsDao)application.getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
@@ -313,7 +314,7 @@
   <div class="card announcements">
     <h3>Announcements by Administrators</h3>
     <%
-      ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
+      List<Announcement> ann = announcementsDao.getAllAnnouncements();
       Map<Announcement, String> announcements = new HashMap<Announcement, String>();
       for (Announcement a : ann) {
         User administrator = usersDao.getUserById(a.getAdministratorId());

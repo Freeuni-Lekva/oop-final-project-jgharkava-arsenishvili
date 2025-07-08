@@ -6,7 +6,6 @@ public class Challenge {
     private long recipientUserId;
     private long quizId;
 
-    // Empty constructor
     public Challenge(long senderUserId, long recipientUserId, long quizId) {
         this.senderUserId = senderUserId;
         this.recipientUserId = recipientUserId;
@@ -16,12 +15,6 @@ public class Challenge {
     // Constructor with all parameters
     public Challenge(long challengeId, long senderUserId, long recipientUserId, long quizId) {
         this.challengeId = challengeId;
-        this.senderUserId = senderUserId;
-        this.recipientUserId = recipientUserId;
-        this.quizId = quizId;
-    }
-
-    public Challenge(long senderUserId, long recipientUserId, long quizId) {
         this.senderUserId = senderUserId;
         this.recipientUserId = recipientUserId;
         this.quizId = quizId;

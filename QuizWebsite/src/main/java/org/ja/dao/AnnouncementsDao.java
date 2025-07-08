@@ -5,16 +5,33 @@ import org.ja.model.OtherObjects.Announcement;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Data Access Object for announcement-specific operations.
+ */
 public class AnnouncementsDao {
     private final BasicDataSource dataSource;
-    private long cnt = 0;
 
+    /**
+     * Constructs an AnnouncementsDao with the given data source.
+     *
+     * @param dataSource the BasicDataSource for database connections
+     */
     public AnnouncementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void insertAnnouncement(Announcement announcement){
+
+    /**
+     * Inserts a new announcement into the database.
+     * The generated announcement ID and creation date will be set in the provided Announcement object.
+     *
+     * @param announcement the Announcement object to insert
+     * @return the generated announcement ID
+     * @throws RuntimeException if a database error occurs or insertion fails
+     */
+    public boolean insertAnnouncement(Announcement announcement){
         String sql = "INSERT INTO announcements (administrator_id, announcement_text) VALUES (?, ?) ";
 
         try (Connection c = dataSource.getConnection();
@@ -23,33 +40,61 @@ public class AnnouncementsDao {
             ps.setLong(1, announcement.getAdministratorId());
             ps.setString(2, announcement.getAnnouncementText());
 
-            ps.executeUpdate();
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting announcement failed, no rows affected.");
+            }
 
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()) {
-                    cnt++;
                     long announcementId = rs.getLong(1);
+
                     announcement.setAnnouncementId(announcementId);
-
-                    String s = "SELECT creation_date FROM announcements where announcement_id = ?";
-
-                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
-                        preparedStatement.setLong(1, announcementId);
-
-                        try (ResultSet r = preparedStatement.executeQuery()) {
-                            if (r.next())
-                                announcement.setCreationDate(r.getTimestamp("creation_date"));
-                        }
-                    }
+                    announcement.setCreationDate(fetchCreationDate(c, announcementId));
+                } else {
+                    throw new SQLException("Inserting announcement failed, no ID obtained.");
                 }
             }
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting announcement into database", e);
         }
     }
 
-    ///  returns announcements sorted by creation date
-    public ArrayList<Announcement> getAllAnnouncements(){
+
+    /**
+     * Retrieves the creation date of an announcement by its ID.
+     *
+     * @param c the active database connection
+     * @param announcementId the announcement ID
+     * @return the creation timestamp
+     * @throws SQLException if the announcement does not exist or a database error occurs
+     */
+    private Timestamp fetchCreationDate(Connection c, long announcementId) throws SQLException {
+        String sql = "SELECT creation_date FROM announcements WHERE announcement_id = ?";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, announcementId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp("creation_date");
+                }
+                throw new SQLException("Creation date not found for announcement ID: " + announcementId);
+            }
+        }
+    }
+
+
+    /**
+     * Retrieves all announcements ordered by creation date descending.
+     *
+     * @return a list of announcements, newest first
+     * @throws RuntimeException if a database error occurs
+     */
+    public List<Announcement> getAllAnnouncements(){
         ArrayList<Announcement> announcements = new ArrayList<>();
 
         String sql = "SELECT * FROM announcements ORDER BY creation_date DESC";
@@ -58,7 +103,7 @@ public class AnnouncementsDao {
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()){
 
-            while(rs.next()) {
+            while (rs.next()) {
                 announcements.add(retrieveAnnouncement(rs));
             }
         } catch (SQLException e) {
@@ -68,73 +113,13 @@ public class AnnouncementsDao {
         return announcements;
     }
 
-    public void removeAnnouncement(long announcementId){
-        String sql = "DELETE FROM announcements WHERE announcement_id = ?";
-
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setLong(1, announcementId);
-
-            if(ps.executeUpdate() > 0)
-                cnt--;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error removing announcement from database", e);
-        }
-    }
-
-    public boolean contains(Announcement a){
-        if(a == null){
-            return false;
-        }
-
-        String sql = "SELECT COUNT(*) FROM announcements WHERE announcement_id=?" +
-                "AND administrator_id=? AND announcement_text=? AND creation_date=?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, a.getAnnouncementId());
-            ps.setLong(2,a.getAdministratorId());
-            ps.setString(3, a.getAnnouncementText());
-            ps.setTimestamp(4,a.getCreationDate());
-
-            try(ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-
-    public boolean contains(long aid){
-        String sql = "SELECT COUNT(*) FROM announcements WHERE announcement_id=?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, aid);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-
-    public long getCount(){
-        return cnt;
-    }
-
+    /**
+     * Maps a ResultSet row to an Announcement object.
+     *
+     * @param rs the ResultSet positioned at the current row
+     * @return the Announcement object
+     * @throws SQLException if a database access error occurs
+     */
     private Announcement retrieveAnnouncement(ResultSet rs) throws SQLException {
         return new Announcement(rs.getLong("announcement_id"), rs.getLong("administrator_id"),
                 rs.getString("announcement_text"), rs.getTimestamp("creation_date"));
