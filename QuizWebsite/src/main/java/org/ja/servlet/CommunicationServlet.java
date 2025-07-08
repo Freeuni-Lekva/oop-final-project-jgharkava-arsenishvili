@@ -34,14 +34,13 @@ public class CommunicationServlet extends HttpServlet {
             friendId = Long.parseLong(id);
             fr = friendShipsDao.getFriendshipByIds(curUser.getId(), friendId);
         }
-        String recipientName = request.getParameter("recipient");
-        String message = request.getParameter("message");
         if("add-friend".equals(action)) {
-            friendShipsDao.insertFriendRequest(curUser.getId(), friendId);
+            friendShipsDao.insertFriendRequest(fr);
         } else if ("remove-friend".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
         } else if("send-challenge".equals(action)) {
-            Quiz quiz = quizzesDao.getQuizByName(request.getParameter("quiz-name"));
+            String quizName = request.getParameter("quiz-name");
+            Quiz quiz = quizzesDao.getQuizByName(quizName);
             if(quiz != null) {
                 Challenge challenge = new Challenge(curUser.getId(), friendId, quiz.getId());
                 challengesDao.insertChallenge(challenge);
@@ -53,9 +52,13 @@ public class CommunicationServlet extends HttpServlet {
         }else if("delete".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
         } else if("send-message".equals(action)) {
+            String recipientName = request.getParameter("recipient");
+            String message = request.getParameter("message");
             User recipient = usersDao.getUserByUsername(recipientName);
-            Message m = new Message(curUser.getId(), recipient.getId(), message);
-            messageDao.insertMessage(m);
+            if(recipient != null){
+                Message m = new Message(curUser.getId(), recipient.getId(), message);
+                messageDao.insertMessage(m);
+            }
         }
     }
 }

@@ -17,19 +17,18 @@ public class FriendShipsDao {
 
     /// if first and second user already exists in table throws RuntimeException
     /// sets status to 'pending'
-    public void insertFriendRequest(long firstUserId, long secondUserId) {
+    public void insertFriendRequest(Friendship friendship) {
         String sql = "INSERT INTO friendships (first_user_id, second_user_id) VALUES (?, ?)";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setLong(1, firstUserId);
-            ps.setLong(2, secondUserId);
+            ps.setLong(1, friendship.getFirstUserId());
+            ps.setLong(2, friendship.getSecondUserId());
 
             ps.executeUpdate();
 
             cnt++;
-            Friendship friendship = getFriendshipByIds(firstUserId, secondUserId);
             friendship.setFriendshipStatus("pending");
 
             retrieveFriendshipDate(friendship);
