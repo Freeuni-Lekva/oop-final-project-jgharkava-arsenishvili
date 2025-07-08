@@ -7,6 +7,7 @@
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -178,5 +179,9 @@
     }
 %>
 
+<form action="quiz-overview.jsp" method="get">
+    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId()%>">
+    <button type="submit" >Exit Quiz</button>
+</form>
 </body>
 </html>

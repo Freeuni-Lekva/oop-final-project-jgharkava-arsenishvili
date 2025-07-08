@@ -76,7 +76,9 @@
 } else {
     List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
 
+
 //    TODO may be better with <a href="">
+
     for(Quiz quiz : quizzes) {%>
 <form action="quiz-overview.jsp" method="get">
     <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">

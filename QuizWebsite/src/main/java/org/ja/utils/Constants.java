@@ -45,6 +45,21 @@ public class Constants {
         public static final String UNORDERED = "unordered";
     }
 
+    public static class QuizQuestionOrderTypes {
+        public static final String QUESTIONS_ORDERED = "ordered";
+        public static final String QUESTIONS_UNORDERED = "randomized";
+    }
+
+    public static class QuizQuestionPlacementTypes {
+        public static final String ONE_PAGE = "one-page";
+        public static final String MULTIPLE_PAGE = "multiple-page";
+    }
+
+    public static class QuizQuestionCorrectionTypes {
+        public static final String IMMEDIATE_CORRECTION = "immediate-correction";
+        public static final String FINAL_CORRECTION = "final-correction";
+    }
+
     public static class ResponseFields {
 
     }
@@ -67,7 +82,15 @@ public class Constants {
 
     public static class RequestParameters {
         public static final String QUIZ_ID = "current-quiz-id";
-        public static final String USER_ID = "current-quiz-id";
+        public static final String USER_ID = "current-user-id";
+    }
+
+    public static class AchievementIds {
+        public static final long FIRST_STEP = 1;
+        public static final long QUIZ_ADDICT = 2;
+        public static final long FLAWLESS_VICTORY = 3;
+        public static final long QUIZ_MASTER = 4;
+        public static final long SPEED_DEMON = 5;
     }
 
     public enum QuizMode {

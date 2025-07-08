@@ -45,7 +45,8 @@ public class QuestionDao {
     }
 
     public void removeQuestion(long questionId) {
-        String sql = "DELETE FROM questions WHERE quiz_id = ?";
+        Question question = getQuestionById(questionId);
+        String sql = "DELETE FROM questions WHERE question_id = ?";
 
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -54,8 +55,31 @@ public class QuestionDao {
 
             if(ps.executeUpdate() > 0)
                 cnt--;
+
+            updateQuizScore(question.getQuizId());
         } catch (SQLException e) {
             throw new RuntimeException("Error removing question from database", e);
+        }
+    }
+
+    private void updateQuizScore(long quizId){
+        String sql = "UPDATE quizzes " +
+                "SET quiz_score = (" +
+                "  SELECT COALESCE(SUM(num_answers), 0) " +
+                "  FROM questions " +
+                "  WHERE quiz_id = ? " +
+                ") " +
+                "WHERE quiz_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+
+            preparedStatement.setLong(1, quizId);
+            preparedStatement.setLong(2, quizId);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating quiz score by id", e);
         }
     }
 
@@ -98,6 +122,36 @@ public class QuestionDao {
         }
 
         return questions;
+    }
+
+    public void updateQuestionText(long questionId, String questionText){
+        String sql = "UPDATE questions SET question = ? WHERE question_id = ?";
+
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+        ){
+            ps.setString(1, questionText);
+            ps.setLong(2, questionId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating question text", e);
+        }
+    }
+
+    public void updateQuestionImage(long questionId, String imageUrl){
+        String sql = "UPDATE questions SET image_url = ? WHERE question_id = ?";
+
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+        ){
+            ps.setString(1, imageUrl);
+            ps.setLong(2, questionId);
+
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Error updating question text", e);
+        }
     }
 
     public void updateQuestion(Question question){
