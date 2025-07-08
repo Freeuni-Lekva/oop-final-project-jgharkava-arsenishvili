@@ -3,6 +3,7 @@ package org.ja.dao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.Filters.Filter;
 import org.ja.model.quiz.Quiz;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,22 +12,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuizzesDao {
+    /*
+    create table quizzes(
+    quiz_id bigint primary key auto_increment,
+    quiz_name varchar(64) unique not null,
+    quiz_description text,
+    quiz_score int not null,
+    average_rating double not null default 0,
+    participant_count bigint not null default 0,
+    creation_date timestamp default current_timestamp,
+    time_limit_in_minutes int not null default 0,
+    category_id bigint not null,
+    creator_id bigint not null,
+    question_order_status enum('ordered', 'randomized') not null default 'ordered',
+    question_placement_status enum('one-page', 'multiple-page') not null default 'one-page',
+    question_correction_status enum('immediate-correction', 'final-correction')
+        not null default 'final-correction',
+
+    check (
+        question_placement_status != 'one-page'
+        or question_correction_status = 'final-correction'
+    ),
+
+    foreign key (creator_id) references users(user_id) on delete cascade,
+    foreign key (category_id) references categories(category_id) on delete cascade
+    );
+    */
+
     private final BasicDataSource dataSource;
-    private long cnt = 0;
+    private long cnt=  0;
     public QuizzesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    /// if quiz by same name exists throws RuntimeException
     public void insertQuiz(Quiz quiz) {
+        /*if(containsQuiz(quiz.getName())){
+            return;
+        }*/
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, quiz_score, average_rating, " +
                 "participant_count, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
                 "question_correction_status ) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);){
-
+             PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
             ps.setString(1, quiz.getName());
             ps.setString(2, quiz.getDescription());
             ps.setInt(3, quiz.getScore());
@@ -68,6 +97,9 @@ public class QuizzesDao {
     }
 
     public void removeQuizById(long id) {
+        if(!containsQuiz(id)){
+            return;
+        }
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -75,8 +107,8 @@ public class QuizzesDao {
 
             preparedStatement.setLong(1, id);
 
-            if(preparedStatement.executeUpdate() > 0)
-                cnt--;
+            preparedStatement.executeUpdate();
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz by id from database", e);
         }
@@ -84,8 +116,10 @@ public class QuizzesDao {
 
     // TODO remove unnecessary deletes
     public void removeQuizByName(String name) {
-        String sql = "DELETE FROM quizzes WHERE quiz_name = ?";
-
+        if(!containsQuiz(name)){
+            return;
+        }
+        String sql = "SELECT quiz_id FROM quizzes WHERE quiz_name = ?";
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
@@ -94,50 +128,13 @@ public class QuizzesDao {
 
             if (rs.next()) {
                 long id = rs.getLong("quiz_id");
-                try (PreparedStatement st1 = c.prepareStatement("DELETE FROM challenges WHERE quiz_id = ?")) {
-                    st1.setLong(1, id);
-                    st1.executeUpdate();
-                }
-
-                try (PreparedStatement st2 = c.prepareStatement("DELETE FROM history WHERE quiz_id = ?")) {
-                    st2.setLong(1, id);
-                    st2.executeUpdate();
-                }
-
-                try (PreparedStatement st3 = c.prepareStatement("DELETE FROM quiz_rating WHERE quiz_id = ?")) {
-                    st3.setLong(1, id);
-                    st3.executeUpdate();
-                }
-
-                try (PreparedStatement st4 = c.prepareStatement("DELETE FROM quiz_tag WHERE quiz_id = ?")) {
-                    st4.setLong(1, id);
-                    st4.executeUpdate();
-                }
-
-                try (PreparedStatement st5 = c.prepareStatement("DELETE FROM matches WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)")) {
-                    st5.setLong(1, id);
-                    st5.executeUpdate();
-                }
-
-                try (PreparedStatement st6 = c.prepareStatement("DELETE FROM answers WHERE question_id IN (SELECT question_id FROM questions WHERE quiz_id = ?)")) {
-                    st6.setLong(1, id);
-                    st6.executeUpdate();
-                }
-
-                try (PreparedStatement st7 = c.prepareStatement("DELETE FROM questions WHERE quiz_id = ?")) {
-                    st7.setLong(1, id);
-                    st7.executeUpdate();
-                }
-
                 try (PreparedStatement deleteQuiz = c.prepareStatement("DELETE FROM quizzes WHERE quiz_id = ?")) {
                     deleteQuiz.setLong(1, id);
-                    if (deleteQuiz.executeUpdate() > 0)
-                        cnt--;
-
+                    deleteQuiz.executeUpdate();
                 }
 
             }
-
+            cnt--;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz by name from database", e);
         }
@@ -173,7 +170,7 @@ public class QuizzesDao {
         }
     }
 
-    // TODO DELETE
+    // TO DELETE
     public void updateQuizById(Quiz quiz, long id) {
         String sql = "UPDATE quizzes SET quiz_name = ?, quiz_description=?, " +
                 "average_rating=?, participant_count=?," +
@@ -203,7 +200,7 @@ public class QuizzesDao {
         }
     }
 
-    // TODO DELETE
+    // TO DELETE
     public void updateQuizByName(Quiz quiz, String name) {
         String sql = "UPDATE quizzes SET quiz_name = ?, quiz_description=?, " +
                 "average_rating=?, participant_count=?, creation_date=?, " +
@@ -266,7 +263,8 @@ public class QuizzesDao {
         return quizzes;
     }
 
-    // TODO change name
+
+    // TO DO: change name
     public ArrayList<Quiz> getQuizzesSortedByCreationDate() {
         String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
         ArrayList<Quiz> quizzes = new ArrayList<>();
@@ -320,7 +318,7 @@ public class QuizzesDao {
         return quizzes;
     }
 
-    //  TODO DELETE: probably not useful due to filter.
+    //  TO DELETE: probably not useful due to filter.
     public ArrayList<Quiz> getQuizzesSortedByParticipantCount() {
         String sql = "SELECT * FROM quizzes ORDER BY participant_count DESC";
         ArrayList<Quiz> quizzes = new ArrayList<>();
@@ -338,7 +336,7 @@ public class QuizzesDao {
 
         return quizzes;
     }
-
+    
     public boolean containsQuiz(String name) {
         String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_name = ?";
 
@@ -350,7 +348,7 @@ public class QuizzesDao {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
                 }
-            }
+
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
@@ -390,7 +388,6 @@ public class QuizzesDao {
                     return null; // or throw an exception if appropriate
                 }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving quiz by ID", e);
         }

@@ -13,73 +13,85 @@
     AdministratorsDao adminsDao = (AdministratorsDao)application.getAttribute(Constants.ContextAttributes.ADMINISTRATORS_DAO);
     String msg = (String) request.getAttribute("message");
     if (msg != null && !msg.isEmpty()) {
+        if(msg.contains("Successfully")){
 %>
-    <div style="color: green;"><strong><%= msg %></strong></div>
+    <div class="message-success"><%=msg%></div>
 <%
-    }
+    }else{
+%>
+    <div class="message-error"><%=msg%></div>
+<%
+    }}
 %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Administrator Page</title>
+    <link rel="stylesheet" type="text/css" href="css/administrator.css">
 </head>
 <body>
-    <h1>Welcome, <%=user.getUsername()%></h1>
+    <div class="header">
+        <h1>Welcome, <%=user.getUsername()%></h1>
+    </div>
 
-<!-- create announcement -->
-<div>
-    <h2>Create an Announcement</h2>
-    <form action="administrator" method="post">
-        <label>Enter your Announcement: <input type="text" name="announcementText"/></label>
-        <button type="submit" name="action" value="create">Post</button>
-    </form>
-</div>
 
-<!-- promote user -->
-<div>
-    <h2>Promote a User</h2>
-    <form action="administrator" method="post">
-        <label>Enter Username: <input type="text" name="promoteUsername" /></label>
-        <button type="submit" name="action" value="promote">Promote</button>
-    </form>
-</div>
+    <div class="admin-container">
+        <!-- create announcement -->
+        <div class="admin-section">
+            <h2>Create an Announcement</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter your Announcement: <input type="text" name="announcementText"/></label>
+                <button type="submit" name="action" value="create">Post</button>
+            </form>
+        </div>
 
-<!-- remove user -->
-<div>
-    <h2>Remove a User</h2>
-    <form action="administrator" method="post">
-        <label>Enter Username: <input type="text" name="removeUsername" /></label>
-        <button type="submit" name="action" value="removeUser">Remove</button>
-    </form>
-</div>
+        <!-- promote user -->
+        <div class="admin-section">
+            <h2>Promote a User</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter Username: <input type="text" name="promoteUsername"/></label>
+                <button type="submit" name="action" value="promote">Promote</button>
+            </form>
+        </div>
 
-<!-- remove quiz-->
-<div>
-    <h2>Remove a Quiz</h2>
-    <form action="administrator" method="post">
-        <label>Enter Quiz Name: <input type="text" name="removeQuizName" /></label>
-        <button type="submit" name="action" value="removeQuiz">Remove</button>
-    </form>
-</div>
+        <!-- remove user -->
+        <div class="admin-section">
+            <h2>Remove a User</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter Username: <input type="text" name="removeUsername" /></label>
+                <button type="submit" name="action" value="removeUser">Remove</button>
+            </form>
+        </div>
 
-<!-- clear History -->
-<div>
-    <h2>Clear Quiz History</h2>
-    <form action="administrator" method="post">
-        <label>Enter Quiz Name: <input type="text" name="clearQuizHistoryName" /></label>
-        <button type="submit" name="action" value="clearHistory">Clear</button>
-    </form>
-</div>
+        <!-- remove quiz-->
+        <div class="admin-section">
+            <h2>Remove a Quiz</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter Quiz Name: <input type="text" name="removeQuizName" /></label>
+                <button type="submit" name="action" value="removeQuiz">Remove</button>
+            </form>
+        </div>
 
-<!-- statistics-->
-<div>
-    <h2>Statistics</h2>
-    <%
-        int user_cnt = adminsDao.getUserCount();
-        int quiz_cnt = adminsDao.getTakenQuizzesCount();
-    %>
-    <p>Number of users in total: <%=user_cnt%></p>
-    <p>Number of quizzes taken in total: <%=quiz_cnt%></p>
-</div>
+        <!-- clear History -->
+        <div class="admin-section">
+            <h2>Clear Quiz History</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter Quiz Name: <input type="text" name="clearQuizHistoryName" /></label>
+                <button type="submit" name="action" value="clearHistory">Clear</button>
+            </form>
+        </div>
+
+        <!-- statistics-->
+        <div class="admin-section">
+            <h2>Statistics</h2>
+            <%
+                int user_cnt = adminsDao.getUserCount();
+                int quiz_cnt = adminsDao.getTakenQuizzesCount();
+            %>
+            <div class="stat-item">Number of users in total: <span class="stat-number"><%=user_cnt%></span></div>
+            <div class="stat-item">Number of quizzes taken in total: <span class="stat-number"><%=quiz_cnt%></span></div>
+        </div>
+    </div>
 </body>
 </html>
+

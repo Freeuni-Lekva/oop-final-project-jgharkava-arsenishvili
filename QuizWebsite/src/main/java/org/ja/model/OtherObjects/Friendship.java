@@ -9,7 +9,9 @@ public class Friendship {
     private String friendshipStatus; // should be "pending" or "friends"
 
     // Empty constructor
-    public Friendship() {
+    public Friendship(long firstUserId, long secondUserId) {
+        this.firstUserId = firstUserId;
+        this.secondUserId = secondUserId;
     }
 
     // Constructor with all parameters
@@ -64,3 +66,4 @@ public class Friendship {
                 friendshipDate.equals(((Friendship) o).getFriendshipDate());
     }
 }
+

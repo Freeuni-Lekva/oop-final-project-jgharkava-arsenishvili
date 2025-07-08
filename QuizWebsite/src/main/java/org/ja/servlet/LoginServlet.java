@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
