@@ -129,12 +129,11 @@ public class AnswersDao {
             ps.setString(3, answer.getAnswerText());
             ps.setInt(4, answer.getAnswerOrder());
             ps.setBoolean(5, answer.getAnswerValidity());
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            } 
             return false;
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
