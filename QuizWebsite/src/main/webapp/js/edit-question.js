@@ -1,133 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-    function updateDeleteButtonState(optionsContainer) {
-        const optionsBlock = optionsContainer.querySelectorAll(".option-block");
-        const deleteButtons = optionsContainer.querySelectorAll(".delete-option-btn");
-        const shouldDisable = optionsBlock.length <= 1;
-
-        deleteButtons.forEach(btn => btn.disabled = shouldDisable);
-    }
-
-    function updateDeleteButtonStateChoices(choicesContainer) {
-        const choiceBlocks = choicesContainer.querySelectorAll(".choice-block");
-        const deleteButtons = choicesContainer.querySelectorAll(".delete-choice-btn");
-        const shouldDisable = choiceBlocks.length <= 1;
-
-        deleteButtons.forEach(btn => btn.disabled = shouldDisable);
-
-        // if only one choice left, mark it as true and send info to server
-        if (choiceBlocks.length === 1){
-            const onlyChoice = choiceBlocks[0];
-            const markBtn = onlyChoice.querySelector(".mark-as-true-btn");
-            const deleteBtn = onlyChoice.querySelector(".delete-choice-btn");
-
-            markBtn.textContent = "Marked as true";
-            markBtn.disabled = true;
-            deleteBtn.disabled = true;
-
-            const questionId = choicesContainer.closest(".question-block")?.dataset.questionId;
-            const answerId = onlyChoice.dataset.answerId;
-
-            fetch("edit-question", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: "setCorrectChoice",
-                    questionId: questionId,
-                    answerId: answerId
-                })
-            }).then(res => res.json())
-                .then(json => {
-                    if (!json.success) {
-                        alert("Error marking the only remaining option as correct");                    } else {
-                    }
-                });
-        }
-    }
-
-    function createOptionBlock(answerId = null, optionText = "") {
-        const block = document.createElement("div");
-
-        block.className = "option-block";
-        if (answerId) block.dataset.answerId = answerId;
-
-        block.dataset.optionText = optionText;
-
-        block.innerHTML = `
-        <textarea class="option-text">${optionText}</textarea>
-        <button class="save-option-btn" disabled>Save Option Text</button>
-        <button class="delete-option-btn">Delete Option</button>`;
-
-        const textarea = block.querySelector(".option-text");
-        const saveButton = block.querySelector(".save-option-btn");
-
-        toggleSaveButtonState(textarea, saveButton);
-        textarea.addEventListener("input", () => {
-            toggleSaveButtonState(textarea, saveButton);
-        });
-
-        // Save handler
-        block.querySelector(".save-option-btn").addEventListener("click", () => {
-            const newText = textarea.value.trim();
-            const oldText = block.dataset.optionText || "";
-            const answerId = block.dataset.answerId;
-            const isNew = !oldText;
-
-            const payload = {
-                action: 'updateOption',
-                answerId: answerId,
-                newText: newText,
-                oldText: oldText,
-                isNew: isNew
-            };
-
-            fetch("edit-question", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
-                .then(res => res.json())
-                .then(json => {
-                    if (json.success) {
-                        block.dataset.optionText = newText;
-                        alert("Saved!");
-                    } else {
-                        alert("Failed to save.");
-                    }
-                });
-        });
-
-        // Delete handler
-        block.querySelector(".delete-option-btn").addEventListener("click", () => {
-            const answerId = block.dataset.answerId;
-            const optionText = block.dataset.optionText;
-            const container = block.closest(".options");
-
-            if (!confirm("Are you sure you want to delete this answer?")) return;
-
-            fetch("edit-question", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    action: 'removeOption',
-                    answerId: answerId,
-                    optionText: optionText
-                })
-            })
-                .then(res => res.json())
-                .then(json => {
-                    if (json.success) {
-                        block.remove();
-                        updateDeleteButtonState(container);
-                    } else {
-                        alert("Failed to delete.");
-                    }
-                });
-        });
-
-        return block;
-    }
-
     // Add Option button logic
     document.querySelectorAll(".add-option-btn").forEach(button => {
         button.addEventListener("click", () => {
@@ -463,147 +334,459 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    document.querySelectorAll(".choices").forEach(container => {
-        updateDeleteButtonStateChoices(container);
+    document.querySelectorAll(".choices").forEach(container => setupChoiceContainer(container));
 
-        // if textarea is empty, disable save choice.
-        document.querySelectorAll(".choice-block").forEach(block => {
-            const textarea = block.querySelector(".choice-text");
-            const saveBtn = block.querySelector(".save-choice-btn");
+    document.querySelectorAll(".multiple-choices").forEach(container => setupMultipleChoiceContainer(container));
 
-            toggleSaveButtonState(textarea, saveBtn);
-            textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
-        });
+    // finish editing button can be validated only if multiple-choice and multi-choice-multi-answer have at least one choice marked as true
+    document.querySelector(".finish-editing-button")?.addEventListener("click", () =>{
+        let allValid = true;
 
-        const questionId = container.closest(".question-block")?.dataset.questionId;
-        const allChoiceBlocks = container.querySelectorAll(".choice-block");
+        document.querySelectorAll(".question-block").forEach(qBlock => {
+            const type = qBlock.dataset.questionType;
 
-        // Initialize correct state based on text content
-        allChoiceBlocks.forEach(block => {
-            const markBtn = block.querySelector(".mark-as-true-btn");
-            const deleteBtn = block.querySelector(".delete-choice-btn");
-
-            if (markBtn.textContent.trim() === "Marked as true") {
-                markBtn.disabled = allChoiceBlocks.length === 1;
-                deleteBtn.disabled = true;
-
-                // Disable all other mark buttons
-                allChoiceBlocks.forEach(otherBlock => {
-                    if (otherBlock !== block) {
-                        const otherMarkBtn = otherBlock.querySelector(".mark-as-true-btn");
-                        otherMarkBtn.disabled = true;
-                    }
+            // MULTIPLE-CHOICE
+            if (type === "multiple-choice") {
+                const choices = qBlock.querySelectorAll(".choice-block");
+                const oneMarked = Array.from(choices).some(block => {
+                    const btn = block.querySelector(".mark-as-true-btn");
+                    return btn && btn.textContent.trim() === "Marked as true";
                 });
+                if (!oneMarked) {
+                    alert("Every single-answer multiple-choice question must have one marked as true.");
+                    allValid = false;
+                    return;
+                }
+            }
+
+            // MULTIPLE-CHOICE-MULTI-ANSWER
+            if (type === "multi-choice-multi-answers") {
+                const choices = qBlock.querySelectorAll(".multiple-choice-block");
+                const atLeastOneMarked = Array.from(choices).some(block => {
+                    const btn = block.querySelector(".multiple-mark-as-true-btn");
+                    return btn && btn.textContent.trim() === "Marked as true";
+                });
+                if (!atLeastOneMarked) {
+                    alert("Every multi-answer question must have at least one choice marked as true.");
+                    allValid = false;
+                    return;
+                }
             }
         });
 
-        // Click handler
-        container.addEventListener("click", function (event) {
-            if (event.target.classList.contains("mark-as-true-btn")){
-                const clickedBlock = event.target.closest(".choice-block");
-                const clickedMarkBtn = clickedBlock.querySelector(".mark-as-true-btn");
-                const clickedDeleteBtn = clickedBlock.querySelector(".delete-choice-btn");
+        if (allValid) {
+            // Redirect to overview
+            const quizId = document.querySelector(".finish-editing-button").dataset.quizId;
+            window.location.href = `quiz-overview.jsp?current-quiz-id=${quizId}`;
+        }
+    });
+});
 
-                const isMarked = clickedMarkBtn.textContent.trim() === "Marked as true";
+// sets up multiple-choice-multi-answer container
+function setupMultipleChoiceContainer(container){
+    updateDeleteButtonStateMultipleChoices(container);
 
-                if (isMarked) {
-                    // unmark all
-                    allChoiceBlocks.forEach(block => {
-                        block.querySelector(".mark-as-true-btn").textContent = "Mark as true";
-                        block.querySelector(".mark-as-true-btn").disabled = false;
-                        block.querySelector(".delete-choice-btn").disabled = false;
-                    });
-                } else {
-                    // mark clicked, disable others
-                    allChoiceBlocks.forEach(block => {
-                        const markBtn = block.querySelector(".mark-as-true-btn");
-                        const deleteBtn = block.querySelector(".delete-choice-btn");
+    // disables save if text is empty
+    container.querySelectorAll(".multiple-choice-block").forEach(block => {
+        const textarea = block.querySelector(".multiple-choice-text");
+        const saveBtn  = block.querySelector(".save-multiple-choice-btn");
 
-                        markBtn.textContent = "Mark as true";
-                        markBtn.disabled = true;
-                        deleteBtn.disabled = false;
-                    });
+        toggleSaveButtonState(textarea, saveBtn);
+        textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+    });
 
-                    clickedMarkBtn.textContent = "Marked as true";
-                    clickedMarkBtn.disabled = false;
-                    clickedDeleteBtn.disabled = true;
+    container.addEventListener("click", function (event) {
+        const target = event.target;
+        const block = target.closest(".multiple-choice-block");
+        if (!block) return;
 
-                    // Send to server
-                    const answerId = clickedBlock.dataset.answerId;
-                    fetch("edit-question", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            action: "setCorrectChoice",
-                            questionId: questionId,
-                            answerId: answerId
-                        })
-                    }).then(res => res.json())
-                        .then(json => {
-                            if (json.success) {
-                                alert("Choice marked as true");
-                            } else {
-                                alert("error marking choice as true");
-                            }
-                        });
+        const answerId = block.dataset.answerId;
+
+        // Mark/unmark as correct
+        if (target.classList.contains("multiple-mark-as-true-btn")) {
+            const nowCorrect = target.textContent.trim() === "Mark as true";
+            target.textContent = nowCorrect ? "Marked as true" : "Mark as true";
+
+            fetch("edit-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "setChoiceValidity",
+                    answerId: answerId,
+                    isCorrect: nowCorrect
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    alert("Failed to update correctness");
                 }
-            } else if (event.target.classList.contains("save-choice-btn")){
-                const clickedBlock = event.target.closest(".choice-block");
-                const textarea = clickedBlock.querySelector(".choice-text");
-                const newText = textarea.value.trim();
-                const answerId = clickedBlock.dataset.answerId;
+            }).catch(err => {
+                console.error("Error updating correctness", err);
+            });
+        }// Save choice text
+        else if (target.classList.contains("save-multiple-choice-btn")) {
+            const textarea = block.querySelector(".multiple-choice-text");
+            const newTxt = textarea.value.trim();
+            if (!newTxt) return;
 
-                fetch("edit-question", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        action: "updateAnswerText",
-                        answerId: answerId,
-                        newText: newText
-                    })
-                }).then(res => res.json())
-                    .then(json => {
-                        if (json.success) {
-                            alert("Choice text updated successfully.");
-                        } else {
-                            alert("Failed to update choice text.");
-                        }
-                    }).catch(err => {
-                    alert("Error saving choice text.");
-                    console.error(err);
-                });
-            } else if (event.target.classList.contains("delete-choice-btn")){
-                const clickedBlock = event.target.closest(".choice-block");
-                const answerId = clickedBlock.dataset.answerId;
-                const container = clickedBlock.closest(".choices");
+            let payload;
 
-                if (!confirm("Are you sure you want to delete this choice?")) return;
+            if (answerId) {
+                // Existing: update text
+                payload = {
+                    action: "updateAnswerText",
+                    answerId: answerId,
+                    newText: newTxt
+                };
+            }
 
+            fetch("edit-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(response => {
+                if (response.ok){
+                    alert("Updated choice text");
+                } else {
+                    alert("Error updating choice text");
+                }
+            }).catch(err => {
+                console.error("Error updating choice", err);
+            })
+        } // Delete choice
+        else if (target.classList.contains("delete-multiple-choice-btn")) {
+            if (!confirm("Delete this choice?")) return;
+
+            block.remove();
+            updateDeleteButtonStateMultipleChoices(container);
+
+            if (answerId) {
                 fetch("edit-question", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         action: "deleteAnswer",
+                        answerId: answerId
+                    })
+                }).then(res => {
+                    if (!res.ok) {
+                        console.error("Failed to delete choice");
+                    }
+                }).catch(err => {
+                    console.error("Error deleting choice", err);
+                });
+            }
+        }
+    });
+}
+
+// sets multiple-choice container
+function setupChoiceContainer(container){
+    updateDeleteButtonStateChoices(container);
+
+    // if textarea is empty, disable save choice.
+    document.querySelectorAll(".choice-block").forEach(block => {
+        const textarea = block.querySelector(".choice-text");
+        const saveBtn = block.querySelector(".save-choice-btn");
+
+        toggleSaveButtonState(textarea, saveBtn);
+        textarea.addEventListener("input", () => toggleSaveButtonState(textarea, saveBtn));
+    });
+
+    const questionId = container.closest(".question-block")?.dataset.questionId;
+    const allChoiceBlocks = container.querySelectorAll(".choice-block");
+
+    // Initialize correct state based on text content
+    allChoiceBlocks.forEach(block => {
+        const markBtn = block.querySelector(".mark-as-true-btn");
+        const deleteBtn = block.querySelector(".delete-choice-btn");
+
+        if (markBtn.textContent.trim() === "Marked as true") {
+            markBtn.disabled = allChoiceBlocks.length === 1;
+            deleteBtn.disabled = true;
+
+            // Disable all other mark buttons
+            allChoiceBlocks.forEach(otherBlock => {
+                if (otherBlock !== block) {
+                    const otherMarkBtn = otherBlock.querySelector(".mark-as-true-btn");
+                    otherMarkBtn.disabled = true;
+                }
+            });
+        }
+    });
+
+    // Click handler
+    container.addEventListener("click", function (event) {
+        if (event.target.classList.contains("mark-as-true-btn")){
+            const clickedBlock = event.target.closest(".choice-block");
+            const clickedMarkBtn = clickedBlock.querySelector(".mark-as-true-btn");
+            const clickedDeleteBtn = clickedBlock.querySelector(".delete-choice-btn");
+
+            const isMarked = clickedMarkBtn.textContent.trim() === "Marked as true";
+
+            if (isMarked) {
+                // unmark all
+                allChoiceBlocks.forEach(block => {
+                    block.querySelector(".mark-as-true-btn").textContent = "Mark as true";
+                    block.querySelector(".mark-as-true-btn").disabled = false;
+                    block.querySelector(".delete-choice-btn").disabled = false;
+                });
+            } else {
+                // mark clicked, disable others
+                allChoiceBlocks.forEach(block => {
+                    const markBtn = block.querySelector(".mark-as-true-btn");
+                    const deleteBtn = block.querySelector(".delete-choice-btn");
+
+                    markBtn.textContent = "Mark as true";
+                    markBtn.disabled = true;
+                    deleteBtn.disabled = false;
+                });
+
+                clickedMarkBtn.textContent = "Marked as true";
+                clickedMarkBtn.disabled = false;
+                clickedDeleteBtn.disabled = true;
+
+                // Send to server
+                const answerId = clickedBlock.dataset.answerId;
+                fetch("edit-question", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "setCorrectChoice",
                         questionId: questionId,
                         answerId: answerId
                     })
                 }).then(res => res.json())
                     .then(json => {
                         if (json.success) {
-                            clickedBlock.remove(); //remove from dom
-                            updateDeleteButtonStateChoices(container);
+                            alert("Choice marked as true");
                         } else {
-                            alert("Failed to delete choice.");
+                            alert("error marking choice as true");
                         }
-                    }).catch(err => {
-                    alert("Error deleting choice.");
-                    console.error(err);
-                });
+                    });
             }
-        });
+        } else if (event.target.classList.contains("save-choice-btn")){
+            const clickedBlock = event.target.closest(".choice-block");
+            const textarea = clickedBlock.querySelector(".choice-text");
+            const newText = textarea.value.trim();
+            const answerId = clickedBlock.dataset.answerId;
+
+            fetch("edit-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "updateAnswerText",
+                    answerId: answerId,
+                    newText: newText
+                })
+            }).then(res => res.json())
+                .then(json => {
+                    if (json.success) {
+                        alert("Choice text updated successfully.");
+                    } else {
+                        alert("Failed to update choice text.");
+                    }
+                }).catch(err => {
+                alert("Error saving choice text.");
+                console.error(err);
+            });
+        } else if (event.target.classList.contains("delete-choice-btn")){
+            const clickedBlock = event.target.closest(".choice-block");
+            const answerId = clickedBlock.dataset.answerId;
+            const container = clickedBlock.closest(".choices");
+
+            if (!confirm("Are you sure you want to delete this choice?")) return;
+
+            fetch("edit-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "deleteAnswer",
+                    questionId: questionId,
+                    answerId: answerId
+                })
+            }).then(res => res.json())
+                .then(json => {
+                    if (json.success) {
+                        clickedBlock.remove(); //remove from dom
+                        updateDeleteButtonStateChoices(container);
+                    } else {
+                        alert("Failed to delete choice.");
+                    }
+                }).catch(err => {
+                alert("Error deleting choice.");
+                console.error(err);
+            });
+        }
+    });
+}
+
+function createOptionBlock(answerId = null, optionText = "") {
+    const block = document.createElement("div");
+
+    block.className = "option-block";
+    if (answerId) block.dataset.answerId = answerId;
+
+    block.dataset.optionText = optionText;
+
+    block.innerHTML = `
+        <textarea class="option-text">${optionText}</textarea>
+        <button class="save-option-btn" disabled>Save Option Text</button>
+        <button class="delete-option-btn">Delete Option</button>`;
+
+    const textarea = block.querySelector(".option-text");
+    const saveButton = block.querySelector(".save-option-btn");
+
+    toggleSaveButtonState(textarea, saveButton);
+    textarea.addEventListener("input", () => {
+        toggleSaveButtonState(textarea, saveButton);
     });
 
-});
+    // Save handler
+    block.querySelector(".save-option-btn").addEventListener("click", () => {
+        const newText = textarea.value.trim();
+        const oldText = block.dataset.optionText || "";
+        const answerId = block.dataset.answerId;
+        const isNew = !oldText;
+
+        const payload = {
+            action: 'updateOption',
+            answerId: answerId,
+            newText: newText,
+            oldText: oldText,
+            isNew: isNew
+        };
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    block.dataset.optionText = newText;
+                    alert("Saved!");
+                } else {
+                    alert("Failed to save.");
+                }
+            });
+    });
+
+    // Delete handler
+    block.querySelector(".delete-option-btn").addEventListener("click", () => {
+        const answerId = block.dataset.answerId;
+        const optionText = block.dataset.optionText;
+        const container = block.closest(".options");
+
+        if (!confirm("Are you sure you want to delete this answer?")) return;
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: 'removeOption',
+                answerId: answerId,
+                optionText: optionText
+            })
+        })
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    block.remove();
+                    updateDeleteButtonState(container);
+                } else {
+                    alert("Failed to delete.");
+                }
+            });
+    });
+
+    return block;
+}
+
+// if only one option is left, disable its delete button
+function updateDeleteButtonState(optionsContainer) {
+    const optionsBlock = optionsContainer.querySelectorAll(".option-block");
+    const deleteButtons = optionsContainer.querySelectorAll(".delete-option-btn");
+    const shouldDisable = optionsBlock.length <= 1;
+
+    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+}
+
+// if only one choice is left, disable its delete button MULTI-CHOICE-MULTI-ANSWER
+function updateDeleteButtonStateMultipleChoices(choicesContainer){
+    const choiceBlocks = choicesContainer.querySelectorAll(".multiple-choice-block");
+    const deleteButtons = choicesContainer.querySelectorAll(".delete-multiple-choice-btn");
+    const shouldDisable = choiceBlocks.length <= 1;
+
+    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+
+    // if only one choice left, mark it as true and send info to server
+    if (choiceBlocks.length === 1){
+        const onlyChoice = choiceBlocks[0];
+        const markBtn = onlyChoice.querySelector(".multiple-mark-as-true-btn");
+        const deleteBtn = onlyChoice.querySelector(".delete-multiple-choice-btn");
+
+        markBtn.textContent = "Marked as true";
+        markBtn.disabled = true;
+        deleteBtn.disabled = true;
+
+        const questionId = choicesContainer.closest(".question-block")?.dataset.questionId;
+        const answerId = onlyChoice.dataset.answerId;
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "setCorrectChoice",
+                questionId: questionId,
+                answerId: answerId
+            })
+        }).then(res => res.json())
+            .then(json => {
+                if (!json.success) {
+                    alert("Error marking the only remaining option as correct");
+                }
+            });
+    }
+}
+
+// if only one choice is left, disable its delete button MULTIPLE-CHOICE
+function updateDeleteButtonStateChoices(choicesContainer) {
+    const choiceBlocks = choicesContainer.querySelectorAll(".choice-block");
+    const deleteButtons = choicesContainer.querySelectorAll(".delete-choice-btn");
+    const shouldDisable = choiceBlocks.length <= 1;
+
+    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+
+    // if only one choice left, mark it as true and send info to server
+    if (choiceBlocks.length === 1){
+        const onlyChoice = choiceBlocks[0];
+        const markBtn = onlyChoice.querySelector(".mark-as-true-btn");
+        const deleteBtn = onlyChoice.querySelector(".delete-choice-btn");
+
+        markBtn.textContent = "Marked as true";
+        markBtn.disabled = true;
+        deleteBtn.disabled = true;
+
+        const questionId = choicesContainer.closest(".question-block")?.dataset.questionId;
+        const answerId = onlyChoice.dataset.answerId;
+
+        fetch("edit-question", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "setCorrectChoice",
+                questionId: questionId,
+                answerId: answerId
+            })
+        }).then(res => res.json())
+            .then(json => {
+                if (!json.success) {
+                    alert("Error marking the only remaining option as correct");
+                }
+            });
+    }
+}
 
 // if textarea is empty, disables saveButton
 function toggleSaveButtonState(textarea, saveButton) {

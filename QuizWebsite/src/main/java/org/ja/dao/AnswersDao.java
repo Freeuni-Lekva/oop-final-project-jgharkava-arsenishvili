@@ -250,22 +250,37 @@ public class AnswersDao {
     }
 
     public void setOneCorrectChoice(long questionChoiceId, long choiceId){
-        String falsenChoices = "UPDATE answers SET answer_validity = false WHERE question_id = ?";
+        String falseChoices = "UPDATE answers SET answer_validity = false WHERE question_id = ?";
         String setRightChoice = "UPDATE answers SET answer_validity = true WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement falsenStmt = connection.prepareStatement(falsenChoices);
+            PreparedStatement falseStmt = connection.prepareStatement(falseChoices);
             PreparedStatement rightStmt = connection.prepareStatement(setRightChoice)){
 
-            falsenStmt.setLong(1, questionChoiceId);
+            falseStmt.setLong(1, questionChoiceId);
 
-            falsenStmt.executeUpdate();
+            falseStmt.executeUpdate();
 
             rightStmt.setLong(1, choiceId);
 
             rightStmt.executeUpdate();
         } catch (SQLException e){
             throw new RuntimeException("Error updating answer validity", e);
+        }
+    }
+
+    public void setChoiceValidity(long choiceId, boolean isCorrect){
+        String updateValidity = "UPDATE answers SET answer_validity = ? WHERE answer_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement updateStmt = connection.prepareStatement(updateValidity)){
+
+            updateStmt.setBoolean(1, isCorrect);
+            updateStmt.setLong(2, choiceId);
+
+            updateStmt.executeUpdate();
+        } catch(SQLException e) {
+            throw new RuntimeException("Error setting choice's validity", e);
         }
     }
 

@@ -41,7 +41,7 @@
     long questionId = question.getQuestionId();
     String questionText = question.getQuestionText();
 %>
-<div class="question-block" data-question-id="<%=questionId%>">
+<div class="question-block" data-question-id="<%=questionId%>" data-question-type="<%=questionType%>">
 
 <%--    Question-text block--%>
     <h4>Type: <%=questionType%></h4>
@@ -106,7 +106,6 @@
         <%
             }
         %>
-        <button type="button" class="add-choice-btn">Add Choice</button>
     </div>
 
     <% } else if (questionType.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {
@@ -203,6 +202,34 @@
 
     <% } else if (questionType.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) { %>
 
+    <div class="multiple-choices">
+        <h5>Choices:</h5>
+        <%  List<Answer> choices = answersDao.getQuestionAnswers(questionId);
+
+            for (Answer choice: choices){
+                long answerId = choice.getAnswerId();
+                String choiceText = choice.getAnswerText();
+                boolean isCorrect = choice.getAnswerValidity();
+        %>
+        <div class="multiple-choice-block" data-answer-id="<%=answerId%>">
+            <textarea class="multiple-choice-text"><%=choiceText%></textarea>
+
+            <button class="multiple-mark-as-true-btn">
+                <%=isCorrect ? "Marked as true" : "Mark as true"%>
+            </button>
+
+            <button class="save-multiple-choice-btn">Save Choice Text</button>
+
+            <button class="delete-multiple-choice-btn">
+                Delete Choice
+            </button>
+        </div>
+        <%
+            }
+        %>
+    </div>
+
+
     <% } else if (questionType.equals(Constants.QuestionTypes.MATCHING_QUESTION)) { %>
 
     <% } %>
@@ -211,6 +238,8 @@
 <%
     }
 %>
+
+<button class="finish-editing-button"  data-quiz-id="<%=quiz.getId()%>">Finish editing questions</button>
 
 </body>
 </html>

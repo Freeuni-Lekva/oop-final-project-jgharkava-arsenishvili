@@ -110,6 +110,15 @@ public class EditQuestionServlet extends HttpServlet {
                 answersDao.removeAnswer(deleteAnswerId);
 
                 break;
+            case "setChoiceValidity":
+                long setChoiceValidityId = jsonObject.get("answerId").getAsLong();
+                boolean isChoiceCorrect = jsonObject.get("isCorrect").getAsBoolean();
+
+                System.out.println(isChoiceCorrect);
+
+                answersDao.setChoiceValidity(setChoiceValidityId, isChoiceCorrect);
+
+                break;
         }
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
