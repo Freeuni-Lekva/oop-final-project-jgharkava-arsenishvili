@@ -1,10 +1,10 @@
 use ja_project_db;
 
-insert into users (user_id, password_hashed, salt, username, user_status) values
-(1, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Nini', 'administrator'),
-(2, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Sandro', 'user'),
-(3, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Tornike', 'user'),
-(4, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Liza', 'user');
+insert into users (user_id, password_hashed, salt, username, user_status, user_photo) values
+(1, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Nini', 'administrator', 'https://i.imgur.com/5PbPhtO.png'),
+(2, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Sandro', 'user', 'https://i.imgur.com/g5y8rN3.png'),
+(3, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Tornike', 'user', 'https://i.imgur.com/C1WXE7I.png'),
+(4, 'ayyD4E76rFdkB9O8E3UM2aZEh9KGIogi72agOHR+pXw=', 'IdvsWXtGSMRxtKBreJkQnA==', 'Liza', 'user', 'https://i.imgur.com/ajmeQC0.png');
 
 insert into categories (category_id, category_name) values
 (1, 'History'),
