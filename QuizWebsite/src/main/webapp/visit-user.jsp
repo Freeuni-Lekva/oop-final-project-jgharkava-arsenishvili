@@ -9,8 +9,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     UsersDao usersDao = (UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO);
-    String name = request.getParameter("query");
-    User visitedUser = usersDao.getUserByUsername(name);
+    User visitedUser;
+    if(request.getParameter("query") != null)
+        visitedUser = usersDao.getUserByUsername(request.getParameter("query"));
+    else
+        visitedUser = usersDao.getUserById(Long.parseLong(request.getParameter(Constants.RequestParameters.USER_ID)));
+    String name = visitedUser.getUsername();
     User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
@@ -22,6 +26,7 @@
 <head>
     <title><%=visitedUser.getUsername()%></title>
     <link rel="stylesheet" type="text/css" href="css/visit-user.css">
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
     <script src = "js/visit-user.js" defer></script>
 </head>
 <body>
@@ -84,8 +89,8 @@
 
 
     <div class="action-row">
-        <form action="user-history.jsp" method="get">
-            <input type="hidden" name="userId" value="<%= visitedUser.getId() %>">
+        <form action="history-page.jsp" method="get">
+            <input type="hidden" name="<%=Constants.RequestParameters.USER_ID%>" value="<%=visitedUser.getId()%>">
             <button type="submit">See <%=name%>'s History</button>
         </form>
 

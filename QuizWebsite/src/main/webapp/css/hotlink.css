@@ -1,0 +1,13 @@
+.hotlink {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.hotlink:hover {
+    text-decoration: underline;
+}
+
+/*
+<link rel="stylesheet" type="text/css" href="css/hotlink.css">
+ */

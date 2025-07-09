@@ -29,6 +29,8 @@
             <title><%=user.getUsername()%>'s History</title><%
         }
     %>
+
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
 </head>
 <body>
     <%
@@ -37,10 +39,7 @@
         } else { %>
             <h1>
 <%-- TODO test this--%>
-                <a href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=user.getId()%>"
-                   style="text-decoration: none; color: inherit; cursor: pointer;"
-                   onmouseover="this.style.textDecoration='underline';"
-                   onmouseout="this.style.textDecoration='none';">
+                <a href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=user.getId()%>" class="hotlink">
                     <%=user.getUsername()%>
                 </a>'s full history of quizzes:
             </h1><%
@@ -51,10 +50,7 @@
     for(History h: arr){
         %>
     <li>
-        <a href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=h.getQuizId()%>"
-           style="text-decoration: none; color: inherit; cursor: pointer;"
-           onmouseover="this.style.textDecoration='underline';"
-           onmouseout="this.style.textDecoration='none';">
+        <a href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=h.getQuizId()%>" class="hotlink">
             <%=quizDao.getQuizById(h.getQuizId()).getName()%>
         </a>
     </li>

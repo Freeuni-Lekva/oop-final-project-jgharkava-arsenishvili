@@ -10,6 +10,7 @@
 
 <%--TODO: add categories and tags--%>
 
+<%--TODO add hotlinks--%>
 <%
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
     UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
@@ -74,6 +75,7 @@
 <head>
     <title>Quiz Overview</title>
     <link rel="stylesheet" href="css/quiz-overview.css" />
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
     <script src="js/quiz-overview.js" defer></script>
 </head>
 
@@ -81,8 +83,7 @@
 <div class="information-container">
     <h1 class="quiz-title"><%= quizName %></h1>
 
-    <%-- TODO: Hotlink to creator's profile --%>
-    <h2 class="creator-name">Creator: <%= creatorName %></h2>
+    <h2 class="creator-name">Creator: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=quiz.getCreatorId()%>"><%= creatorName %></a></h2>
 
     <p class="quiz-description"><%= quizDescription %></p>
 
