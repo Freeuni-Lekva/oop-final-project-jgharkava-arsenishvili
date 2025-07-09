@@ -119,3 +119,16 @@ body {
     color: #739cc8;
 }
 
+.back-btn {
+    background: #e3f2fd;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    grid-area: center;
+}
+
+.back-btn:hover {
+    background: #e0e0e0;
+}

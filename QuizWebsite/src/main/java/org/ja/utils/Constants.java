@@ -65,6 +65,6 @@ public class Constants {
 
     public static class RequestParameters {
         public static final String QUIZ_ID = "current-quiz-id";
-        public static final String USER_ID = "current-quiz-id";
+        public static final String USER_ID = "current-user-id";
     }
 }

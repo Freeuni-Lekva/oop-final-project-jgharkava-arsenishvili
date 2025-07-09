@@ -337,7 +337,7 @@ public class QuizzesDao {
         return quizzes;
     }
     
-    public boolean containsQuiz(String name) {
+    public boolean containsQuiz(String name){
         String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_name = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -348,8 +348,9 @@ public class QuizzesDao {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
                 }
-
+            }
             return false;
+
         } catch (SQLException e) {
             throw new RuntimeException("Error checking user existence", e);
         }
