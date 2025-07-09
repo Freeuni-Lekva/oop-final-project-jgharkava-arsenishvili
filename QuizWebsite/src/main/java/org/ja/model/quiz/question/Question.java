@@ -103,7 +103,7 @@ public class Question {
 
     @Override
     public int hashCode(){
-        return questionText.hashCode();
+        return questionText != null ? questionText.hashCode() : imageUrl.hashCode();
     }
 
 }

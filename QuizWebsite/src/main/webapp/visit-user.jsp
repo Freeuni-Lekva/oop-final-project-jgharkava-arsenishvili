@@ -94,6 +94,7 @@
         <p><strong><%= a.getAchievementName() %>
         </strong> – <%= a.getAchievementDescription() %>
         </p>
+        <img src="<%=a.getAchievementPhoto()%>" alt="Description of image" width="200"/>
         <% }
         } else { %>
         <p><%= visitedUser.getUsername() %> has no achievements yet.</p>

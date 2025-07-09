@@ -30,38 +30,49 @@
 </head>
 <body>
 
+
 <%
-    long startTime = (Long) session.getAttribute("start-time");
-    int duration = (Integer) session.getAttribute("time-limit-in-seconds");
-    long now = System.currentTimeMillis();
-    long timeLeft = duration - (now - startTime) / 1000;
+    long startTime;
+    int duration;
+    long now;
+    long timeLeft;
+
+    if(Constants.QuizMode.TAKING == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {
+        startTime = (Long) session.getAttribute("start-time");
+        duration = (Integer) session.getAttribute("time-limit-in-seconds");
+        now = System.currentTimeMillis();
+        timeLeft = duration - (now - startTime) / 1000;
 %>
 
-<script>
-    let timeLeft = <%= timeLeft %>;
+    <script>
+        let timeLeft = <%= timeLeft %>;
 
-    function formatTime(secs) {
-        const m = Math.floor(secs / 60);
-        const s = secs % 60;
-        return m + ":" + (s < 10 ? "0" + s : s);
-    }
-
-    function updateTimer() {
-        if (timeLeft <= 0) {
-            document.getElementById("question-form").submit();
-        } else {
-            document.getElementById("timer").textContent = formatTime(timeLeft);
-            timeLeft--;
-            setTimeout(updateTimer, 1000);
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return m + ":" + (s < 10 ? "0" + s : s);
         }
+
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                document.getElementById("question-form").submit();
+            } else {
+                document.getElementById("timer").textContent = formatTime(timeLeft);
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        window.onload = updateTimer;
+    </script>
+
+    <div>Time left: <span id="timer"></span></div>
+
+    <h2>Question <%=index+1%></h2>
+<%
     }
+%>
 
-    window.onload = updateTimer;
-</script>
-
-<div>Time left: <span id="timer"></span></div>
-
-<h2>Question <%=index+1%></h2>
 <form id="question-form" action="grade-single-question" method="post">
     <%
         if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION) || type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>

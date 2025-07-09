@@ -51,7 +51,7 @@
         <textarea name = "answer" placeholder = "Type the correct answer..." rows = "2" required></textarea>
       </label>
 
-      <button type = "button" onclick = "addAnswerOption('response-answer-container')">Add another answer</button>
+      <button type = "button" id="question-response-add-button" onclick = "addAnswerOption('response-answer-container')">Add another answer</button>
 
     </div>
   </div>
@@ -73,7 +73,7 @@
         <textarea name = "answer" placeholder = "Type the correct answer..." rows = "2" required></textarea>
       </label>
 
-      <button type = "button" onclick = "addAnswerOption('picture-answer-container')">Add another answer</button>
+      <button type = "button" id="picture-response-add-button" onclick = "addAnswerOption('picture-answer-container')">Add another answer</button>
     </div>
   </div>
 
@@ -94,7 +94,7 @@
         <textarea name = "answer" placeholder="Type the correct answer..." rows = "2" required></textarea>
       </label>
 
-      <button type = "button" onclick = "addAnswerOption('fill-in-the-blank-answer-container')">Add another answer</button>
+      <button type = "button" id="fill-in-the-blank-add-button" onclick = "addAnswerOption('fill-in-the-blank-answer-container')">Add another answer</button>
     </div>
   </div>
 
@@ -114,7 +114,7 @@
 
         <div class="button-row">
           <button type="button" class="mark-button">Mark as True</button>
-          <button type="button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
+          <button type="button" id="multiple-choice-add-button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
         </div>
       </div>
     </div>
@@ -136,7 +136,7 @@
 
         <div class="button-row">
           <button type="button" class="mark-button">Mark as True</button>
-          <button type="button" onclick="addAnswerOption('multi-choice-multi-answer-container')">Add another option</button>
+          <button type="button" id="multi-choice-multi-answer-add-button" onclick="addAnswerOption('multi-choice-multi-answer-container')">Add another option</button>
         </div>
       </div>
     </div>
@@ -156,7 +156,7 @@
 
     <div id="multi-answer-container">
 
-    <button type = "button" onclick = "addAnswerGroup()">Add new answer</button>
+    <button type = "button" id="multi-answer-add-button" onclick = "addAnswerGroup()">Add new answer</button>
 
     </div>
   </div>
@@ -173,13 +173,13 @@
         <div class="left-column">
           <h4>Left Options</h4>
           <div id="left-options"></div>
-          <button type="button" onclick="addLeftOption()">Add Left Option</button>
+          <button id="add-left-option-button"type="button" onclick="addLeftOption()">Add Left Option</button>
         </div>
 
         <div class="right-column">
           <h4>Right Options</h4>
           <div id="right-options"></div>
-          <button type="button" onclick="addRightOption()">Add Right Option</button>
+          <button id="add-right-option-button" type="button" onclick="addRightOption()">Add Right Option</button>
         </div>
       </div>
     </div>

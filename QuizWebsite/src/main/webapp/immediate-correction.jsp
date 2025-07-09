@@ -6,16 +6,23 @@
 <%@ page import="org.ja.model.OtherObjects.Answer" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
     Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
     List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
-    Question question = questions.get(index - 1);
+
+    /// question amomaqvs arasworad
+    Question question = (Question) request.getAttribute("question");
+
+    Constants.QuizMode quizMode = (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
-    List<Integer> respGrades = ((List<List<Integer>>) session.getAttribute("responseGrades")).get(index-1);
-    Response resp = ((List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES)).get(index - 1);
+    List<Integer> respGrades = ((List<List<Integer>>) session.getAttribute("responseGrades"))
+            .get(quizMode == Constants.QuizMode.TAKING ? index - 1 : 0);
+    Response resp = ((List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES))
+            .get(quizMode == Constants.QuizMode.TAKING ? index - 1 : 0);
 %>
 <style>
     .incorrect { color: red; }
@@ -28,40 +35,49 @@
 </head>
 <body>
 
+
 <%
-    long startTime = (Long) session.getAttribute("start-time");
-    int duration = (Integer) session.getAttribute("time-limit-in-seconds");
-    long now = System.currentTimeMillis();
-    long timeLeft = duration - (now - startTime) / 1000;
+    long startTime;
+    int duration;
+    long now;
+    long timeLeft;
+
+    if(Constants.QuizMode.TAKING == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {
+        startTime = (Long) session.getAttribute("start-time");
+        duration = (Integer) session.getAttribute("time-limit-in-seconds");
+        now = System.currentTimeMillis();
+        timeLeft = duration - (now - startTime) / 1000;%>
+
+        <script>
+            let timeLeft = <%= timeLeft %>;
+
+            function formatTime(secs) {
+                const m = Math.floor(secs / 60);
+                const s = secs % 60;
+                return m + ":" + (s < 10 ? "0" + s : s);
+            }
+
+            function updateTimer() {
+                if (timeLeft <= 0) {
+                    document.getElementById("question-form").submit();
+                } else {
+                    document.getElementById("timer").textContent = formatTime(timeLeft);
+                    timeLeft--;
+                    setTimeout(updateTimer, 1000);
+                }
+            }
+
+            window.onload = updateTimer;
+        </script>
+
+        <div>Time left: <span id="timer"></span></div><%
+    }
 %>
-
-<script>
-    let timeLeft = <%= timeLeft %>;
-
-    function formatTime(secs) {
-        const m = Math.floor(secs / 60);
-        const s = secs % 60;
-        return m + ":" + (s < 10 ? "0" + s : s);
-    }
-
-    function updateTimer() {
-        if (timeLeft <= 0) {
-            document.getElementById("next-form").submit();
-        } else {
-            document.getElementById("timer").textContent = formatTime(timeLeft);
-            timeLeft--;
-            setTimeout(updateTimer, 1000);
-        }
-    }
-
-    window.onload = updateTimer;
-</script>
-
-<div>Time left: <span id="timer"></span></div>
 
 <div class="question-block">
     <div class="question-text">
-        Question <%=index%>: <%=question.getQuestionText() != null ? question.getQuestionText() : ""%>
+        Question <%=quizMode == Constants.QuizMode.TAKING ? index : ""%>:
+        <%=question.getQuestionText() != null ? question.getQuestionText() : ""%>
     </div>
 
     <% if(question.getImageUrl() != null) { %>
@@ -139,19 +155,29 @@
     <% } %>
 
     <div class="score-display">
-        Score: <%=grades.get(index - 1)%> out of <%=question.getNumAnswers()%>
+        Score: <%=grades.getFirst()%> out of <%=question.getNumAnswers()%>
     </div>
 </div>
 
-<% if(index == questions.size()) { %>
-<form id="next-form" method="get" action="quiz-result.jsp">
-    <input type="submit" value="View Quiz Result">
-</form>
-<% } else { %>
-<form id="next-form" method="get" action="single-question-page.jsp">
-    <input type="submit" value="Next Question">
-</form>
-<% } %>
+<%
+    if(Constants.QuizMode.PRACTICE == quizMode) {
+        Map<Question, Integer> masteryMap = (Map<Question, Integer>) session.getAttribute(Constants.SessionAttributes.PRACTICE_QUESTIONS_MASTERY_MAP);%>
+
+        <a href="<%=masteryMap.isEmpty() ? "successful-practice.jsp" : "single-question-page.jsp"%>">
+            <button type="button">Next Question</button>
+        </a><%
+    } else {
+        if(index == questions.size()) { %>
+            <form id="next-form" method="get" action="quiz-result.jsp">
+                <input type="submit" value="View Quiz Result">
+            </form><%
+        } else { %>
+            <form id="next-form" method="get" action="single-question-page.jsp">
+                <input type="submit" value="Next Question">
+            </form><%
+        }
+    }
+%>
 
 <form action="quiz-overview.jsp" method="get">
     <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId()%>">
