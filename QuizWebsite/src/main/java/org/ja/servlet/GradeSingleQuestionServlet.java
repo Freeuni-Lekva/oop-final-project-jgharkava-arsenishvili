@@ -52,8 +52,8 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         List<Integer> grades = (List<Integer>) session.getAttribute("grades");
         List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
 
-        grades.removeFirst();
-        responseGrades.removeFirst();
+        grades.remove(0);
+        responseGrades.remove(0);
 
         calculateGrade(response, question, grades, responseGrades);
 
