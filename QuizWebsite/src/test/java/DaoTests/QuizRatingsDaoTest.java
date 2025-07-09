@@ -1,190 +1,97 @@
 package DaoTests;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
-import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.OtherObjects.*;
-import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.sql.*;
+import java.util.List;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class QuizRatingsDaoTest {
 
-    private BasicDataSource basicDataSource;
+/**
+ * Unit tests for the QuizRatingsDao class using an in-memory H2 database.
+ */
+public class QuizRatingsDaoTest extends BaseDaoTest{
     private QuizRatingsDao dao;
-    private UsersDao usersDao;
-    private QuizzesDao quizzesDao;
-    private CategoriesDao categoriesDao;
+
     @BeforeEach
     public void setUp() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        setUpDataSource();
 
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/drop.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
+        dao = new QuizRatingsDao(basicDataSource);
+    }
+
+    @Test
+    public void testInsertNewRatingAndAverageUpdate() {
+        QuizRating rating = new QuizRating(4L, 8L, 5, "Great quiz!");
+        assertTrue(dao.insertQuizRating(rating));
+
+        QuizRating stored = dao.getQuizRatingByUserIdQuizId(8L, 4L);
+        assertEquals(4L, stored.getQuizId());
+        assertEquals(8L, stored.getUserId());
+        assertEquals(5, stored.getRating());
+        assertEquals("Great quiz!", stored.getReview());
+
+        // Ensure average_rating in quizzes table is updated
+        double avg = getQuizAverageRating(4L);
+        assertEquals(4.5, avg);
+    }
+
+    @Test
+    public void testUpdateExistingRating() {
+        QuizRating rating = new QuizRating(5L, 8L, 2, "Not bad");
+        assertTrue(dao.insertQuizRating(rating));
+
+        QuizRating updated = new QuizRating(5L, 8L, 5, "Much better now");
+        assertTrue(dao.insertQuizRating(updated));  // should trigger update
+
+        QuizRating stored = dao.getQuizRatingByUserIdQuizId(8L, 5L);
+        assertEquals(5, stored.getRating());
+        assertEquals("Much better now", stored.getReview());
+    }
+
+    @Test
+    public void testGetQuizRatingsByQuizIdLimit() {
+        dao.insertQuizRating(new QuizRating(4L, 5L, 3, "Nice"));
+        dao.insertQuizRating(new QuizRating(4L, 6L, 4, "Cool"));
+        dao.insertQuizRating(new QuizRating(4L, 7L, 5, "Perfect"));
+
+        List<QuizRating> limited = dao.getQuizRatingsByQuizIdLimit(4L, 2);
+        assertEquals(2, limited.size());
+
+        assertTrue(limited.stream().allMatch(r -> r.getQuizId() == 4L));
+    }
+
+
+    // --- Helper Methods ---
+
+
+    /**
+     * Retrieves the average rating of a quiz from the {@code quizzes} table.
+     *
+     * @param quizId the ID of the quiz whose average rating is to be retrieved
+     * @return the average rating as a {@code double}
+     * @throws RuntimeException if the quiz ID is not found or a database error occurs
+     */
+    private double getQuizAverageRating(long quizId) {
+        String sql = "SELECT average_rating FROM quizzes WHERE quiz_id = ?";
+
+        try (Connection connection = basicDataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, quizId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("average_rating");
+                } else {
+                    throw new RuntimeException("No quiz rating by this quizId");
                 }
             }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch quiz average rating", e);
         }
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/schema.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-
-            dao=new QuizRatingsDao(basicDataSource);
-            finishSetup();
-        }
-    }
-
-    private void finishSetup() throws SQLException, NoSuchAlgorithmException {
-        usersDao=new UsersDao(basicDataSource);
-        User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(sandro);
-        User tornike=new User(2, "Tornike", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(tornike);
-        User liza=new User(3, "Liza", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(liza);
-        User nini=new User(4, "Nini", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(nini);
-
-
-        categoriesDao=new CategoriesDao(basicDataSource);
-        Category h=new Category(1, "history");
-        categoriesDao.insertCategory(h);
-        Category g=new Category(2, "geography");
-        categoriesDao.insertCategory(g);
-        Category m=new Category(3, "Maths");
-        categoriesDao.insertCategory(m);
-
-        quizzesDao=new QuizzesDao(basicDataSource);
-        Quiz q1 = new Quiz(12, "historyQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-
-        Quiz q2 = new Quiz(12, "geoQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q3 = new Quiz(12, "mathsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q4 = new Quiz(12, "physicsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        quizzesDao.insertQuiz(q1);
-        quizzesDao.insertQuiz(q2);
-        quizzesDao.insertQuiz(q3);
-        quizzesDao.insertQuiz(q4);
-
-        qr1=new QuizRating(1, 1, 2, "mid af");
-        qr2=new QuizRating(1, 2, 3, "pretty good ngl");
-        qr3=new QuizRating(2, 3, 5, "awesome");
-        qr4=new QuizRating(3, 1, 3, "it's alright like...");
-        qr5=new QuizRating(1, 1, 3, "actually, ok");
-    }
-
-    private QuizRating qr1;
-    private QuizRating qr2;
-    private QuizRating qr3;
-    private QuizRating qr4;
-    private QuizRating qr5;
-
-    @Test
-    public void testInsert() {
-        dao.insertQuizRating(qr1);
-        assertTrue(dao.contains(qr1));
-        dao.insertQuizRating(qr2);
-        dao.insertQuizRating(qr3);
-        dao.insertQuizRating(qr4);
-        assertEquals(4, dao.getCount());
-        dao.insertQuizRating(qr5);
-        assertTrue(dao.contains(qr5));
-        assertFalse(dao.contains(qr1));
-        assertEquals(4, dao.getCount());
-    }
-
-    @Test
-    public void testRemove() {
-        dao.insertQuizRating(qr1);
-        dao.insertQuizRating(qr2);
-        dao.insertQuizRating(qr3);
-        dao.insertQuizRating(qr4);
-        dao.insertQuizRating(qr5);
-        dao.removeQuizRating(1,1);
-        assertFalse(dao.contains(qr5));
-        assertEquals(3, dao.getCount());
-    }
-
-    @Test
-    public void testGetQuizRatingsByUserId() {
-        dao.insertQuizRating(qr1);
-        dao.insertQuizRating(qr2);
-        dao.insertQuizRating(qr3);
-        dao.insertQuizRating(qr4);
-        dao.insertQuizRating(qr5);
-        ArrayList<QuizRating> arr=dao.getQuizRatingsByUserId(1);
-        assertEquals(2, arr.size());
-        assertTrue(arr.contains(qr5));
-        assertTrue(arr.contains(qr4));
-    }
-
-    @Test
-    public void testGetQuizRatingsByQuizId() {
-        dao.insertQuizRating(qr1);
-        dao.insertQuizRating(qr2);
-        dao.insertQuizRating(qr3);
-        dao.insertQuizRating(qr4);
-        dao.insertQuizRating(qr5);
-        ArrayList<QuizRating> arr=dao.getQuizRatingsByQuizId(1);
-        assertEquals(2, arr.size());
-        assertTrue(arr.contains(qr5));
-        assertTrue(arr.contains(qr2));
     }
 }

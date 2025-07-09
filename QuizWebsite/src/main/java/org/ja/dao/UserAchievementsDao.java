@@ -4,67 +4,35 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.UserAchievement;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
+
+/**
+ * DAO class for accessing and managing user achievements stored in the 'user_achievement' table.
+ */
 public class UserAchievementsDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+
+
+    /**
+     * Constructs a new UserAchievementsDao with the specified data source.
+     *
+     * @param dataSource the connection pool for obtaining database connections
+     */
     public UserAchievementsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    ///  if UserAchievement with same user and achievement ids exists, returns RuntimeException
-    public void insertAchievement(UserAchievement ua) {
-        String sql = "INSERT INTO user_achievement (user_id, achievement_id) VALUES (?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setLong(1, ua.getUserId());
-            ps.setLong(2, ua.getAchievementId());
-
-            ps.executeUpdate();
-
-            cnt++;
-
-            String s = "SELECT achievement_date FROM user_achievement WHERE " +
-                    "user_id = ? AND achievement_id = ?";
-
-            try (PreparedStatement preparedStatement = conn.prepareStatement(s)){
-                preparedStatement.setLong(1, ua.getUserId());
-                preparedStatement.setLong(2, ua.getAchievementId());
-
-                try (ResultSet r = preparedStatement.executeQuery()) {
-                    if (r.next()) {
-                        ua.setAchievementDate(r.getTimestamp("achievement_date"));
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to insert user achievement", e);
-        }
-    }
-
-    // Removes the specified achievement from a user
-    public void removeAchievement(UserAchievement ua) {
-        String sql = "DELETE FROM user_achievement WHERE user_id = ? AND achievement_id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setLong(1, ua.getUserId());
-            ps.setLong(2, ua.getAchievementId());
-
-            if(ps.executeUpdate() > 0)
-                cnt--;
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to remove user achievement", e);
-        }
-    }
-
-    // TODO change to ArrayList<Long>
-    // Returns all user_achievement rows for a user
-    public ArrayList<UserAchievement> getUserAchievements(long userId) {
-        ArrayList<UserAchievement> achievements = new ArrayList<>();
+    /**
+     * Retrieves all achievements earned by a specific user.
+     *
+     * @param userId the ID of the user whose achievements are being retrieved
+     * @return a list of {@link UserAchievement} objects associated with the user
+     * @throws RuntimeException if a SQL error occurs
+     */
+    public List<UserAchievement> getUserAchievements(long userId) {
+        List<UserAchievement> achievements = new ArrayList<>();
 
         String sql = "SELECT * FROM user_achievement WHERE user_id = ?";
 
@@ -83,34 +51,16 @@ public class UserAchievementsDao {
         return achievements;
     }
 
-    public boolean contains(UserAchievement ua) {
-        if(ua==null){
-            return false;
-        }
-        String sql = "SELECT COUNT(*) FROM user_achievement WHERE user_id = ? AND achievement_id=?" +
-                "AND achievement_date=?";
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+    // --- Helper Methods ---
 
-            ps.setLong(1, ua.getUserId());
-            ps.setLong(2, ua.getAchievementId());
-            ps.setTimestamp(3, ua.getAchievementDate());
-            try(ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-
-    public long getCount(){
-        return  cnt;
-    }
-
+    /**
+     * Maps a {@link ResultSet} row to a {@link UserAchievement} object.
+     *
+     * @param rs the result set containing the current row
+     * @return the mapped {@link UserAchievement} object
+     * @throws SQLException if an error occurs while accessing the result set
+     */
     private UserAchievement retrieveUserAchievement(ResultSet rs) throws SQLException {
         return new UserAchievement(rs.getLong("user_id"), rs.getLong("achievement_id"),
                 rs.getTimestamp("achievement_date"));

@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.center-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.challenge-item {
+    grid-area: center;
+    background: #fff3e0;
+    width: 500px;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 4px solid #ff9800;
+}
+
+.challenge-actions {
+    margin-top: 5px;
+}
+
+.accept-button, .delete-button {
+    display: inline-block;
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.accept-button {
+    background: #d4edda;
+    color: #155724;
+    border: none;
+    outline: none;
+}
+
+.accept-button:hover {
+    background: #c3e6cb;
+}
+
+.delete-button {
+    background: #f8d7da;
+    color: #721c24;
+    border: none;
+    outline: none;
+}
+
+.delete-button:hover {
+    background: #f5c6cb;
+}
+
+h2, h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #eee;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #d0e2ff;
+    color: #003366;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+button:hover {
+    background-color: #a7c8f2;
+}
