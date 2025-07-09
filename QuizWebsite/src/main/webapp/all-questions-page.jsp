@@ -1,3 +1,4 @@
+<%@ page import="java.lang.*" %>
 <%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="java.util.ArrayList" %>
