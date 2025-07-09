@@ -52,7 +52,7 @@
     List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId);
     List<History> topPerformers = historiesDao.getTopNDistinctHistoriesByQuizId(quizId, 3);
     List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId);
-    List<History> recentPerformers = historiesDao.getHistoriesByQuizIdSortedByDate(quizId);
+    List<History> recentPerformers = historiesDao.getHistoriesByQuizId(quizId);
 
     long totalAttempts = historiesDao.getTotalAttempts(quizId);
     double averageScore = historiesDao.getAverageScore(quizId);

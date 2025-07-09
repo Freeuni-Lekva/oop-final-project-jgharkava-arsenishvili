@@ -2,6 +2,7 @@ package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.model.OtherObjects.Answer;
+import org.ja.model.quiz.question.Question;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,8 +15,7 @@ import java.util.List;
 /**
  * Data Access Object for managing answers in the quiz system.
  */
-public class AnswersDao {
-    private final BasicDataSource dataSource;
+public class AnswersDao extends BaseDao{
 
     /**
      * Constructs a new AnswersDao with the given data source.
@@ -23,7 +23,7 @@ public class AnswersDao {
      * @param dataSource the data source for database connections
      */
     public AnswersDao(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
 
@@ -57,6 +57,11 @@ public class AnswersDao {
                 }
             }
 
+            long questionId = answer.getQuestionId();
+
+            updateQuestionNumAnswers(questionId);
+            updateQuizScore(getQuizId(questionId));
+
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting answer into database", e);
@@ -72,6 +77,15 @@ public class AnswersDao {
      * @throws RuntimeException if a database error occurs
      */
     public boolean removeAnswer(long answerId) {
+
+        // If it does not exist, return false
+        Answer answer = getAnswerById(answerId);
+        if (answer == null) return false;
+
+        Question question = getQuestionById(answer.getQuestionId());
+        if (question == null) return false;
+
+
         String sql = "DELETE FROM answers WHERE answer_id = ?";
 
         try (Connection c = dataSource.getConnection();
@@ -79,7 +93,14 @@ public class AnswersDao {
 
             ps.setLong(1, answerId);
 
-            return ps.executeUpdate() > 0;
+            if (ps.executeUpdate() == 0){
+                return false;
+            }
+
+            updateQuestionNumAnswers(question.getQuestionId());
+            updateQuizScore(question.getQuizId());
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing answer from database", e);
         }
@@ -169,7 +190,6 @@ public class AnswersDao {
         String selectAnswers = "SELECT answer_text FROM answers WHERE answer_id = ?";
         String updateAnswerText = "UPDATE answers SET answer_text = ? WHERE answer_id = ?";
 
-
         try (Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectAnswers)){
 
@@ -211,6 +231,7 @@ public class AnswersDao {
             throw new RuntimeException("Error updating answer option text by id", e);
         }
     }
+
 
     /**
      * Removes a specific answer option from an answer.
@@ -266,14 +287,20 @@ public class AnswersDao {
 
     }
 
+
     /**
-     * Sets exactly one answer as correct for a question by resetting all others.
+     * Sets exactly one correct answer for a multiple-choice question by:
+     * <ul>
+     *     <li>Marking all answers for the given question ID as incorrect</li>
+     *     <li>Marking the specified answer (by its ID) as correct</li>
+     * </ul>
      *
-     * @param questionChoiceId the question ID to update
-     * @param choiceId   the answer ID to mark as correct
+     * @param questionChoiceId the ID of the question of whose answers should be updated
+     * @param choiceId the ID of the answer choice to be marked as correct
+     * @return true if the operation was successful (i.e., at least one answer was marked false and exactly one was marked true); false otherwise
      * @throws RuntimeException if a database error occurs
      */
-    public void setOneCorrectChoice(long questionChoiceId, long choiceId){
+    public boolean setOneCorrectChoice(long questionChoiceId, long choiceId){
         String falseChoices = "UPDATE answers SET answer_validity = false WHERE question_id = ?";
         String setRightChoice = "UPDATE answers SET answer_validity = true WHERE answer_id = ?";
 
@@ -282,12 +309,13 @@ public class AnswersDao {
             PreparedStatement rightStmt = connection.prepareStatement(setRightChoice)){
 
             falseStmt.setLong(1, questionChoiceId);
-
-            falseStmt.executeUpdate();
+            int falseUpdated = falseStmt.executeUpdate();
 
             rightStmt.setLong(1, choiceId);
+            int trueUpdated = rightStmt.executeUpdate();
 
-            rightStmt.executeUpdate();
+            // true if at least one was set false and exactly one was set true
+            return falseUpdated > 0 && trueUpdated == 1;
         } catch (SQLException e){
             throw new RuntimeException("Error updating answer validity", e);
         }
@@ -302,6 +330,15 @@ public class AnswersDao {
      * @throws RuntimeException if a database error occurs
      */
     public boolean setChoiceValidity(long choiceId, boolean isCorrect){
+
+        // If it does not exist, return false
+        Answer answer = getAnswerById(choiceId);
+        if (answer == null) return false;
+
+        Question question = getQuestionById(answer.getQuestionId());
+        if (question == null) return false;
+
+
         String updateValidity = "UPDATE answers SET answer_validity = ? WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -310,7 +347,16 @@ public class AnswersDao {
             updateStmt.setBoolean(1, isCorrect);
             updateStmt.setLong(2, choiceId);
 
-            return updateStmt.executeUpdate() > 0;
+            if (updateStmt.executeUpdate() > 0){
+                long questionId = getQuestionId(choiceId);
+
+                updateQuestionNumAnswers(questionId);
+                updateQuizScore(getQuizId(questionId));
+
+                return true;
+            }
+
+            return false;
         } catch(SQLException e) {
             throw new RuntimeException("Error setting choice's validity", e);
         }
@@ -339,6 +385,37 @@ public class AnswersDao {
         }
     }
 
+
+    // --- Helper Methods ---
+
+
+    /**
+     * Retrieves an answer by its ID.
+     *
+     * @param answerId the ID of the question
+     * @return the corresponding Answer object, or null if not found
+     */
+    private Answer getAnswerById(long answerId){
+        String sql = "SELECT * FROM answers WHERE answer_id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setLong(1, answerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return retrieveAnswer(rs);
+                } else {
+                    return null;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching answer by ID: " + answerId, e);
+        }
+    }
+
     /**
      * Converts the current row of the ResultSet to an Answer object.
      *
@@ -351,4 +428,6 @@ public class AnswersDao {
                 rs.getString("answer_text"), rs.getInt("answer_order"),
                 rs.getBoolean("answer_validity"));
     }
+
+
 }

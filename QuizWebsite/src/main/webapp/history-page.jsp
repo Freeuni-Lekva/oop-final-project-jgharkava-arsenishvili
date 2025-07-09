@@ -4,7 +4,8 @@
 <%@ page import="org.ja.model.OtherObjects.History" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.QuizzesDao" %>
-<%@ page import="org.ja.dao.UsersDao" %><%--
+<%@ page import="org.ja.dao.UsersDao" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/6/2025
@@ -17,7 +18,7 @@
     User user = ((UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO)).getUserById(userId);
     User sessionUser = (User) session.getAttribute(Constants.SessionAttributes.USER);
     HistoriesDao hd=(HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
-    ArrayList<History> arr=hd.getHistoriesByUserIdSortedByDate(user.getId());
+    List<History> arr=hd.getHistoriesByUserId(user.getId());
     QuizzesDao quizDao = (QuizzesDao)application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
 %>
 <html>

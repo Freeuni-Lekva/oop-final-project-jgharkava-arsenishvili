@@ -31,13 +31,12 @@ public class AdministratorsDao {
      * @return true if the user was updated; false if not found
      */
     public boolean promoteToAdministrator(long userId) {
-        String sql = "UPDATE users SET user_status = 'administrator' WHERE user_id = ?";
+        String sql = "UPDATE users SET user_status = 'administrator' WHERE user_id = ? AND user_status = 'user'";
 
         try (Connection c = ds.getConnection();
             PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setLong(1, userId);
-
 
             return st.executeUpdate() > 0;
         } catch (SQLException e) {

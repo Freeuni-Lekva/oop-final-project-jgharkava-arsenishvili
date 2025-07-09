@@ -267,7 +267,7 @@
 
     <% } else if (questionType.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
 
-        ArrayList<Match> matches = matchesDao.getQuestionMatches(questionId);
+        List<Match> matches = matchesDao.getQuestionMatches(questionId);
 
         ArrayList<String> leftMatches = new ArrayList<String>();
 

@@ -6,6 +6,7 @@
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     UsersDao usersDao = (UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO);
@@ -15,7 +16,7 @@
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
     AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);
-    ArrayList<UserAchievement> achievements = userAchievementsDao.getUserAchievements(visitedUser.getId());
+    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(visitedUser.getId());
 %>
 <!DOCTYPE html>
 <html>

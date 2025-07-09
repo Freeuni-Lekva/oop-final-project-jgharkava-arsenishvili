@@ -3,7 +3,8 @@
 <%@ page import="org.ja.dao.CategoriesDao" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.TagsDao" %>
-<%@ page import="org.ja.model.CategoriesAndTags.Tag" %><%--
+<%@ page import="org.ja.model.CategoriesAndTags.Tag" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: lizamarsagishvili
   Date: 18.06.25
@@ -14,10 +15,10 @@
 
 <%
     CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
-    ArrayList<Category> categories = categoriesDao.getAllCategories();
+    List<Category> categories = categoriesDao.getAllCategories();
 
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
-    ArrayList<Tag> tags = tagsDao.getAllTags();
+    List<Tag> tags = tagsDao.getAllTags();
 %>
 
 

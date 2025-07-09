@@ -42,9 +42,7 @@ public class AchievementsDao {
             ps.setString(3, achievement.getAchievementPhoto());
 
             int rowsAffected = ps.executeUpdate();
-            if (rowsAffected == 0) {
-                return false; // No row inserted
-            }
+            if (rowsAffected == 0) return false; // No row inserted}
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()){
@@ -52,6 +50,7 @@ public class AchievementsDao {
                 } else {
                     throw new RuntimeException("Insert succeeded but no ID was returned.");
                 }
+
             }
 
             return true;
@@ -86,6 +85,10 @@ public class AchievementsDao {
 
         return null;
     }
+
+
+    // --- Helper Methods ---
+
 
     /**
      * Helper method to create an Achievement object from the current row of a ResultSet.

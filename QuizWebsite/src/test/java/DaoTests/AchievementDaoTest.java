@@ -12,64 +12,52 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class AchievementDaoTest extends BaseDaoTest{
     private AchievementsDao dao;
-    private Achievement a1, a2, a3;
 
-    /**
-     * Sets up a fresh in-memory database and test DAO before each test.
-     */
+
     @BeforeEach
     public void setUp() throws Exception {
         setUpDataSource();
 
-        executeSqlFile("database/drop.sql");
-        executeSqlFile("database/schema.sql");
-
         dao = new AchievementsDao(basicDataSource);
-
-        // Initializing Achievements
-        a1 = new Achievement(0L, "master", "master", "master.jpg");
-        a2 = new Achievement(0L, "beginner", "beginner", "beginner.jpg");
-        a3 = new Achievement(0L, "grandMaster", "grandMaster", "grandMaster.jpg");
     }
 
-    /**
-     * Tests that achievements are inserted correctly and assigned IDs.
-     */
     @Test
-    public void testInsertAchievement(){
-        assertTrue(dao.insertAchievement(a1));
-        assertTrue(a1.getAchievementId() > 0);
-        assertTrue(dao.insertAchievement(a2));
-        assertTrue(dao.insertAchievement(a3));
+    public void testGetExistingAchievementById() {
+        Achievement a = dao.getAchievement(1L);
+        assertNotNull(a);
+        assertEquals("Brainstormer", a.getAchievementName());
+        assertEquals("Finish 5 quizzes with above 80%", a.getAchievementDescription());
+        assertNull(a.getAchievementPhoto());
     }
 
-
-    /**
-     * Tests that duplicate inserts (same name, description, photo) fail gracefully.
-     */
     @Test
-    public void testInsertDuplicate() {
-        assertTrue(dao.insertAchievement(a1));
-        Achievement duplicate = new Achievement(0, a1.getAchievementName(), a1.getAchievementDescription(), a1.getAchievementPhoto());
-
-        assertThrows(RuntimeException.class, () -> dao.insertAchievement(duplicate));
+    public void testGetNonExistentAchievement() {
+        assertNull(dao.getAchievement(1225)); // ID not present
     }
 
-
-    /**
-     * Tests retrieval of existing and non-existing achievements by ID.
-     */
     @Test
-    public void testGetAchievement() {
-        assertTrue(dao.insertAchievement(a2));
-        long id = a2.getAchievementId();
+    public void testInsertAchievement() {
+        Achievement newAchievement = new Achievement(0L, "Trivia Titan", "Answer 100 questions correctly", null);
 
-        Achievement retrieved = dao.getAchievement(id);
-        assertNotNull(retrieved);
-        assertEquals(a2.getAchievementName(), retrieved.getAchievementName());
-        assertEquals(a2.getAchievementDescription(), retrieved.getAchievementDescription());
-        assertEquals(a2.getAchievementPhoto(), retrieved.getAchievementPhoto());
+        boolean inserted = dao.insertAchievement(newAchievement);
+        assertTrue(inserted);
 
-        assertNull(dao.getAchievement(1225)); // Should not exist
+        long id = newAchievement.getAchievementId();
+        assertTrue(id > 0, "ID should be auto-generated");
+
+        Achievement fetched = dao.getAchievement(id);
+        assertNotNull(fetched);
+        assertEquals("Trivia Titan", fetched.getAchievementName());
+        assertEquals("Answer 100 questions correctly", fetched.getAchievementDescription());
+        assertNull(fetched.getAchievementPhoto());
     }
+
+    @Test
+    public void testInsertAchievementWithInvalidDataThrows() {
+        Achievement invalid = new Achievement(0L, null, "desc", null);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> dao.insertAchievement(invalid));
+        assertTrue(ex.getMessage().contains("Error inserting achievement"));
+    }
+
 }

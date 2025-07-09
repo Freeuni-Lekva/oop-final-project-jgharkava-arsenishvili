@@ -65,30 +65,6 @@ public class AnnouncementsDao {
 
 
     /**
-     * Retrieves the creation date of an announcement by its ID.
-     *
-     * @param c the active database connection
-     * @param announcementId the announcement ID
-     * @return the creation timestamp
-     * @throws SQLException if the announcement does not exist or a database error occurs
-     */
-    private Timestamp fetchCreationDate(Connection c, long announcementId) throws SQLException {
-        String sql = "SELECT creation_date FROM announcements WHERE announcement_id = ?";
-
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setLong(1, announcementId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getTimestamp("creation_date");
-                }
-                throw new SQLException("Creation date not found for announcement ID: " + announcementId);
-            }
-        }
-    }
-
-
-    /**
      * Retrieves all announcements ordered by creation date descending.
      *
      * @return a list of announcements, newest first
@@ -113,8 +89,35 @@ public class AnnouncementsDao {
         return announcements;
     }
 
+
+    // --- Helper Methods ---
+
+
     /**
-     * Maps a ResultSet row to an Announcement object.
+     * Retrieves the creation date of an announcement by its ID.
+     *
+     * @param c the active database connection
+     * @param announcementId the announcement ID
+     * @return the creation timestamp
+     * @throws SQLException if the announcement does not exist or a database error occurs
+     */
+    private Timestamp fetchCreationDate(Connection c, long announcementId) throws SQLException {
+        String sql = "SELECT creation_date FROM announcements WHERE announcement_id = ?";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setLong(1, announcementId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp("creation_date");
+                }
+                throw new SQLException("Creation date not found for announcement ID: " + announcementId);
+            }
+        }
+    }
+
+    /**
+     * Helper to map a ResultSet row to an Announcement object.
      *
      * @param rs the ResultSet positioned at the current row
      * @return the Announcement object
