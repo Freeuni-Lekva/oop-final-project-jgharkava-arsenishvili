@@ -1,27 +1,43 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.Filters.Filter;
 import org.ja.model.user.User;
-
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.ArrayList;
+/**
+ * Data Access Object for performing operations on the 'users' table.
+ */
 public class UsersDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+
+    /**
+     * Constructs a UsersDao with the provided DataSource.
+     *
+     * @param dataSource the data source used to obtain DB connections
+     */
     public UsersDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    /// if user with same username already exists throws RuntimeException
-    public void insertUser(User user) throws SQLException {
+
+    /**
+     * Inserts a new user into the database.
+     * If a user with the same username already exists, a RuntimeException is thrown.
+     * The generated user ID and registration date are set on the user object.
+     *
+     * @param user the user object to insert
+     * @return true if insertion was successful, false otherwise
+     * @throws SQLException if a database access error occurs
+     * @throws RuntimeException if user cannot be inserted or no ID is returned
+     */
+    public boolean insertUser(User user) throws SQLException {
         String sql = "INSERT INTO users (password_hashed, username, user_photo, user_status, salt) " +
                 "VALUES (?, ?, ?, ?, ?);";
+
         try (Connection c = dataSource.getConnection();
             PreparedStatement preparedStatement =
                     c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -32,47 +48,52 @@ public class UsersDao {
             preparedStatement.setString(4, user.getStatus());
             preparedStatement.setString(5, user.getSalt());
 
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0){
+                return false;
+            }
 
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
-                    cnt++;
-                    long userId = keys.getLong(1);
-                    user.setId(userId);
-
-                    String s = "SELECT registration_date FROM users where user_id = ?";
-
-                    try (PreparedStatement ps = c.prepareStatement(s)){
-                        ps.setLong(1, userId);
-
-                        try (ResultSet r = ps.executeQuery()) {
-                            if (r.next()) {
-                                user.setRegistrationDate(r.getTimestamp("registration_date"));
-                            }
-                        }
-                    }
+                    user.setId(keys.getLong(1));
+                    loadRegistrationDate(user, c);
+                } else {
+                    throw new RuntimeException("Inserted user into database but no ID generated");
                 }
             }
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting user into database", e);
         }
     }
 
-    public void removeUserById(long id) {
+
+    /**
+     * Removes a user from the database by their ID.
+     *
+     * @param id the user ID to delete
+     * @return true if a user was deleted, false otherwise
+     */
+    public boolean removeUserById(long id) {
         String sql = "DELETE FROM users WHERE user_id = ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement preparedStatement = c.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
 
-            if(preparedStatement.executeUpdate() > 0)
-                cnt--;
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing user by id from database", e);
         }
     }
 
-    public void removeUserByName(String name) {
+
+    /**
+     * Removes a user from the database by their username.
+     *
+     * @param name the username to delete
+     * @return true if a user was deleted, false otherwise
+     */
+    public boolean removeUserByName(String name) {
         String sql = "DELETE FROM users WHERE username = ?";
 
         try(Connection c=dataSource.getConnection();
@@ -80,13 +101,19 @@ public class UsersDao {
 
             preparedStatement.setString(1, name);
 
-            if(preparedStatement.executeUpdate() > 0)
-                cnt--;
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing user by name from database", e);
         }
     }
 
+
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user to retrieve
+     * @return a User object if found, or null otherwise
+     */
     public User getUserById(long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
 
@@ -95,9 +122,10 @@ public class UsersDao {
 
             st.setLong(1, id);
 
-            try (ResultSet rs = st.executeQuery()){
-                if (rs.next())
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
                     return retrieveUser(rs);
+                }
             }
 
         } catch (SQLException | NoSuchAlgorithmException e) {
@@ -105,8 +133,17 @@ public class UsersDao {
         }
         return null;
     }
+
+
+    /**
+     * Retrieves a user by their username.
+     *
+     * @param username the username to search for
+     * @return a User object if found, or null otherwise
+     */
     public User getUserByUsername(String username) {
         String sql="SELECT * FROM users WHERE username=?";
+
         try (Connection c=dataSource.getConnection()){
             PreparedStatement st=c.prepareStatement(sql);
             st.setString(1, username);
@@ -117,71 +154,44 @@ public class UsersDao {
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error querying user by username from database", e);
         }
         return null;
     }
 
-    private ArrayList<User> getUsersByFilter(Filter filter) {
-        String sql="SELECT * FROM users WHERE " + filter.toString();
 
-        ArrayList<User> users = new ArrayList<>();
+    // --- Helper Methods ---
 
-        try (Connection c=dataSource.getConnection();
-            PreparedStatement st=c.prepareStatement(sql)){
 
-            try (ResultSet rs = st.executeQuery()){
-                while (rs.next())
-                    users.add(retrieveUser(rs));
-            }
+    /**
+     * Loads the registration date for a given user ID and sets it on the User object.
+     *
+     * @param user the user object to update
+     * @param connection the active SQL connection
+     * @throws SQLException if a database error occurs
+     */
+    public void loadRegistrationDate(User user, Connection connection) throws SQLException {
+        String sql = "SELECT registration_date FROM users WHERE user_id = ?";
 
-        } catch (SQLException | NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error querying user by filter from database", e);
-        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, user.getId());
 
-        return users;
-    }
-    public boolean containsUser(String username) {
-        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) > 0;
+                    user.setRegistrationDate(rs.getTimestamp("registration_date"));
                 }
             }
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-    public boolean containsUser(long id) {
-        String sql = "SELECT COUNT(*) FROM users WHERE user_id = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
         }
     }
 
-    public long getCount(){
-        return cnt;
-    }
+
+    /**
+     * Helper method to convert a ResultSet row into a User object.
+     * @param rs the ResultSet positioned at the desired row
+     * @return the User object
+     * @throws SQLException if an error occurs while reading from ResultSet
+     */
     private User retrieveUser(ResultSet rs) throws SQLException, NoSuchAlgorithmException {
         return new User(rs.getLong("user_id"), rs.getString("username"),
                 rs.getString("password_hashed"), rs.getString("salt"),

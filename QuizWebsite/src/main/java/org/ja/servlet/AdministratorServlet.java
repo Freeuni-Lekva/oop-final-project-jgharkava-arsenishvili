@@ -1,9 +1,7 @@
 package org.ja.servlet;
 
-import org.ja.dao.AdministratorsDao;
-import org.ja.dao.AnnouncementsDao;
-import org.ja.dao.QuizzesDao;
-import org.ja.dao.UsersDao;
+import org.ja.dao.*;
+import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.OtherObjects.Announcement;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.user.User;
@@ -25,6 +23,7 @@ public class AdministratorServlet extends HttpServlet {
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
         UsersDao usersDao = (UsersDao) getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         AnnouncementsDao announcementsDao = (AnnouncementsDao) getServletContext().getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
+        CategoriesDao categoriesDao = (CategoriesDao) getServletContext().getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
         String action = request.getParameter("action");
         if("create".equals(action)) {
             String text = request.getParameter("announcementText");
@@ -59,7 +58,7 @@ public class AdministratorServlet extends HttpServlet {
             String name = request.getParameter("removeQuizName");
             Quiz quiz = quizzesDao.getQuizByName(name);
             if(quiz != null){
-                quizzesDao.removeQuizByName(name);
+                quizzesDao.removeQuizById(quiz.getId());
                 request.setAttribute("message", "Successfully removed quiz " + name);
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
             }else{
@@ -75,6 +74,17 @@ public class AdministratorServlet extends HttpServlet {
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
             }else {
                 request.setAttribute("message", "Quiz " + name + " has no history");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+            }
+        }else if("addCategory".equals(action)) {
+            String name = request.getParameter("addCategoryName");
+            Category category = categoriesDao.getCategoryByName(name);
+            if(category == null){
+                categoriesDao.insertCategory(new Category(name));
+                request.setAttribute("message", "Successfully added quiz category: " + name);
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+            }else{
+                request.setAttribute("message", "Category " + name + " already exists");
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
             }
         }

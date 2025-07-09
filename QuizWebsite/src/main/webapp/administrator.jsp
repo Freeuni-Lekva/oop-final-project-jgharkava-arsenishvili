@@ -81,6 +81,15 @@
             </form>
         </div>
 
+        <!-- add Category -->
+        <div class="admin-section">
+            <h2>Add Quiz Category</h2>
+            <form action="administrator" method="post" class="admin-form">
+                <label>Enter Category Name: <input type="text" name="addCategoryName" /></label>
+                <button type="submit" name="action" value="addCategory">Add</button>
+            </form>
+        </div>
+
         <!-- statistics-->
         <div class="admin-section">
             <h2>Statistics</h2>
@@ -91,6 +100,9 @@
             <div class="stat-item">Number of users in total: <span class="stat-number"><%=user_cnt%></span></div>
             <div class="stat-item">Number of quizzes taken in total: <span class="stat-number"><%=quiz_cnt%></span></div>
         </div>
+        <button onclick="window.history.back()" class="back-btn">
+            ← Go Back
+        </button>
     </div>
 </body>
 </html>

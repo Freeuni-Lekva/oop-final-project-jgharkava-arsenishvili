@@ -11,14 +11,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) class for managing quiz-related operations in the database.
+ */
 public class QuizzesDao {
     private final BasicDataSource dataSource;
-    private long cnt=  0;
+
+
+    /**
+     * Constructs a QuizzesDao using the provided data source.
+     *
+     * @param dataSource the data source to use for database connections
+     */
     public QuizzesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void insertQuiz(Quiz quiz) {
+
+    /**
+     * Inserts a new quiz into the database.
+     *
+     * @param quiz the quiz to insert
+     * @return true if the quiz was inserted successfully; false otherwise
+     */
+    public boolean insertQuiz(Quiz quiz) {
         String sql = "INSERT INTO quizzes ( quiz_name, quiz_description, quiz_score, average_rating, " +
                 "participant_count, time_limit_in_minutes, category_id," +
                 "creator_id, question_order_status, question_placement_status," +
@@ -38,35 +54,34 @@ public class QuizzesDao {
             ps.setString(10, quiz.getQuestionPlacement());
             ps.setString(11, quiz.getQuestionCorrection());
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() == 0){
+                return false;
+            }
 
             try (ResultSet rs = ps.getGeneratedKeys()){
-                if(rs.next()) {
-                    cnt++;
-
-                    long quizId = rs.getLong(1);
-                    quiz.setId(quizId);
-
-                    String s = "SELECT creation_date FROM quizzes where quiz_id = ?";
-
-                    try (PreparedStatement preparedStatement = c.prepareStatement(s)){
-                        preparedStatement.setLong(1, quizId);
-
-                        try (ResultSet r = preparedStatement.executeQuery()) {
-                            if (r.next()) {
-                                quiz.setCreationDate(r.getTimestamp("creation_date"));
-                            }
-                        }
-                    }
+                if (rs.next()) {
+                    quiz.setId(rs.getLong(1));
+                    setQuizCreationDate(quiz, c);
+                } else {
+                    throw new RuntimeException("Quiz insertion succeeded, but no generated quiz ID was returned.");
                 }
             }
 
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting quiz into database", e);
         }
     }
 
-    public void updateQuizTitle(long id, String title){
+
+    /**
+     * Updates the title of a quiz.
+     *
+     * @param id    the ID of the quiz to update
+     * @param title the new title to set
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizTitle(long id, String title){
         String sql = "UPDATE quizzes SET quiz_name = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -75,13 +90,21 @@ public class QuizzesDao {
             preparedStatement.setString(1, title);
             preparedStatement.setLong(2, id);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz title by id", e);
         }
     }
 
-    public void updateQuizDescription(long id, String description){
+
+    /**
+     * Updates the description of a quiz.
+     *
+     * @param id          the ID of the quiz to update
+     * @param description the new description to set
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizDescription(long id, String description){
         String sql = "UPDATE quizzes SET quiz_description = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -90,13 +113,21 @@ public class QuizzesDao {
             preparedStatement.setString(1, description);
             preparedStatement.setLong(2, id);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz description by id", e);
         }
     }
 
-    public void updateQuizTimeLimit(long id, int timeLimit){
+
+    /**
+     * Updates the time limit (in minutes) for a quiz.
+     *
+     * @param id        the ID of the quiz to update
+     * @param timeLimit the new time limit in minutes
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizTimeLimit(long id, int timeLimit){
         String sql = "UPDATE quizzes SET time_limit_in_minutes = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -105,13 +136,21 @@ public class QuizzesDao {
             preparedStatement.setInt(1, timeLimit);
             preparedStatement.setLong(2, id);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz time limit by id", e);
         }
     }
 
-    public void updateQuizCategory(long quizId, long categoryId){
+
+    /**
+     * Updates the category of a quiz.
+     *
+     * @param quizId     the ID of the quiz to update
+     * @param categoryId the new category ID to set
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizCategory(long quizId, long categoryId){
         String sql = "UPDATE quizzes SET category_id = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -120,13 +159,21 @@ public class QuizzesDao {
             preparedStatement.setLong(1, categoryId);
             preparedStatement.setLong(2, quizId);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz category by id", e);
         }
     }
 
-    public void updateQuizQuestionOrderStatus(long quizId, String questionOrderStatus){
+
+    /**
+     * Updates the question order status for a quiz.
+     *
+     * @param quizId              the ID of the quiz
+     * @param questionOrderStatus the new question order status
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizQuestionOrderStatus(long quizId, String questionOrderStatus){
         String sql = "UPDATE quizzes SET question_order_status = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -135,13 +182,21 @@ public class QuizzesDao {
             preparedStatement.setString(1, questionOrderStatus);
             preparedStatement.setLong(2, quizId);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz question order status by id", e);
         }
     }
 
-    public void updateQuizQuestionPlacementStatus(long quizId, String questionPlacementStatus){
+
+    /**
+     * Updates the question placement status for a quiz.
+     *
+     * @param quizId                 the ID of the quiz
+     * @param questionPlacementStatus the new placement status
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizQuestionPlacementStatus(long quizId, String questionPlacementStatus){
         String sql = "UPDATE quizzes SET question_placement_status = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -150,13 +205,21 @@ public class QuizzesDao {
             preparedStatement.setString(1, questionPlacementStatus);
             preparedStatement.setLong(2, quizId);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz question placement status by id", e);
         }
     }
 
-    public void updateQuizQuestionCorrectionStatus(long quizId, String questionCorrectionStatus){
+
+    /**
+     * Updates the question correction status for a quiz.
+     *
+     * @param quizId                  the ID of the quiz
+     * @param questionCorrectionStatus the new correction status
+     * @return true if the update was successful; false otherwise
+     */
+    public boolean updateQuizQuestionCorrectionStatus(long quizId, String questionCorrectionStatus){
         String sql = "UPDATE quizzes SET question_correction_status = ? WHERE quiz_id = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -165,133 +228,41 @@ public class QuizzesDao {
             preparedStatement.setString(1, questionCorrectionStatus);
             preparedStatement.setLong(2, quizId);
 
-            preparedStatement.executeUpdate();
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e){
             throw new RuntimeException("Error updating quiz question correction status by id", e);
         }
     }
 
-    public void removeQuizById(long id) {
+
+    /**
+     * Deletes a quiz by its ID.
+     *
+     * @param id the ID of the quiz to delete
+     * @return true if the quiz was successfully deleted; false otherwise
+     */
+    public boolean removeQuizById(long id) {
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement preparedStatement = c.prepareStatement(sql)){
+             PreparedStatement preparedStatement = c.prepareStatement(sql)){
 
             preparedStatement.setLong(1, id);
 
-            preparedStatement.executeUpdate();
-            cnt--;
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing quiz by id from database", e);
         }
     }
 
-    // TODO update function
-    public void removeQuizByName(String name) {
-        String sql = "DELETE FROM quizzes WHERE quiz_name = ?";
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, name);
 
-            if(ps.executeUpdate() > 0)
-                cnt--;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error removing quiz by name from database", e);
-        }
-    }
-
-    public void updateQuiz(Quiz quiz){
-        String sql = "UPDATE quizzes SET quiz_name = ?, quiz_description=?, " +
-                "average_rating=?, participant_count=?, creation_date=?, " +
-                "time_limit_in_minutes=?, category_id=?, creator_id=?," +
-                "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=?, quiz_score = ? WHERE quiz_id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, quiz.getName());
-            stmt.setString(2, quiz.getDescription());
-            stmt.setDouble(3, quiz.getAvgRating());
-            stmt.setLong(4, quiz.getParticipantCount());
-            stmt.setTimestamp(5, quiz.getCreationDate());
-            stmt.setInt(6, quiz.getTimeInMinutes());
-            stmt.setLong(7, quiz.getCategoryId());
-            stmt.setLong(8, quiz.getCreatorId());   // "one-page" or "multiple-page"
-            stmt.setString(9, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
-            stmt.setString(10, quiz.getQuestionPlacement());
-            stmt.setString(11, quiz.getQuestionCorrection());
-            stmt.setInt(12, quiz.getScore());
-            stmt.setLong(13, quiz.getId());
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating quiz in database", e);
-        }
-    }
-
-    // TO DELETE
-    public void updateQuizById(Quiz quiz, long id) {
-        String sql = "UPDATE quizzes SET quiz_name = ?, quiz_description=?, " +
-                "average_rating=?, participant_count=?," +
-                "time_limit_in_minutes=?, category_id=?, creator_id=?," +
-                "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=?, quiz_score = ? WHERE quiz_id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, quiz.getName());
-            stmt.setString(2, quiz.getDescription());
-            stmt.setDouble(3, quiz.getAvgRating());
-            stmt.setLong(4, quiz.getParticipantCount());
-            stmt.setInt(5, quiz.getTimeInMinutes());
-            stmt.setLong(6, quiz.getCategoryId());
-            stmt.setLong(7, quiz.getCreatorId());   // "one-page" or "multiple-page"
-            stmt.setString(8, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
-            stmt.setString(9, quiz.getQuestionPlacement());
-            stmt.setString(10, quiz.getQuestionCorrection());
-            stmt.setInt(11, quiz.getScore());
-            stmt.setLong(12, id);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating quiz by id into database", e);
-        }
-    }
-
-    // TO DELETE
-    public void updateQuizByName(Quiz quiz, String name) {
-        String sql = "UPDATE quizzes SET quiz_name = ?, quiz_description=?, " +
-                "average_rating=?, participant_count=?, creation_date=?, " +
-                "time_limit_in_minutes=?, category_id=?, creator_id=?," +
-                "question_order_status=?, question_placement_status=?, " +
-                "question_correction_status=?, quiz_score = ? WHERE quiz_name = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, quiz.getName());
-            stmt.setString(2, quiz.getDescription());
-            stmt.setDouble(3, quiz.getAvgRating());
-            stmt.setLong(4, quiz.getParticipantCount());
-            stmt.setTimestamp(5, quiz.getCreationDate());
-            stmt.setInt(6, quiz.getTimeInMinutes());
-            stmt.setLong(7, quiz.getCategoryId());
-            stmt.setLong(8, quiz.getCreatorId());   // "one-page" or "multiple-page"
-            stmt.setString(9, quiz.getQuestionOrder());  // "immediate-correction" or "final-correction"
-            stmt.setString(10, quiz.getQuestionPlacement());
-            stmt.setString(11, quiz.getQuestionCorrection());
-            stmt.setInt(12, quiz.getScore());
-            stmt.setString(13, name);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating quiz by name into database", e);
-        }
-    }
-
-    public ArrayList<Quiz> filterQuizzes(Filter filter) {
+    /**
+     * Retrieves quizzes from the database based on the given filter.
+     *
+     * @param filter the filter criteria for retrieving quizzes
+     * @return a list of quizzes matching the filter
+     */
+    public List<Quiz> filterQuizzes(Filter filter) {
         String sql = "SELECT DISTINCT quizzes.quiz_id, quiz_name, quiz_description, average_rating, " +
                 "participant_count, creation_date, time_limit_in_minutes, quizzes.category_id, " +
                 "creator_id, question_order_status, question_placement_status, question_correction_status, quiz_score " +
@@ -300,7 +271,7 @@ public class QuizzesDao {
                 "left join tags on tags.tag_id = quiz_tag.tag_id " +
                 "WHERE " + filter.buildWhereClause() + " ORDER BY " + filter.buildOrderByClause();
 
-        ArrayList<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
 
         try(Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
@@ -324,10 +295,14 @@ public class QuizzesDao {
     }
 
 
-    // TO DO: change name
-    public ArrayList<Quiz> getQuizzesSortedByCreationDate() {
+    /**
+     * Retrieves all quizzes from the database sorted by creation date (most recent first).
+     *
+     * @return a list of quizzes sorted by creation date
+     */
+    public List<Quiz> getQuizzesSortedByCreationDate() {
         String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
-        ArrayList<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -343,7 +318,14 @@ public class QuizzesDao {
         return quizzes;
     }
 
-    public ArrayList<Quiz> getFriendsQuizzesSortedByCreationDate(long userId) {
+
+    /**
+     * Retrieves quizzes created by a user's friends, sorted by creation date.
+     *
+     * @param userId the ID of the user whose friends' quizzes to retrieve
+     * @return a list of quizzes created by friends
+     */
+    public List<Quiz> getFriendsQuizzesSortedByCreationDate(long userId) {
         String sql = "SELECT q.*" +
                 "        FROM quizzes q" +
                 "        JOIN (" +
@@ -357,13 +339,13 @@ public class QuizzesDao {
                 "              AND friendship_status = 'friends'" +
                 "        ) f ON q.creator_id = f.friend_id" +
                 "        ORDER BY q.creation_date DESC";
-        ArrayList<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
-             stmt.setLong(1, userId);
-             stmt.setLong(2, userId);
-             stmt.setLong(3, userId);
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
+            stmt.setLong(3, userId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
@@ -378,16 +360,21 @@ public class QuizzesDao {
         return quizzes;
     }
 
-    //  TO DELETE: probably not useful due to filter.
-    public ArrayList<Quiz> getQuizzesSortedByParticipantCount() {
+
+    /**
+     * Retrieves quizzes from the database sorted by participant count in descending order.
+     *
+     * @return a list of popular quizzes
+     */
+    public List<Quiz> getQuizzesSortedByParticipantCount() {
         String sql = "SELECT * FROM quizzes ORDER BY participant_count DESC";
-        ArrayList<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-             while (rs.next())
+            while (rs.next())
                 quizzes.add(retrieveQuiz(rs));
 
         } catch (SQLException e) {
@@ -396,60 +383,24 @@ public class QuizzesDao {
 
         return quizzes;
     }
-    
-    public boolean containsQuiz(String name) {
-        String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_name = ?";
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setString(1, name);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-
-                return false;
-            } catch (SQLException e) {
-                throw new RuntimeException("Error checking user existence", e);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public boolean containsQuiz(long id) {
-        String sql = "SELECT COUNT(*) FROM quizzes WHERE quiz_id = ?";
-
+    /**
+     * Retrieves a quiz by its ID.
+     *
+     * @param id the ID of the quiz
+     * @return the Quiz object if found; null otherwise
+     */
+    public Quiz getQuizById(long id) {
+        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setLong(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
-        }
-    }
-
-    public long getCount(){
-        return cnt;
-    }
-
-    public Quiz getQuizById(long id) {
-        String sql = "SELECT * FROM quizzes WHERE quiz_id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, id); // Properly set the parameter
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return retrieveQuiz(rs); // Move to the first row and extract data
+                    return retrieveQuiz(rs);
                 } else {
-                    return null; // or throw an exception if appropriate
+                    return null;
                 }
             }
         } catch (SQLException e) {
@@ -457,17 +408,24 @@ public class QuizzesDao {
         }
     }
 
+
+    /**
+     * Retrieves a quiz by its name.
+     *
+     * @param name the name of the quiz
+     * @return the Quiz object if found; null otherwise
+     */
     public Quiz getQuizByName(String name) {
         String sql = "SELECT * FROM quizzes WHERE quiz_name = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setString(1, name); // Properly set the parameter
+            ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return retrieveQuiz(rs); // Move to the first row and extract data
+                    return retrieveQuiz(rs);
                 } else {
-                    return null; // or throw an exception if appropriate
+                    return null;
                 }
             }
 
@@ -476,12 +434,20 @@ public class QuizzesDao {
         }
     }
 
-    public ArrayList<Quiz> getQuizzesByCreatorId(long id) {
+
+    /**
+     * Retrieves all quizzes created by a specific user.
+     *
+     * @param id the creator's user ID
+     * @return a list of quizzes created by the user
+     */
+    public List<Quiz> getQuizzesByCreatorId(long id) {
         String sql = "SELECT * FROM quizzes WHERE creator_id = ?";
-        ArrayList<Quiz> quizzes = new ArrayList<>();
+        List<Quiz> quizzes = new ArrayList<>();
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
-             stmt.setLong(1, id);
+            stmt.setLong(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -494,6 +460,43 @@ public class QuizzesDao {
         return quizzes;
     }
 
+
+
+    // --- Helper Methods ---
+
+
+    /**
+     * Loads the creation date from the database for the given quiz ID
+     * and sets it on the provided Quiz object.
+     *
+     * @param quiz   the Quiz object to update
+     * @param connection the database connection to use
+     * @throws SQLException if a database error occurs
+     */
+    private void setQuizCreationDate(Quiz quiz, Connection connection) throws SQLException {
+        String sql = "SELECT creation_date FROM quizzes WHERE quiz_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, quiz.getId());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    quiz.setCreationDate(rs.getTimestamp("creation_date"));
+                } else {
+                    throw new RuntimeException("Quiz not found in database after insertion: ID = " + quiz.getId());
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Helper method that builds a Quiz object from a ResultSet row.
+     *
+     * @param rs the ResultSet containing quiz data
+     * @return the constructed Quiz object
+     * @throws SQLException if a database access error occurs
+     */
     private Quiz retrieveQuiz(ResultSet rs) throws SQLException {
         return new Quiz(rs.getLong("quiz_id"), rs.getString("quiz_name"),
                 rs.getString("quiz_description"), rs.getInt("quiz_score"),

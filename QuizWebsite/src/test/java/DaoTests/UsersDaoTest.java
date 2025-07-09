@@ -1,115 +1,86 @@
 package DaoTests;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.UsersDao;
 import org.ja.model.user.User;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UsersDaoTest{
+
+/**
+ * Unit tests for the UsersDao class using an in-memory H2 database.
+ */
+public class UsersDaoTest extends BaseDaoTest{
+
     private UsersDao dao;
-    private BasicDataSource basicDataSource;
+
     @BeforeEach
     public void setUp() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        setUpDataSource();
 
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/drop.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-        }
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/schema.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-            dao=new UsersDao(basicDataSource);
-        }
+        dao = new UsersDao(basicDataSource);
     }
+
     @Test
-    public void testInsert() throws SQLException, NoSuchAlgorithmException {
-        assertEquals(0,dao.getCount());
-        User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        dao.insertUser(sandro);
-        assertEquals(1,dao.getCount());
-        assertEquals(1,sandro.getId());
-        User tornike=new User(12, "Tornike", "123", "2025-6-14", null,"sth.jpg", "administrator");
-        dao.insertUser(tornike);
-        assertEquals(2,dao.getCount());
-        assertEquals(2,tornike.getId());
+    public void testInsertUserAndGetUserById() throws SQLException, NoSuchAlgorithmException {
+        User user = new User(-1L, "Dummy", "dddd", "1234", Timestamp.valueOf(LocalDateTime.now()), "image", Constants.UserTypes.USER);
 
+        boolean inserted = dao.insertUser(user);
+        assertTrue(inserted);
+        assertTrue(user.getId() > 0);
+        assertNotNull(user.getRegistrationDate());
+
+        User retrieved = dao.getUserById(user.getId());
+        assertNotNull(retrieved);
+        assertEquals(user.getUsername(), retrieved.getUsername());
+        assertEquals(user.getStatus(), retrieved.getStatus());
     }
+
     @Test
-    public void testGetUser() throws SQLException, NoSuchAlgorithmException {
-        User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        dao.insertUser(sandro);
-        User tornike=new User(12, "Tornike", "123", "2025-6-14", null,"sth.jpg", "administrator");
-        dao.insertUser(tornike);
-        assertEquals("Sandro", dao.getUserById(1).getUsername());
-        assertEquals("Tornike", dao.getUserById(2).getUsername());
-        assertTrue(dao.containsUser("Sandro"));
-        assertFalse(dao.containsUser("Nini"));
-        assertTrue(dao.containsUser("Tornike"));
+    public void testGetUserByUsername() throws SQLException, NoSuchAlgorithmException {
+        User user = new User(-1L, "Dummy", "dddd", "1234", Timestamp.valueOf(LocalDateTime.now()), "image", Constants.UserTypes.USER);
+
+        boolean inserted = dao.insertUser(user);
+        assertTrue(inserted);
+        assertTrue(user.getId() > 0);
+        assertNotNull(user.getRegistrationDate());
+
+        User retrieved = dao.getUserByUsername(user.getUsername());
+        assertNotNull(retrieved);
+        assertEquals(user.getUsername(), retrieved.getUsername());
+        assertEquals(user.getStatus(), retrieved.getStatus());
     }
+
     @Test
-    public void testRemoveUser() throws SQLException, NoSuchAlgorithmException {
-        User sandro=new User(12, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        dao.insertUser(sandro);
-        User tornike=new User(12, "Tornike", "123", "2025-6-14", null,"sth.jpg", "administrator");
-        dao.insertUser(tornike);
-        dao.removeUserById(1);
-        dao.removeUserById(4);
-        dao.removeUserByName("Liza");
-        assertEquals("Tornike",dao.getUserById(2).getUsername());
-        assertEquals(1,dao.getCount());
-        dao.removeUserById(4);
-        assertEquals(1,dao.getCount());
-        assertEquals(2, dao.getUserByUsername("Tornike").getId());
+    public void testRemoveUserById() throws SQLException, NoSuchAlgorithmException {
+        User user = new User(-1L, "Dummy", "dddd", "1234", Timestamp.valueOf(LocalDateTime.now()), "image", Constants.UserTypes.USER);
+
+        dao.insertUser(user);
+        long id = user.getId();
+
+        boolean removed = dao.removeUserById(id);
+        assertTrue(removed);
+
+        User shouldBeNull = dao.getUserById(id);
+        assertNull(shouldBeNull);
     }
 
+    @Test
+    public void testRemoveUserByName() throws SQLException, NoSuchAlgorithmException {
+        User user = new User(-1L, "Dummy", "dddd", "1234", Timestamp.valueOf(LocalDateTime.now()), "image", Constants.UserTypes.USER);
 
+        dao.insertUser(user);
+        String name = user.getUsername();
+
+        boolean removed = dao.removeUserByName(name);
+        assertTrue(removed);
+        assertFalse(dao.removeUserByName(name));
+    }
 
 }

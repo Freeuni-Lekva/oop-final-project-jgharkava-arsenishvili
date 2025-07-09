@@ -93,6 +93,11 @@ public class Constants {
         public static final long SPEED_DEMON = 5;
     }
 
+    public static class UserTypes {
+        public static final String USER = "user";
+        public static final String ADMINISTRATOR = "administrator";
+    }
+
     public enum QuizMode {
         TAKING,
         PRACTICE
