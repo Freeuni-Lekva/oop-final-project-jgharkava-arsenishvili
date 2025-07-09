@@ -108,6 +108,31 @@ public class TagsDao {
 
 
     /**
+     * Retrieves a tag by its name.
+     * @param name the name of the tag
+     * @return the tag if found, otherwise null
+     */
+    public Tag getTagByName (String name) {
+        String sql = "SELECT * FROM tags WHERE tag_name = ?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setString(1, name);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next())
+                    return retrieveTag(rs);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error querying tag from by id database", e);
+        }
+        return null;
+    }
+
+
+    /**
      * Retrieves all tags in the database.
      * @return a list of all tags
      */
