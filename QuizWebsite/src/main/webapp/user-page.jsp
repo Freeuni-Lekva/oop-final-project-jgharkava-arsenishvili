@@ -26,7 +26,7 @@
     User foundUser = usersDao.getUserByUsername(query.trim());
 
     if (foundUser != null && foundUser.getId() != user.getId()) {
-      response.sendRedirect("visit-user.jsp?query=" + foundUser.getUsername());
+      response.sendRedirect("visit-user.jsp?" + Constants.RequestParameters.USER_ID + "=" + foundUser.getId());
       return;
     } else {
       errorMessage = "User \"" + query + "\" not found.";
@@ -56,7 +56,7 @@
 
     <!-- Popular Quizzes -->
     <div class="quiz-section popular">
-      <h4>Most Popular</h4>
+      <h3>Most Popular</h3>
       <%
         List<Quiz> quizzes = quizDao.getQuizzesSortedByParticipantCount();
         int cnt1 = 0;
@@ -75,7 +75,7 @@
 
     <!-- Recently Created -->
     <div class="quiz-section recent">
-      <h4>Recently Created</h4>
+      <h3>Recently Created</h3>
       <%
         List<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
         int cnt2 = 0;
@@ -96,13 +96,13 @@
 
   <!-- Lookup Section -->
   <div class="card lookup">
-    <h3>Lookup People</h3>
+    <h3>Find People</h3>
     <form action="user-page.jsp" method="get">
       <input type="text" name="query" placeholder="Search for users..." value="<%= query != null ? query : "" %>">
       <button type="submit">Search</button>
     </form>
     <% if (errorMessage != null) { %>
-    <p style="color: red; margin-top: 10px;"><%= errorMessage %></p>
+    <p id="error-message" style="color: red; margin-top: 10px;"><%= errorMessage %></p>
     <% } %>
   </div>
 
@@ -112,7 +112,7 @@
 
     <!-- Last Taken -->
     <div class="history-section">
-      <h4>Last Taken</h4>
+      <h3>Last Taken</h3>
       <%
         List<History> recentHistory = historiesDao.getHistoriesByUserId(user.getId());
         if(!recentHistory.isEmpty()){
@@ -136,7 +136,7 @@
 
     <!-- Last Created -->
     <div class="history-section">
-      <h4>Last Created</h4>
+      <h3>Last Created</h3>
       <%
         List<Quiz> creationHistory = quizDao.getQuizzesByCreatorId(user.getId());
         int cnt4 = 0;
@@ -164,7 +164,7 @@
 
     <!-- Last Taken by Friends -->
     <div class="history-section">
-      <h4>Last Taken</h4>
+      <h3>Last Taken</h3>
       <%
         List<History> friendsQuizzes = historiesDao.getUserFriendsHistory(user.getId());
         if(friendsQuizzes != null && !friendsQuizzes.isEmpty()) {
@@ -188,7 +188,7 @@
 
     <!-- Last Created by Friends -->
     <div class="history-section">
-      <h4>Last Created</h4>
+      <h3>Last Created</h3>
       <%
         List<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
         if(quizzesByFriends != null && !quizzesByFriends.isEmpty()) {
@@ -211,8 +211,8 @@
   </div>
 
   <div class="full-history">
-    <h4>Full history</h4>
-    <a href="history.jsp">view your full history</a>
+    <h4>Full Quiz history</h4>
+    <a href="history-page.jsp?<%=Constants.RequestParameters.USER_ID%>=<%= user.getId() %>">view your full quiz history</a>
   </div>
 
   <!-- Achievements Section -->
@@ -226,6 +226,7 @@
     <div class="achievement-badge">
       <strong><%=latest.getAchievementName()%></strong>
     </div>
+    <a href="all-achievements.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=user.getId()%>" class="view-all-link">View all your achievements →</a>
     <%}else{%>
       <p class="text-small">No achievements yet</p>
     <%}%>
@@ -252,33 +253,43 @@
       List<Message> messages = messageDao.getMessagesForUser(user.getId());
       if(messages != null && !messages.isEmpty()){
     %>
-    <p class="mb-10">You have <%=messages.size()%> new message(s).</p>
-    <%
-      int cnt5 = 0;
-      for(Message m: messages){
-        if(cnt5 == 3) break;
-    %>
-    <div class="message-item">
-      From: <%=usersDao.getUserById(m.getSenderUserId()).getUsername()%>
-    </div>
-    <%
-        cnt5++;
-      }
-    %>
-    <a href="messages.jsp">See all messages</a> <br></br>
-    <div class="mb-15">
-      <label>Send a message:</label>
-      <input type="text" id="recipient" placeholder="Recipient username" required>
-      <textarea id="message" rows="2" placeholder="Write your message" required></textarea>
-      <button onclick="sendMessage()">Send</button>
-      <p id="message-status"></p>
-    </div>
+    <p class="mb-10" id="message-count-wrapper">
+      You have <span id="message-count"><%= messages.size() %></span> new message(s).
+    </p>
+    <div class="scrollable-pane">
+      <%
+        for(Message m: messages){
+          String sender = usersDao.getUserById(m.getSenderUserId()).getUsername();
+          String content = m.getMessageText().replace("\"", "&quot;").replace("\n", "\\n");
+      %>
+      <div class="message-item">
+        <p>From: <strong><%= sender %></strong></p>
+        <button class="view-message-button" data-message="<%= content %>">View</button>
+      </div>
 
     <%
-    } else {
+      }%>
+    </div>
+    <%} else {
     %>
     <p class="text-small">No new messages.</p>
+
     <% } %>
+    <div class="message-item message-form">
+      <label for="recipient">Send a message:</label>
+      <input type="text" id="recipient" class="message-input" placeholder="Recipient username" required>
+      <textarea id="message" class="message-textarea" rows="2" placeholder="Write your message" required></textarea>
+      <button class="send-button" onclick="sendMessage()">Send</button>
+      <p id="message-status" class="message-status"></p>
+    </div>
+  </div>
+
+  <!-- Message Modal -->
+  <div id="messageModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <p id="modal-message-text"></p>
+    </div>
   </div>
 
   <!-- Challenges Section -->
@@ -287,28 +298,32 @@
     <%
       List<Challenge> challenges = challengeDao.challengesAsReceiver(user.getId());
       if(challenges != null && !challenges.isEmpty()){
+        int num = challenges.size();
     %>
-    <p class="mb-10">You have <%=challenges.size()%> new challenge(s).</p>
-    <%
-      int cnt6 = 0;
-      for(Challenge c: challenges){
-        if(cnt6 == 3) break;
-    %>
-    <div class="challenge-item">
-      <strong><%=quizDao.getQuizById(c.getQuizId()).getName()%></strong>
-      <p class="text-small">From: <%=usersDao.getUserById(c.getSenderUserId()).getUsername()%></p>
-    </div>
-    <%
-        cnt6++;
-      }
-    %>
-    <a href="challenges.jsp">See all challenges</a>
-    <%
-    } else {
+    <p class="mb-10" id="challenge-count-wrapper" data-total-count="<%=num%>">
+      You have <span id="challenge-count"><%=num%></span> new challenge(s).
+    </p>
+      <div class="scrollable-pane">
+      <%
+        for(Challenge c: challenges){
+      %>
+      <div class="challenge-item" id="challenge-<%=c.getChallengeId()%>">
+        <strong><%=quizDao.getQuizById(c.getQuizId()).getName()%></strong>
+        <p class="text-small">From: <%=usersDao.getUserById(c.getSenderUserId()).getUsername()%></p>
+        <div class="challenge-actions">
+          <button class="accept-button" data-challenge-id="<%=c.getChallengeId()%>" data-quiz-id="<%=c.getQuizId()%>">Accept</button>
+          <button class="delete-button" data-challenge-id="<%=c.getChallengeId()%>">Delete</button>
+        </div>
+      </div>
+      <%
+        }%>
+      </div>
+    <%} else {
     %>
     <p class="text-small">No new challenges.</p>
     <% } %>
   </div>
+
 
   <!-- Announcements Section -->
   <div class="card announcements">
@@ -336,7 +351,7 @@
     <% } %>
   </div>
 
-  <!-- Friend Requests Section || Show All friend requests-->
+  <!-- Friend Requests Section-->
   <div class="card friend-requests">
     <h3>Friend Requests</h3>
     <%
@@ -344,24 +359,24 @@
       if(requests != null && !requests.isEmpty()){
         int num = requests.size();
     %>
-    <p class="mb-10" id="request-count">You have <%=num%> friend request(s).</p>
+    <p class="mb-10" id="request-count-wrapper" data-total-count="<%=num%>">
+      You have <span id="request-count"><%=num%></span> friend request(s).
+    </p>
+    <div class="scrollable-pane">
     <%
-      int cnt10 = 0;
       for(Friendship f: requests){
-        if(cnt10 == 3) break;
     %>
     <div class="friend-request" data-user-id="<%=f.getFirstUserId()%>">
       <span><%=usersDao.getUserById(f.getFirstUserId()).getUsername()%></span>
-      <div>
-        <button class="accept" data-user-id="<%=f.getFirstUserId()%>">Accept</button>
-        <button class="delete" data-user-id="<%=f.getFirstUserId()%>">Delete</button>
+      <div class="friend-request-actions">
+        <button class="accept-request-button" data-user-id="<%=f.getFirstUserId()%>">Accept</button>
+        <button class="delete-request-button" data-user-id="<%=f.getFirstUserId()%>">Delete</button>
       </div>
     </div>
-
     <%
-        cnt10++;
-      }
-    } else {
+      }%>
+    </div>
+    <%} else {
     %>
     <p class="text-small">No new friend requests.</p>
     <% } %>
@@ -377,6 +392,10 @@
   <%
     }
   %>
+
+  <form action="logout" method="post" style="position: absolute; top: 20px; right: 20px;">
+    <button type="submit">Log Out</button>
+  </form>
 
 </div>
 </body>

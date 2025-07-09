@@ -245,7 +245,7 @@ public class QuizzesDao {
         String sql = "DELETE FROM quizzes WHERE quiz_id = ?";
 
         try (Connection c = dataSource.getConnection();
-            PreparedStatement preparedStatement = c.prepareStatement(sql)){
+             PreparedStatement preparedStatement = c.prepareStatement(sql)){
 
             preparedStatement.setLong(1, id);
 
@@ -343,9 +343,9 @@ public class QuizzesDao {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
-             stmt.setLong(1, userId);
-             stmt.setLong(2, userId);
-             stmt.setLong(3, userId);
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
+            stmt.setLong(3, userId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
@@ -374,7 +374,7 @@ public class QuizzesDao {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-             while (rs.next())
+            while (rs.next())
                 quizzes.add(retrieveQuiz(rs));
 
         } catch (SQLException e) {
@@ -383,7 +383,6 @@ public class QuizzesDao {
 
         return quizzes;
     }
-
 
     /**
      * Retrieves a quiz by its ID.
@@ -448,7 +447,7 @@ public class QuizzesDao {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
-             stmt.setLong(1, id);
+            stmt.setLong(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

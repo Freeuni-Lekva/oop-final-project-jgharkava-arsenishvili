@@ -1,45 +1,252 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
+* {
     margin: 0;
-    padding: 40px;
-    display: flex;
-    justify-content: center;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.container {
-    background-color: #ffffff;
-    padding: 20px 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 600px;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.visit-user-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    grid-template-areas:
+        "profile actions"
+        "bottom-actions bottom-actions";
+}
+
+.card {
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
 }
 
 .user-info {
+    grid-area: profile;
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 30px;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.profile-pic {
-    width: 100px;
-    height: 100px;
+.user-info h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.user-info img {
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
+    border: 3px solid #d4edda;
     object-fit: cover;
     margin-top: 10px;
 }
 
 .action-row {
+    grid-area: actions;
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.action-row h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+.action-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+    margin-bottom: 15px;
+}
+
+.action-section.friend-action {
+    border-left-color: #e18989;
+}
+
+.action-section.challenge-action {
+    border-left-color: #ff9800;
+}
+
+.action-section.message-action {
+    border-left-color: #2196f3;
 }
 
 form {
-    display: inline-block;
+    margin-bottom: 15px;
 }
 
-textarea {
-    display: block;
-    margin-top: 5px;
+form:last-child {
+    margin-bottom: 0;
 }
+
+input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+button[type="button"] {
+    background: #e18989;
+    color: #2c3e50;
+}
+
+button[type="button"]:hover {
+    background: #d4edda;
+    transform: translateY(-2px);
+}
+
+button[value="accept"] {
+    background: #d4edda;
+    color: #155724;
+}
+
+button[value="delete"], button[value="remove-friend"], button[value="remove-request"] {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+button[value="accept"]:hover {
+    background: #c3e6cb;
+}
+
+button[value="delete"]:hover, button[value="remove-friend"]:hover, button[value="remove-request"]:hover {
+    background: #f1b0b7;
+}
+
+.bottom-actions {
+    grid-area: bottom-actions;
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bottom-actions > * {
+    flex: 1;
+}
+
+.bottom-actions form, .bottom-actions button {
+    width: 100%;
+}
+
+.bottom-actions button {
+    padding: 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.bottom-actions button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+#achievements-section {
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#achievements-section h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+#achievements-section p {
+    background: linear-gradient(135deg, #ffd700, #ffed4a);
+    color: #333;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    border: 2px solid #f39c12;
+    font-weight: bold;
+}
+
+.back-btn {
+    background: #e3f2fd;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    grid-area: center;
+}
+
+.back-btn:hover {
+    background: #e0e0e0;
+}
+
