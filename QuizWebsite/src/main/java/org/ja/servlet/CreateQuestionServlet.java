@@ -33,10 +33,10 @@ public class CreateQuestionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         this.request = request;
-        questionText = request.getParameter("questionText");
+        questionText = request.getParameter("questionText").trim();
         String questionType = request.getParameter("questionType");
 
-        imageUrl = request.getParameter("imageUrl");
+        imageUrl = request.getParameter("imageUrl") != null ? request.getParameter("imageUrl").trim() : null;
         answers = request.getParameterValues("answer");
 
         questionAnswerMap = (Map<Question, List<Answer>>) request.getSession().getAttribute(Constants.SessionAttributes.QUESTIONS);
@@ -69,14 +69,6 @@ public class CreateQuestionServlet extends HttpServlet {
         request.getSession().setAttribute(Constants.SessionAttributes.QUESTIONS, questionAnswerMap);
         request.getSession().setAttribute(Constants.SessionAttributes.MATCHES, questionMatchMap);
 
-        // Debug print just in case TODO delete
-//        for (Map.Entry<Question, List<Match>> entry : questionMatchMap.entrySet()) {
-//            System.out.println("Question: " + entry.getKey());
-//            for (Match a : entry.getValue()) {
-//                System.out.println(" → Answer: " + a);
-//            }
-//        }
-
         request.getSession().setAttribute(Constants.SessionAttributes.HAS_QUESTIONS, true);
         response.sendRedirect("create-question.jsp");
     }
@@ -102,7 +94,7 @@ public class CreateQuestionServlet extends HttpServlet {
     }
 
     private void handleFillInTheBlankQuestion() {
-        question = new FillInTheBlankQuestion(questionText);
+        question = new FillInTheBlankQuestion(questionText.replace("_____", "_"));
 
         String joinedAnswers = Arrays.stream(answers)
                 .map(String::trim)

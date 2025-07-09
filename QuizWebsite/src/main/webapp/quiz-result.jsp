@@ -39,16 +39,15 @@
     int seconds = totalSeconds % 60;
 %>
 
-<style>
-    .incorrect { color: red; }
-    .correct { color: green; }
-</style>
-
 <html>
 <head>
     <title>Quiz Result</title>
+    <link rel="stylesheet" type="text/css" href="css/quiz-result.css">
+    <script src="js/quiz-result.js" defer></script>
 </head>
 <body>
+
+<input type="hidden" id="quiz-id-hidden" value="<%=quiz.getId()%>">
 
 <div class="score-box">
     <h2>Quiz Result</h2>
@@ -210,31 +209,27 @@
 </div>
 
 
-<script>
-    function sendChallenge(button, friendId) {
-        fetch("challenge-servlet", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "challenged-id=" + encodeURIComponent(friendId) +
-                  "&<%=Constants.RequestParameters.QUIZ_ID%>=" + encodeURIComponent(<%=quiz.getId()%>)
-        });
+<!-- Quiz Review & Rating -->
+<div class="quiz-feedback-section">
+    <h3>Rate This Quiz</h3>
 
-        button.disabled = true;
-    }
-</script>
+    <div id="rating-stars" class="star-rating">
+        <span data-value="5">&#9733;</span>
+        <span data-value="4">&#9733;</span>
+        <span data-value="3">&#9733;</span>
+        <span data-value="2">&#9733;</span>
+        <span data-value="1">&#9733;</span>
+    </div>
 
-<style>
-    #user-list-panel {
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #ccc; /* Optional: adds a visual boundary */
-        padding: 10px;
-    }
-</style>
+    <textarea id="quiz-review" rows="4" cols="50" placeholder="Leave a comment about the quiz..." style="margin-top: 10px; width: 100%; max-width: 600px;"></textarea>
 
-<%--retunt to homepage--%>
+    <br><br>
+    <button onclick="submitReview()">Submit Rating & Review</button>
+    <p id="rating-status" style="margin-top: 10px;"></p>
+</div>
+
+
+<%--return to homepage--%>
 <br><br><br>
 <a href="user-page.jsp">
     <button>Back To Homepage</button>
