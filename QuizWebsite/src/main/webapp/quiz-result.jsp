@@ -107,7 +107,6 @@
                 <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= match.getLeftMatch() %> → <%= match.getRightMatch() %></div><%
                 }
             }%>
-
     </div>
 
     <div class="answer-block">
@@ -151,7 +150,7 @@
         <% } %>
     </div>
 
-    <% } else { // Default case (e.g., open questions)
+    <% } else {
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
     %>
     <div class="answer-block">
@@ -164,7 +163,6 @@
         <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
         <% }
             } %>
-
     </div>
 
     <div class="answer-block">
@@ -192,10 +190,7 @@
 
     <div class="user-entry">
         <span>
-            <a href="visit-user?<%=Constants.RequestParameters.USER_ID%>=<%=friend.getId()%>"
-               style="text-decoration: none; color: inherit; cursor: pointer;"
-               onmouseover="this.style.textDecoration='underline';"
-               onmouseout="this.style.textDecoration='none';">
+            <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=friend.getId()%>">
                 <%= friend.getUsername() %>
             </a>
         </span>

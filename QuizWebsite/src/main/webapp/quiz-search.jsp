@@ -25,6 +25,7 @@
 <html>
 <head>
     <title>Quiz Search</title>
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
 </head>
 <body>
 
@@ -67,27 +68,18 @@
         List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
 
         for(Quiz quiz : quizzes) {%>
-<form action="quiz-overview.jsp" method="get">
-    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%></button>
-</form>
+
+        <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a><br>
 <%
     }
 } else {
     List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
 
-
-//    TODO may be better with <a href="">
-
     for(Quiz quiz : quizzes) {%>
-<form action="quiz-overview.jsp" method="get">
-    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;"><%=quiz.getName()%></button>
-</form>
+        <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a><br>
 <%
         }
     }
 %>
-
 </body>
 </html>

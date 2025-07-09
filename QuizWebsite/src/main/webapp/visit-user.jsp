@@ -13,6 +13,9 @@
     long id = Long.parseLong(request.getParameter(Constants.RequestParameters.USER_ID));
     User visitedUser = usersDao.getUserById(id);
     User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
+
+    if(visitedUser.getId() == currentUser.getId()) response.sendRedirect("/user-page.jsp");
+
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
     AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);
@@ -23,6 +26,7 @@
 <head>
     <title><%=visitedUser.getUsername()%></title>
     <link rel="stylesheet" type="text/css" href="css/visit-user.css">
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
     <script src = "js/visit-user.js" defer></script>
 </head>
 <body>
@@ -74,14 +78,11 @@
         <%}%>
     </div>
 </div>
-
-
-
-
     <div class="bottom-actions">
         <form action="history-page.jsp" method="get">
             <input type="hidden" name="<%= Constants.RequestParameters.USER_ID %>" value="<%= visitedUser.getId() %>">
             <button type="submit">See <%=visitedUser.getUsername()%>'s Quiz History</button>
+
         </form>
 
         <button type="button" onclick="toggleAchievements()">View <%= visitedUser.getUsername() %>'s Achievements</button>
