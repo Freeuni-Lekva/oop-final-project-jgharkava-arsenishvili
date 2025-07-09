@@ -85,7 +85,12 @@
 %>
 <div class="question-block">
     <div class="question-text">
-        Question <%= j + 1 %>: <%= question.getQuestionText() != null ? question.getQuestionText() : ""%>
+        Question <%= j + 1 %>:
+        <%if(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION.equals(type)) {%>
+            <%=question.getQuestionText().replace("_", "_____")%><%
+        } else {%>
+            <%=question.getQuestionText() != null ? question.getQuestionText() : ""%><%
+        }%>
     </div>
 
     <% if (question.getImageUrl() != null) { %>
@@ -116,7 +121,10 @@
         <% } %>
     </div>
 
-    <% } else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
+    <% }
+
+    /// MULTI CHOICE QUESTIONS
+    else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
         int responseIndex = 0;
     %>
@@ -150,7 +158,10 @@
         <% } %>
     </div>
 
-    <% } else {
+    <% }
+
+    /// OTHER TYPE OF QUESTIONS
+    else {
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
     %>
     <div class="answer-block">
@@ -160,8 +171,12 @@
                 <h6>Haven't Chosen In Time</h6><%
             } else {
                 for(int i = 0; i < resp.size(); i++) { %>
-        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
-        <% }
+                    <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i).trim().isEmpty() ? "Left Empty" : resp.getAnswer(i) %></div><%
+                }
+
+                for(int i = resp.size(); i < question.getNumAnswers(); i++) { %>
+                    <div class="incorrect">Left Empty</div><%
+                }
             } %>
     </div>
 

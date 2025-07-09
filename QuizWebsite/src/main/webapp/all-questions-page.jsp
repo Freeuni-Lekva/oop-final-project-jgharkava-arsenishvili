@@ -62,9 +62,15 @@
 
             <h2>Question <%=i+1%></h2><%
 
-            ///  RESPONSE OF FILL_IN_THE_BLANK questions
-            if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION) || type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
+            ///  RESPONSE QUESTION
+            if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION)) {%>
                 <h3><%=question.getQuestionText()%></h3>
+                <input type="text" name="response_<%=i+1%>_1"><br><br><%
+            }
+
+            /// FILL_IN_THE_BLANK QUESTION
+            else if (type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
+                <h3><%=question.getQuestionText().replace("_", "_____")%></h3>
                 <input type="text" name="response_<%=i+1%>_1"><br><br><%
             }
 

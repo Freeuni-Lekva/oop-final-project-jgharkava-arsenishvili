@@ -431,6 +431,16 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
                 setTimeout(() => option.setCustomValidity(""), 2000);
             }
+
+            if(option.closest(".right-option-wrapper") && option.value.includes("not selected")) {
+                e.preventDefault();
+
+                // TODO continue
+                option.setCustomValidity("This field cannot include 'not selected'.");
+                option.reportValidity();
+
+                setTimeout(() => option.setCustomValidity(""), 2000);
+            }
         })
     }
 
