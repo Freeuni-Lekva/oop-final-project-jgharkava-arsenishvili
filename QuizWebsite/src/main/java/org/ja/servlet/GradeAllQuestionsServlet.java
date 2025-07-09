@@ -53,10 +53,10 @@ public class GradeAllQuestionsServlet extends HttpServlet {
             List<Integer> respGrades;
 
             if(Constants.QuestionTypes.MATCHING_QUESTION.equals(question.getQuestionType())) {
-                ArrayList<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
+                List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
                 respGrades = question.gradeResponse(matches, response);
             } else {
-                ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
+                List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
                 respGrades = question.gradeResponse(answers, response);
             }
 

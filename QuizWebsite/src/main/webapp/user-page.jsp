@@ -6,6 +6,7 @@
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   AnnouncementsDao announcementsDao = (AnnouncementsDao)application.getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
@@ -57,7 +58,7 @@
     <div class="quiz-section popular">
       <h3>Most Popular</h3>
       <%
-        ArrayList<Quiz> quizzes = quizDao.getQuizzesSortedByParticipantCount();
+        List<Quiz> quizzes = quizDao.getQuizzesSortedByParticipantCount();
         int cnt1 = 0;
         for (Quiz quiz : quizzes) {
           if (cnt1 == 3) break;
@@ -76,7 +77,7 @@
     <div class="quiz-section recent">
       <h3>Recently Created</h3>
       <%
-        ArrayList<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
+        List<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
         int cnt2 = 0;
         for (Quiz quiz : recentlyCreated) {
           if (cnt2 == 3) break;
@@ -113,7 +114,7 @@
     <div class="history-section">
       <h3>Last Taken</h3>
       <%
-        ArrayList<History> recentHistory = historiesDao.getHistoriesByUserIdSortedByDate(user.getId());
+        List<History> recentHistory = historiesDao.getHistoriesByUserId(user.getId());
         if(!recentHistory.isEmpty()){
           int cnt3 = 0;
           for(History h: recentHistory){
@@ -137,7 +138,7 @@
     <div class="history-section">
       <h3>Last Created</h3>
       <%
-        ArrayList<Quiz> creationHistory = quizDao.getQuizzesByCreatorId(user.getId());
+        List<Quiz> creationHistory = quizDao.getQuizzesByCreatorId(user.getId());
         int cnt4 = 0;
         if(!creationHistory.isEmpty()){
           for(Quiz q: creationHistory){
@@ -165,7 +166,7 @@
     <div class="history-section">
       <h3>Last Taken</h3>
       <%
-        ArrayList<History> friendsQuizzes = historiesDao.getUserFriendsHistorySortedByCompletionDate(user.getId());
+        List<History> friendsQuizzes = historiesDao.getUserFriendsHistory(user.getId());
         if(friendsQuizzes != null && !friendsQuizzes.isEmpty()) {
           int cnt8 = 0;
           for(History h: friendsQuizzes){
@@ -189,7 +190,7 @@
     <div class="history-section">
       <h3>Last Created</h3>
       <%
-        ArrayList<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
+        List<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
         if(quizzesByFriends != null && !quizzesByFriends.isEmpty()) {
           int cnt9 = 0;
           for(Quiz q: quizzesByFriends){
@@ -218,7 +219,7 @@
   <div class="card achievements">
     <h3>Latest Achievement</h3>
     <%
-      ArrayList<UserAchievement> achievements = userAchievementDao.getUserAchievements(user.getId());
+      List<UserAchievement> achievements = userAchievementDao.getUserAchievements(user.getId());
       if (achievements != null && !achievements.isEmpty()) {
         Achievement latest = achievementDao.getAchievement(achievements.get(0).getAchievementId());
     %>
@@ -249,7 +250,7 @@
   <div class="card messages">
     <h3>Messages</h3>
     <%
-      ArrayList<Message> messages = messageDao.getMessagesForUserSorted(user.getId());
+      List<Message> messages = messageDao.getMessagesForUser(user.getId());
       if(messages != null && !messages.isEmpty()){
     %>
     <p class="mb-10" id="message-count-wrapper">
@@ -295,7 +296,7 @@
   <div class="card challenges">
     <h3>Challenges</h3>
     <%
-      ArrayList<Challenge> challenges = challengeDao.challengesAsReceiver(user.getId());
+      List<Challenge> challenges = challengeDao.challengesAsReceiver(user.getId());
       if(challenges != null && !challenges.isEmpty()){
         int num = challenges.size();
     %>
@@ -328,7 +329,7 @@
   <div class="card announcements">
     <h3>Announcements by Administrators</h3>
     <%
-      ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
+      List<Announcement> ann = announcementsDao.getAllAnnouncements();
       Map<Announcement, String> announcements = new HashMap<Announcement, String>();
       for (Announcement a : ann) {
         User administrator = usersDao.getUserById(a.getAdministratorId());
@@ -354,7 +355,7 @@
   <div class="card friend-requests">
     <h3>Friend Requests</h3>
     <%
-      ArrayList<Friendship> requests = friendsDao.getFriendRequests(user.getId());
+      List<Friendship> requests = friendsDao.getFriendRequests(user.getId());
       if(requests != null && !requests.isEmpty()){
         int num = requests.size();
     %>

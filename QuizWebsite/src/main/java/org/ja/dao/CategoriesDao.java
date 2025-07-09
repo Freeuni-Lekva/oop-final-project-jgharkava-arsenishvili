@@ -8,15 +8,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Data Access Object for managing categories in the quiz system.
+ */
 public class CategoriesDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+
+    /**
+     * Constructs a new CategoriesDao with the specified data source.
+     *
+     * @param dataSource the database connection pool to use for queries
+     */
     public CategoriesDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public void insertCategory(Category category) {
+
+    /**
+     * Inserts a new category into the database.
+     * Sets the generated ID on the passed {@link Category} object if successful.
+     *
+     * @param category the Category object to insert (with name set)
+     * @return true if the category was inserted and ID was generated; false otherwise
+     * @throws RuntimeException if an SQL error occurs or generated ID is not returned
+     */
+    public boolean insertCategory(Category category) {
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
@@ -24,35 +42,32 @@ public class CategoriesDao {
 
             preparedStatement.setString(1, category.getCategoryName());
 
-            preparedStatement.executeUpdate();
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows == 0) return false;
 
             try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
                 if (keys.next()) {
-                    cnt++;
-                    long newId = keys.getLong(1);
-                    category.setCategoryId(newId); // if you want to store it in your object
+                    category.setCategoryId(keys.getLong(1));
+                } else {
+                    throw new RuntimeException("Insert succeeded but no ID was returned.");
                 }
             }
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error adding category to database", e);
         }
     }
 
-    public void removeCategory(Category category) {
-        String sql = "DELETE FROM categories WHERE category_id = ?";
 
-        try(Connection c = dataSource.getConnection();
-            PreparedStatement preparedStatement = c.prepareStatement(sql)){
-
-            preparedStatement.setLong(1, category.getCategoryId());
-
-            preparedStatement.executeUpdate();
-            cnt--;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error removing category from database", e);
-        }
-    }
-
+    /**
+     * Retrieves a category by its unique ID.
+     *
+     * @param id the ID of the category to retrieve
+     * @return the Category with the specified ID
+     * @throws RuntimeException if no category with the given ID exists or if a database error occurs
+     */
     public Category getCategoryById(long id) {
         String sql = "SELECT * FROM categories WHERE category_id = ?";
 
@@ -62,18 +77,26 @@ public class CategoriesDao {
             ps.setLong(1, id);
 
             try (ResultSet rs = ps.executeQuery()){
-                if (rs.next())
+                if (rs.next()) {
                     return retrieveCategory(rs);
+                } else {
+                    throw new RuntimeException("Category with ID " + id + " not found.");
+                }
             }
-
         } catch (SQLException e){
             throw new RuntimeException("Error querying category by id from database", e);
         }
-        return null;
     }
 
-    public ArrayList<Category> getAllCategories(){
-        ArrayList<Category> categories = new ArrayList<>();
+
+    /**
+     * Retrieves all categories from the database.
+     *
+     * @return a list of all Category objects; empty list if none exist
+     * @throws RuntimeException if a database error occurs
+     */
+    public List<Category> getAllCategories(){
+        List<Category> categories = new ArrayList<>();
 
         String sql = "SELECT * FROM categories";
 
@@ -94,30 +117,18 @@ public class CategoriesDao {
     }
 
 
-    // TO DELETE
-    public Category getCategoryByName(String categoryName) {
-        String sql = "SELECT * FROM categories WHERE category_name=?";
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
+    // --- Helper Methods ---
 
-            ps.setString(1, categoryName);
 
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next())
-                    return retrieveCategory(rs);
-            }
-
-        }catch (SQLException e){
-            throw new RuntimeException("Error querying category by name from database", e);
-        }
-        return null;
-    }
-
+    /**
+     * Helper method to map a ResultSet row to a Category object.
+     *
+     * @param rs the ResultSet positioned at the current row
+     * @return a Category object populated with data from the current row
+     * @throws SQLException if an error occurs accessing the ResultSet
+     */
     private Category retrieveCategory(ResultSet rs) throws SQLException {
         return new Category(rs.getLong("category_id"), rs.getString("category_name"));
-    }
-    public long getCount(){
-        return cnt;
     }
 
 }

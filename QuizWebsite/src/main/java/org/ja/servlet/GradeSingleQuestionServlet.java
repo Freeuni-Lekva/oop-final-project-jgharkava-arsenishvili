@@ -52,12 +52,12 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         List<Integer> grades = (List<Integer>) session.getAttribute("grades");
         List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
 
-        grades.removeFirst();
-        responseGrades.removeFirst();
+        grades.remove(0);
+        responseGrades.remove(0);
 
         calculateGrade(response, question, grades, responseGrades);
 
-        int grade = grades.getFirst();
+        int grade = grades.get(0);
 
         Map<Question, Integer> masteryMap = (Map<Question, Integer>) session.getAttribute(Constants.SessionAttributes.PRACTICE_QUESTIONS_MASTERY_MAP);
 

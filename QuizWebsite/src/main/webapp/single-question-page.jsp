@@ -6,7 +6,8 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
-<%@ page import="org.ja.model.quiz.Quiz" %><%--
+<%@ page import="org.ja.model.quiz.Quiz" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 6/27/2025
@@ -118,7 +119,7 @@
             }
 
         } else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
-            ArrayList<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
+            List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
             ArrayList<String> leftMatches = new ArrayList<String>();
 
             for (Match match : matches) {

@@ -4,6 +4,7 @@
     <file url="file://$PROJECT_DIR$/QuizWebsite/database/drop.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/database/fill.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/database/schema.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/QuizWebsite/database/testdb.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/AnnouncementsDao.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/CategoriesDao.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/QuizWebsite/src/main/java/org/ja/dao/FriendShipsDao.java" dialect="GenericSQL" />

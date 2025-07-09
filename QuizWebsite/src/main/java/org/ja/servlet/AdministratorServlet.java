@@ -58,7 +58,7 @@ public class AdministratorServlet extends HttpServlet {
             String name = request.getParameter("removeQuizName");
             Quiz quiz = quizzesDao.getQuizByName(name);
             if(quiz != null){
-                quizzesDao.removeQuizByName(name);
+                quizzesDao.removeQuizById(quiz.getId());
                 request.setAttribute("message", "Successfully removed quiz " + name);
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
             }else{

@@ -1,116 +1,74 @@
 package DaoTests;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.CategoriesDao;
 import org.ja.model.CategoriesAndTags.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.List;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CategoriesDaoTest {
+/**
+ * Unit tests for the CategoriesDao class using an in-memory H2 database.
+ */
+public class CategoriesDaoTest extends BaseDaoTest{
     private CategoriesDao dao;
-    private BasicDataSource basicDataSource;
-
-    private Category h;
-    private Category same;
-    private Category g;
 
     @BeforeEach
     public void setUp() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        setUpDataSource();
 
-        // Initializing Categories
-        g = new Category(42, "geography");
-        same = new Category(15, "history");
-        h = new Category(42, "history");
-
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/drop.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-        }
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/schema.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-            dao=new CategoriesDao(basicDataSource);
-        }
+        dao = new CategoriesDao(basicDataSource);
     }
 
     @Test
-    public void testInsert() throws SQLException {
-        assertEquals(0, dao.getCount());
-        dao.insertCategory(h);
-        assertEquals(1, dao.getCount());
-        assertEquals(1, h.getCategoryId());
-        assertNotNull(dao.getCategoryByName("history"));
+    public void testGetCategoryById() {
 
-        assertThrows(RuntimeException.class, () -> {
-            dao.insertCategory(same);
-        });
+        // Existing
+        Category category = dao.getCategoryById(5L);
+        assertNotNull(category);
+        assertEquals(5, category.getCategoryId());
+        assertEquals("Math", category.getCategoryName());
 
-        assertEquals(1, dao.getCount());
-        dao.insertCategory(g);
-        assertEquals(2, dao.getCount());
-        assertEquals(3, g.getCategoryId());
+        // Non-existing
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> dao.getCategoryById(9999L));
+        assertTrue(exception.getMessage().contains("not found"));
     }
 
     @Test
-    public void testRemove() throws SQLException {
-        dao.insertCategory(h);
-        dao.insertCategory(g);
+    public void testInsertCategory() {
+        Category newCategory = new Category(0, "Science");
 
-        assertEquals("history", dao.getCategoryById(1).getCategoryName());
-        assertEquals("geography", dao.getCategoryById(2).getCategoryName());
-        dao.removeCategory(new Category(1, "history"));
-        assertEquals(1, dao.getCount());
-        assertNull(dao.getCategoryById(1));
-        Category m = new Category(42, "Maths");
-        dao.insertCategory(m);
-        assertEquals(2, dao.getCount());
-        assertEquals(3, m.getCategoryId());
-        assertEquals("Maths", dao.getCategoryById(3).getCategoryName());
-        assertEquals(3, dao.getCategoryByName("Maths").getCategoryId());
+        boolean inserted = dao.insertCategory(newCategory);
+        assertTrue(inserted, "Category should be inserted successfully");
+        assertTrue(newCategory.getCategoryId() > 0, "Inserted category should have a generated ID");
+
+        Category fetched = dao.getCategoryById(newCategory.getCategoryId());
+        assertNotNull(fetched);
+        assertEquals("Science", fetched.getCategoryName());
     }
 
+    @Test
+    public void testGetAllCategories() {
+        List<Category> categories = dao.getAllCategories();
 
+        assertNotNull(categories);
+        assertTrue(categories.size() >= 4);
 
+        boolean foundMath = categories.stream()
+                .anyMatch(c -> c.getCategoryName().equalsIgnoreCase("Math"));
+        assertTrue(foundMath);
 
+        boolean foundMovies = categories.stream()
+                .anyMatch(c -> c.getCategoryName().equalsIgnoreCase("Movies"));
+        assertTrue(foundMovies);
+
+        boolean foundTechnology = categories.stream()
+                .anyMatch(c -> c.getCategoryName().equalsIgnoreCase("Technology"));
+        assertTrue(foundTechnology);
+
+        boolean foundArt = categories.stream()
+                .anyMatch(c -> c.getCategoryName().equalsIgnoreCase("Art"));
+        assertTrue(foundArt);
+    }
 }

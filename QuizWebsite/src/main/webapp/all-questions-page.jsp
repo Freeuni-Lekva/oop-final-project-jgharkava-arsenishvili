@@ -116,7 +116,7 @@
 
             /// MATCHING QUESTION
             else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
-                ArrayList<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
+                List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
                 List<String> leftMatches = new ArrayList<String>();
                 for (int k = 0; k < matches.size(); k++) {
                     leftMatches.add(matches.get(k).getLeftMatch());
