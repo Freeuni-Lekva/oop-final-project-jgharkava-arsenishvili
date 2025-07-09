@@ -1,0 +1,163 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Main container */
+.history-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+.history-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.history-header h1 {
+    font-size: 2em;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* User link styling */
+.user-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-link:hover {
+    text-decoration: underline;
+    color: #3498db;
+}
+
+/* History list */
+.history-list {
+    list-style: none;
+    padding: 0;
+}
+
+.history-item {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-left-color: #2980b9;
+}
+
+.history-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Quiz name link */
+.quiz-link {
+    text-decoration: none;
+    color: #2c3e50;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.quiz-link:hover {
+    text-decoration: underline;
+    color: #3498db;
+}
+
+/* Quiz details */
+.quiz-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.detail-item {
+    background: #ffffff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.detail-value {
+    color: #555;
+    font-size: 1.1em;
+}
+
+.detail-item.score {
+    border-left: 4px solid #28a745;
+}
+
+.detail-item.time {
+    border-left: 4px solid #ffc107;
+}
+
+.detail-item.date {
+    border-left: 4px solid #17a2b8;
+}
+
+.empty-history {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+.empty-history i {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.back-btn {
+    margin-top: 10px;
+    background: #e3f2fd;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    grid-area: center;
+}
+
+.back-btn:hover {
+    background: #e0e0e0;
+}

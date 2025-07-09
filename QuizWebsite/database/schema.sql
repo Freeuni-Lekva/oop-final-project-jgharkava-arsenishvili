@@ -2,29 +2,32 @@ use ja_project_db;
 
 -- Users table with basic information, including id, password, username, registration date, photo (might be null)
 -- and status: one may be an administrator or a basic user.
-create table users (
-    user_id bigint primary key auto_increment,
-    password_hashed varchar(256) not null,
-    salt varchar(256) not null,
-    username varchar(64) unique not null,
-    registration_date timestamp default current_timestamp,
-    user_photo varchar(256),
-    user_status enum('administrator', 'user') not null default 'user'
+create table users
+(
+    user_id           bigint primary key auto_increment,
+    password_hashed   varchar(256)                   not null,
+    salt              varchar(256)                   not null,
+    username          varchar(64) unique             not null,
+    registration_date timestamp                               default current_timestamp,
+    user_photo        varchar(256),
+    user_status       enum ('administrator', 'user') not null default 'user'
 );
 
 
 -- Categories table.
 -- Might include categories like history, geography etc.
-create table categories(
-    category_id bigint primary key auto_increment,
+create table categories
+(
+    category_id   bigint primary key auto_increment,
     category_name varchar(64) unique not null
 );
 
 
 -- Tags table.
 -- Might include tags like easy, fun, beginner, timed etc.
-create table tags(
-    tag_id bigint primary key auto_increment,
+create table tags
+(
+    tag_id   bigint primary key auto_increment,
     tag_name varchar(64) unique not null
 );
 
@@ -38,29 +41,30 @@ create table tags(
 -- Whether the questions should be presented on a single-page or one question per page;
 -- Whether (in case of multiple pages) the answers should be corrected immediately or together at once
 -- (check constraint is provided so that immediate correction is available only in case of multiple-page option)
-create table quizzes(
-    quiz_id bigint primary key auto_increment,
-    quiz_name varchar(64) unique not null,
-    quiz_description text,
-    quiz_score int not null,
-    average_rating double not null default 0,
-    participant_count bigint not null default 0,
-    creation_date timestamp default current_timestamp,
-    time_limit_in_minutes int not null default 0,
-    category_id bigint not null,
-    creator_id bigint not null,
-    question_order_status enum('ordered', 'randomized') not null default 'ordered',
-    question_placement_status enum('one-page', 'multiple-page') not null default 'one-page',
-    question_correction_status enum('immediate-correction', 'final-correction')
-        not null default 'final-correction',
+create table quizzes
+(
+    quiz_id                    bigint primary key auto_increment,
+    quiz_name                  varchar(64) unique                 not null,
+    quiz_description           text,
+    quiz_score                 int                                not null,
+    average_rating             double                             not null default 0,
+    participant_count          bigint                             not null default 0,
+    creation_date              timestamp                                   default current_timestamp,
+    time_limit_in_minutes      int                                not null default 0,
+    category_id                bigint                             not null,
+    creator_id                 bigint                             not null,
+    question_order_status      enum ('ordered', 'randomized')     not null default 'ordered',
+    question_placement_status  enum ('one-page', 'multiple-page') not null default 'one-page',
+    question_correction_status enum ('immediate-correction', 'final-correction')
+                                                                  not null default 'final-correction',
 
     check (
         question_placement_status != 'one-page'
-        or question_correction_status = 'final-correction'
-    ),
+            or question_correction_status = 'final-correction'
+        ),
 
-    foreign key (creator_id) references users(user_id) on delete cascade,
-    foreign key (category_id) references categories(category_id) on delete cascade
+    foreign key (creator_id) references users (user_id) on delete cascade,
+    foreign key (category_id) references categories (category_id) on delete cascade
 );
 
 

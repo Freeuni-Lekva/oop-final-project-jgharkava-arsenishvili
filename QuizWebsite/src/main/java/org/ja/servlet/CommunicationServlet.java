@@ -36,29 +36,48 @@ public class CommunicationServlet extends HttpServlet {
         }
         if("add-friend".equals(action)) {
             friendShipsDao.insertFriendRequest(new Friendship(curUser.getId(), friendId));
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         } else if ("remove-friend".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         } else if("send-challenge".equals(action)) {
-            String quizName = request.getParameter("quiz-name");
+            String quizName = request.getParameter("quizName");
             Quiz quiz = quizzesDao.getQuizByName(quizName);
             if(quiz != null) {
                 Challenge challenge = new Challenge(curUser.getId(), friendId, quiz.getId());
                 challengesDao.insertChallenge(challenge);
+                response.setContentType("text/plain");
+                response.getWriter().write("OK");
             }
         }else if("remove-request".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         }else if("accept".equals(action)) {
             friendShipsDao.acceptFriendRequest(fr);
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         }else if("delete".equals(action)) {
             friendShipsDao.removeFriendShip(fr);
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         } else if("send-message".equals(action)) {
-            String recipientName = request.getParameter("recipient");
+            long recipientId =  Integer.parseInt(request.getParameter("friendId"));
             String message = request.getParameter("message");
-            User recipient = usersDao.getUserByUsername(recipientName);
+            User recipient = usersDao.getUserById(recipientId);
             if(recipient != null){
                 Message m = new Message(curUser.getId(), recipient.getId(), message);
                 messageDao.insertMessage(m);
+                response.setContentType("text/plain");
+                response.getWriter().write("OK");
             }
+        }else if("delete-challenge".equals(action)) {
+            long challengeId = Long.parseLong(request.getParameter("challengeId"));
+            challengesDao.removeChallenge(challengeId);
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
         }
     }
 }
