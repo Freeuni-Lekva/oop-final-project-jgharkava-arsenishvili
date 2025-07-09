@@ -32,7 +32,7 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, time_limit
 'one-page', 'final-correction');
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values
-(1, 'WWII began in _', null, 'fill-in-the-blank', 1, 'ordered'),
+(1, 'WWII began in _____', null, 'fill-in-the-blank', 1, 'ordered'),
 (1, 'Who was the British Prime Minister during most of WWII?', null,'multiple-choice', 1, 'ordered'),
 (1, 'List 3 Axis powers during WWII', null, 'multi-answer', 3, 'unordered'),
 (2, 'Match the countries to their capitals', null, 'matching', 4, 'ordered'),
