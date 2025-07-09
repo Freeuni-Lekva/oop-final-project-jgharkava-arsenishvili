@@ -6,7 +6,7 @@ create table users(
     user_id bigint primary key auto_increment,
     password_hashed varchar(256) not null,
     salt varchar(256) not null,
-    username varchar(64) unique not null,
+    username varchar(64) unique not null collate utf8mb4_bin, -- ensures case-sensitivity
     registration_date timestamp default current_timestamp,
     user_photo varchar(256),
     user_status enum('administrator','user') not null default 'user'
