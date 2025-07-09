@@ -47,7 +47,7 @@
 <body>
     <div class = "container">
         <h2>Create a Quiz</h2>
-        <form action = "create-quiz" method = "post">
+        <form action = "create-quiz" method = "post" id="quizForm">
 
             <label for = "quizTitle">Quiz Title</label>
             <input type = "text" name = "quizTitle" id = "quizTitle" required placeholder = "Enter quiz Title">
@@ -104,7 +104,7 @@
             <label>Question Correction:</label>
             <div class = "radio-group">
                 <label class = "radio-option"><input type = "radio" name = "correctionType" value = "final-correction" required checked>Final Feedback</label>
-                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "immediate-correction">Immediate Correction</label>
+                <label class = "radio-option"><input type = "radio" name = "correctionType" value = "immediate-correction" disabled>Immediate Correction</label>
             </div>
 
             <button type = "submit" name = "action" value = "createQuiz" class = "btn">

@@ -28,6 +28,16 @@ function showQuestionForm() {
             addLeftOption();
         }
     }
+
+    if (selectedType === "multi-answer") {
+        addAnswerGroup();
+        addAnswerGroup();
+    }
+    else if (selectedType === "multiple-choice")
+        addAnswerOption('multiple-choice-answer-container');
+    else if (selectedType === "multi-choice-multi-answers")
+        addAnswerOption('multi-choice-multi-answer-container');
+
 }
 
 window.addEventListener("DOMContentLoaded", function (){
@@ -38,13 +48,6 @@ window.addEventListener("DOMContentLoaded", function (){
 })
 
 document.addEventListener("DOMContentLoaded", function () {
-    const selectedType = document.getElementById("questionType").value;
-
-    if (selectedType === "multi-answer"){
-        addAnswerGroup();
-        return;
-    }
-
     const firstMarkButtonMultiChoice = document.querySelector("#multiple-choice-answer-container .mark-button");
     if (firstMarkButtonMultiChoice) {
         const hiddenInput = firstMarkButtonMultiChoice.closest(".option-block").querySelector("input[name='isCorrect']");
@@ -63,6 +66,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function addAnswerOption(containerId) {
     answerCount++;
+
+    if(answerCount === 6) {
+        document.getElementById("multiple-choice-add-button").disabled = true;
+        document.getElementById("multi-choice-multi-answer-add-button").disabled = true;
+    }
+
+    if(answerCount === 11) {
+        document.getElementById("fill-in-the-blank-add-button").disabled = true;
+        document.getElementById("picture-response-add-button").disabled = true;
+        document.getElementById("question-response-add-button").disabled = true;x
+    }
 
     const container = document.getElementById(containerId);
     const isMultipleChoice = containerId === "multiple-choice-answer-container";
@@ -217,7 +231,6 @@ function renderQuestionWithBlanks() {
     updateFinalQuestion();
 }
 
-
 function insertBlank(index) {
     if (blankInserted) {
         alert("Only one blank is allowed.");
@@ -290,7 +303,9 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             input.setCustomValidity("You must insert a blank into the question.");
             input.reportValidity();
 
-            setTimeout(() => input.setCustomValidity(""), 1000);
+            setTimeout(() => input.setCustomValidity(""), 2000);
+
+            return;
         }
     }
 
@@ -305,7 +320,9 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             firstTextarea.setCustomValidity("You must mark one option as correct.");
             firstTextarea.reportValidity();
 
-            setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+            setTimeout(() => firstTextarea.setCustomValidity(""), 2000);
+
+            return;
         }
     }
 
@@ -320,9 +337,117 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             firstTextarea.setCustomValidity("You must mark at least one option as correct.");
             firstTextarea.reportValidity();
 
-            setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+            setTimeout(() => firstTextarea.setCustomValidity(""), 2000);
+
+            return;
         }
     }
+
+    const container = document.getElementById(`${selectedType}-form`);
+
+    const answers = container.querySelectorAll(`[name="answer"]`);
+
+    answers.forEach(answerField => {
+        if(answerField.value.trim() === "") {
+            e.preventDefault();
+            answerField.setCustomValidity("Please fill out this field.");
+            answerField.reportValidity();
+
+            setTimeout(() => answerField.setCustomValidity(""), 2000);
+        }
+    })
+
+    if(selectedType === "picture-response") {
+        const imageUrl = container.querySelector(`[name="imageUrl"]`);
+
+        if(imageUrl.value.trim() === "") {
+            e.preventDefault();
+
+            imageUrl.setCustomValidity("Please fill out this field.");
+            imageUrl.reportValidity();
+
+            setTimeout(() => imageUrl.setCustomValidity(""), 2000);
+        }
+    }
+    else if(selectedType === "fill-in-the-blank") {
+        const rawQuestionInput = document.getElementById("rawQuestionInput");
+
+        if(rawQuestionInput.value.trim() === "") {
+            e.preventDefault();
+
+            rawQuestionInput.setCustomValidity("Please fill out this field.");
+            rawQuestionInput.reportValidity();
+
+            setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
+        }
+
+        if(rawQuestionInput.value.includes("_")) {
+            e.preventDefault();
+
+            rawQuestionInput.setCustomValidity("Please do not use underscores (_) in fill-in-the-blank questions — they mark the blanks.");
+            rawQuestionInput.reportValidity();
+
+            setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
+        }
+    }
+    else {
+        const questionText = container.querySelector(`[name="questionText"]`);
+
+        if(questionText.value.trim() === "") {
+            e.preventDefault();
+
+            questionText.setCustomValidity("Please fill out this field.");
+            questionText.reportValidity();
+
+            setTimeout(() => questionText.setCustomValidity(""), 2000);
+        }
+    }
+
+    if(selectedType === "multi-answer") {
+        const textAreas = document.querySelectorAll
+        ("#multi-answer-form .answer-group textarea, #multi-answer-form .answer-group input[type='text']");
+
+        textAreas.forEach(textarea => {
+            if (textarea.value.trim() === "") {
+                e.preventDefault();
+
+                textarea.setCustomValidity("Please fill out this field.");
+                textarea.reportValidity();
+
+                setTimeout(() => textarea.setCustomValidity(""), 2000);
+            }
+        });
+    }
+
+    if(selectedType === "matching") {
+        const matchOptions = container.querySelectorAll('.left-group input[type="text"], .right-option-wrapper input[type="text"]');
+
+        matchOptions.forEach(option => {
+            if(option.value.trim() === "") {
+                e.preventDefault();
+
+                option.setCustomValidity("Please fill out this field.");
+                option.reportValidity();
+
+                setTimeout(() => option.setCustomValidity(""), 2000);
+            }
+        })
+    }
+
+    const multiAnswerContainer = document.getElementById("multi-answer-container");
+
+    if (!multiAnswerContainer) return;
+
+    const order = Array.from(multiAnswerContainer.querySelectorAll(".answer-group"))
+        .map(group => group.dataset.groupId); // collect order of groupIds
+
+    let hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "answerOrder";
+    hidden.id = "answerOrderInput";
+    hidden.value = order.join(",");
+
+    this.appendChild(hidden);
 });
 
 let multiAnswerCount = 0;
@@ -341,8 +466,8 @@ function addAnswerGroup(afterElement = null) {
 
         <div class = "options-container" id = "options-${groupId}"></div>
 
-        <button type="button" onclick="addOption(${groupId})">Add Option</button>
-        <button type="button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
+        <button id="add-option-button-${groupId}" type="button" onclick="addOption(${groupId})">Add Option</button>
+        <button type="button" class="insert-below-button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
         <hr/>
     `;
 
@@ -350,6 +475,11 @@ function addAnswerGroup(afterElement = null) {
         afterElement.insertAdjacentElement("afterend", group);
     } else {
         container.appendChild(group);
+    }
+
+    if (multiAnswerCount === 10) {
+        document.getElementById("multi-answer-add-button").disabled = true;
+        Array.from(document.getElementsByClassName("insert-below-button")).forEach(btn => btn.disabled = true);
     }
 }
 
@@ -367,29 +497,16 @@ function addOption(groupId) {
 
     container.appendChild(label);
     container.appendChild(input);
+
+    if(optionCount === 10) {
+        document.getElementById(`add-option-button-${groupId}`).disabled = true;
+    }
 }
 
 function insertAnswerBelow(button) {
     const group = button.closest(".answer-group");
     addAnswerGroup(group);
 }
-
-document.getElementById("create-question-form").addEventListener("submit", function (e) {
-    const container = document.getElementById("multi-answer-container");
-
-    if (!container) return;
-
-    const order = Array.from(container.querySelectorAll(".answer-group"))
-        .map(group => group.dataset.groupId); // collect order of groupIds
-
-    let hidden = document.createElement("input");
-    hidden.type = "hidden";
-    hidden.name = "answerOrder";
-    hidden.id = "answerOrderInput";
-    hidden.value = order.join(",");
-
-    this.appendChild(hidden);
-});
 
 let rightOptionId = 0;
 let leftOptionId = 0;
@@ -415,6 +532,10 @@ function addRightOption(value = "") {
 
     updateAllDropdowns();
     rightOptionId++;
+
+    if(rightOptionId === 10) {
+        document.getElementById("add-right-option-button").disabled = true;
+    }
 }
 
 function addLeftOption() {
@@ -441,6 +562,10 @@ function addLeftOption() {
 
     updateDropdown(select);
     leftOptionId++;
+
+    if(leftOptionId === 10) {
+        document.getElementById("add-left-option-button").disabled = true;
+    }
 }
 
 function updateAllDropdowns() {

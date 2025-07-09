@@ -32,7 +32,7 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, time_limit
 'one-page', 'final-correction');
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values
-(1, 'WWII began in _', null, 'fill-in-the-blank', 1, 'ordered'),
+(1, 'WWII began in _____', null, 'fill-in-the-blank', 1, 'ordered'),
 (1, 'Who was the British Prime Minister during most of WWII?', null,'multiple-choice', 1, 'ordered'),
 (1, 'List 3 Axis powers during WWII', null, 'multi-answer', 3, 'unordered'),
 (2, 'Match the countries to their capitals', null, 'matching', 4, 'ordered'),
@@ -83,12 +83,12 @@ insert into friendships(first_user_id, second_user_id, friendship_status) values
 (4, 3, 'pending'),
 (2, 3, 'pending');
 
-insert into achievements(achievement_name, achievement_description) values
-('First step', 'Complete your first quiz'),
-('Quiz Addict', 'Complete 10 quizzes'),
-('Flawless Victory', 'Complete a quiz with no wrong answers'),
-('Quiz Master', 'Score 100% on 5 quizzes'),
-('Speed Demon', 'Finish a quiz in under 1 minute');
+insert into achievements(achievement_name, achievement_description, achievement_photo) values
+('First step', 'Complete your first quiz', 'https://i.imgur.com/13UgB9t.png'),
+('Quiz Addict', 'Complete 10 quizzes', 'https://i.imgur.com/uDXCVba.png'),
+('Flawless Victory', 'Complete a quiz with no wrong answers', 'https://i.imgur.com/koveqao.png'),
+('Quiz Master', 'Score 100% on 5 quizzes', 'https://i.imgur.com/T0PqbI7.png'),
+('Speed Demon', 'Finish a quiz in under 1 minute', 'https://i.imgur.com/RXU33E6.png');
 
 insert into user_achievement(user_id, achievement_id) values
 (1, 1),

@@ -6,6 +6,7 @@ public class Challenge {
     private long recipientUserId;
     private long quizId;
 
+    // Empty constructor
     public Challenge(long senderUserId, long recipientUserId, long quizId) {
         this.senderUserId = senderUserId;
         this.recipientUserId = recipientUserId;

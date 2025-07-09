@@ -233,7 +233,7 @@
 
   <!-- Take Quiz Button -->
   <div class="card take-quiz">
-    <form action="take-quiz.jsp" method="get">
+    <form action="quiz-search.jsp" method="get">
       <button class="quiz-button" type="submit">Take Quiz</button>
     </form>
   </div>
