@@ -169,7 +169,7 @@
         <div class="label">Correct Answer(s):</div>
         <% for(Answer answer : answers) {
             String answerText = answer.getAnswerText();%>
-        <div><%= answerText.contains("/") ? answerText.substring(0, answerText.indexOf('/')) : answerText %></div>
+        <div><%= answerText.contains("¶") ? answerText.substring(0, answerText.indexOf('¶')) : answerText %></div>
         <% } %>
     </div>
     <% } %>

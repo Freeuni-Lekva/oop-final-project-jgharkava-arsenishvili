@@ -23,7 +23,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testInsertFriendRequestNew() {
+    public void testInsertFriendRequestNew() {
         Friendship friendship = new Friendship(6, 5); // Gio -> Mariam (not existing in original data)
 
         boolean inserted = dao.insertFriendRequest(friendship);
@@ -33,14 +33,14 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testInsertFriendRequestExisting() {
+    public void testInsertFriendRequestExisting() {
         Friendship existing = new Friendship(5, 6); // Already exists in DB
 
         assertThrows(RuntimeException.class, () -> dao.insertFriendRequest(existing));
     }
 
     @Test
-    void testGetFriendshipByIds() {
+    public void testGetFriendshipByIds() {
 
         // Existing
         Friendship friendship = dao.getFriendshipByIds(5, 6);
@@ -52,7 +52,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testAcceptFriendRequest() {
+    public void testAcceptFriendRequest() {
         Friendship f = new Friendship(6, 7); // from inserted dataset
 
         boolean updated = dao.acceptFriendRequest(f);
@@ -62,7 +62,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testRemoveFriendship() {
+    public void testRemoveFriendship() {
         Friendship friendship = new Friendship(6, 5);
 
         boolean removed = dao.removeFriendShip(friendship);
@@ -72,7 +72,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetFriends() {
+    public void testGetFriends() {
         List<Friendship> friendsOf7 = dao.getFriends(7); // Only (7, 8) friends exist
 
         assertEquals(1, friendsOf7.size());
@@ -80,7 +80,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetFriendRequests() {
+    public void testGetFriendRequests() {
         List<Friendship> requestsFor8 = dao.getFriendRequests(8);
         assertTrue(requestsFor8.stream().anyMatch(f -> f.getFriendshipStatus().equals("pending")));
     }

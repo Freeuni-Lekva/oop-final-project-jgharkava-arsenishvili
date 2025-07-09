@@ -57,10 +57,7 @@ create table quizzes(
     ),
 
     foreign key (creator_id) references users(user_id) on delete cascade,
-    foreign key (category_id) references categories(category_id) on delete cascade,
-
-    index idx_quizzes_category_id (category_id),
-    index idx_quizzes_creator_id (creator_id)
+    foreign key (category_id) references categories(category_id) on delete cascade
 );
 
 -- Questions table.
@@ -100,10 +97,7 @@ create table questions(
         or question_type = 'multi-answer'
     ),
 
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-
-    index idx_questions_quiz_id (quiz_id),
-    index idx_questions_num_answers (num_answers)
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
 
@@ -118,9 +112,7 @@ create table answers(
     answer_validity boolean not null default true,
 
     foreign key (question_id) references questions(question_id) on delete cascade,
-    unique (question_id, answer_order),
-
-    index idx_answers_question_id (question_id)
+    unique (question_id, answer_order)
 );
 
 
@@ -132,11 +124,8 @@ create table matches(
     left_match text not null,
     right_match text not null,
 
-    foreign key (question_id) references questions(question_id) on delete cascade,
-
-    index idx_matches_question_id (question_id)
+    foreign key (question_id) references questions(question_id) on delete cascade
 );
-
 
 -- Quiz Tag table.
 -- Associates tags to quizzes.
@@ -146,12 +135,8 @@ create table quiz_tag(
 
     primary key (quiz_id, tag_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (tag_id) references tags(tag_id) on delete cascade,
-
-    index idx_quiz_tag_quiz_id (quiz_id),
-    index idx_quiz_tag_tag_id (tag_id)
+    foreign key (tag_id) references tags(tag_id) on delete cascade
 );
-
 
 -- Friendships table.
 -- Shows the relationship between two users. It may be a ng friend request (from the first to the second user) or
@@ -164,10 +149,7 @@ create table friendships(
 
     primary key (first_user_id, second_user_id),
     foreign key (first_user_id) references users(user_id) on delete cascade,
-    foreign key (second_user_id) references users(user_id) on delete cascade,
-
-    index idx_friendships_first_user_id (first_user_id),
-    index idx_friendships_second_user_id (second_user_id)
+    foreign key (second_user_id) references users(user_id) on delete cascade
 );
 
 
@@ -190,10 +172,7 @@ create table user_achievement(
 
     primary key (user_id, achievement_id),
     foreign key (user_id) references users(user_id) on delete cascade,
-    foreign key (achievement_id) references achievements(achievement_id) on delete cascade,
-
-    index idx_user_achievement_user_id (user_id),
-    index idx_user_achievement_achievement_id (achievement_id)
+    foreign key (achievement_id) references achievements(achievement_id) on delete cascade
 );
 
 -- Messages table.
@@ -207,10 +186,7 @@ create table messages(
     message_send_date timestamp default current_timestamp,
 
     foreign key (sender_user_id) references users(user_id) on delete cascade,
-    foreign key (recipient_user_id) references users(user_id) on delete cascade,
-
-    index idx_messages_sender_user_id (sender_user_id),
-    index idx_messages_recipient_user_id (recipient_user_id)
+    foreign key (recipient_user_id) references users(user_id) on delete cascade
 );
 
 -- Challenges table.
@@ -224,11 +200,7 @@ create table challenges(
 
     foreign key (sender_user_id) references users(user_id) on delete cascade,
     foreign key (recipient_user_id) references users(user_id) on delete cascade,
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-
-    index idx_challenges_sender_user_id (sender_user_id),
-    index idx_challenges_recipient_user_id (recipient_user_id),
-    index idx_challenges_quiz_id (quiz_id)
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
 
 -- History table.
@@ -242,10 +214,7 @@ create table history(
     completion_date timestamp default current_timestamp,
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade,
-
-    index idx_history_quiz_id (quiz_id),
-    index idx_history_user_id (user_id)
+    foreign key (user_id) references users(user_id) on delete cascade
 );
 
 -- Quiz Rating table.
@@ -258,10 +227,7 @@ create table quiz_rating(
 
     primary key (quiz_id, user_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade,
-
-    index idx_quiz_rating_quiz_id (quiz_id),
-    index idx_quiz_rating_user_id (user_id)
+    foreign key (user_id) references users(user_id) on delete cascade
 );
 
 -- Announcements table.
@@ -273,11 +239,30 @@ create table announcements(
     announcement_text text not null,
     creation_date timestamp default current_timestamp,
 
-    foreign key (administrator_id) references users(user_id) on delete cascade,
-
-    index idx_announcements_administrator_id (administrator_id)
+    foreign key (administrator_id) references users(user_id) on delete cascade
 );
 
 
-
-
+-- Indexes on foreign keys and frequently queried columns to optimize JOINs and WHERE clause performance across major entities
+create index idx_quizzes_category_id on quizzes (category_id);
+create index idx_quizzes_creator_id on quizzes (creator_id);
+create index idx_questions_quiz_id on questions (quiz_id);
+create index idx_questions_num_answers on questions (num_answers);
+create index idx_answers_question_id on answers (question_id);
+create index idx_matches_question_id on matches (question_id);
+create index idx_quiz_tag_quiz_id on quiz_tag (quiz_id);
+create index idx_quiz_tag_tag_id on quiz_tag (tag_id);
+create index idx_friendships_first_user_id on friendships(first_user_id);
+create index idx_friendships_second_user_id on friendships(second_user_id);
+create index idx_user_achievement_user_id on user_achievement(user_id);
+create index idx_user_achievement_achievement_id on user_achievement(achievement_id);
+create index idx_messages_sender_user_id on messages(sender_user_id);
+create index idx_messages_recipient_user_id on messages(recipient_user_id);
+create index idx_challenges_sender_user_id on challenges(sender_user_id);
+create index idx_challenges_recipient_user_id on challenges(recipient_user_id);
+create index idx_challenges_quiz_id on challenges(quiz_id);
+create index idx_history_quiz_id on history(quiz_id);
+create index idx_history_user_id on history(user_id);
+create index idx_quiz_rating_quiz_id on quiz_rating (quiz_id);
+create index idx_quiz_rating_user_id on quiz_rating(user_id);
+create index idx_announcements_administrator_id on announcements (administrator_id);

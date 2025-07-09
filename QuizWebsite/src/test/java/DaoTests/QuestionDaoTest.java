@@ -41,7 +41,7 @@ public class QuestionDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testUpdateQuestionText() {
+    public void testUpdateQuestionText() {
         Question q = new ResponseQuestion(-1L, 4L, "Old Text", null,
                 Constants.QuestionTypes.RESPONSE_QUESTION, 1, Constants.OrderTypes.ORDERED);
 
@@ -56,7 +56,7 @@ public class QuestionDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testUpdateQuestionImage() {
+    public void testUpdateQuestionImage() {
         Question q = new ResponseQuestion(-1L, 4L, "With image", null,
                 Constants.QuestionTypes.RESPONSE_QUESTION, 1, Constants.OrderTypes.ORDERED);
 
@@ -71,7 +71,7 @@ public class QuestionDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testQuizScoreUpdateAfterRemoval() {
+    public void testQuizScoreUpdateAfterRemoval() {
         Question q = new MultiAnswerQuestion(-1L, 4L, "Quiz score test", null,
                 Constants.QuestionTypes.MULTI_ANSWER_QUESTION, 3, Constants.OrderTypes.ORDERED);
 
@@ -87,7 +87,7 @@ public class QuestionDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testInsertQuestionUpdatesQuizScore() {
+    public void testInsertQuestionUpdatesQuizScore() {
         long quizId = 4;
         int scoreBefore = getQuizScore(quizId);
 
@@ -107,7 +107,7 @@ public class QuestionDaoTest extends BaseDaoTest{
 
 
     @Test
-    void testRemoveQuestionUpdatesQuizScore() {
+    public void testRemoveQuestionUpdatesQuizScore() {
         long quizId = 4;
 
         dao.removeQuestion(1);
