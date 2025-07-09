@@ -173,13 +173,13 @@
         <div class="left-column">
           <h4>Left Options</h4>
           <div id="left-options"></div>
-          <button type="button" onclick="addLeftOption()">Add Left Option</button>
+          <button id="add-left-option-button"type="button" onclick="addLeftOption()">Add Left Option</button>
         </div>
 
         <div class="right-column">
           <h4>Right Options</h4>
           <div id="right-options"></div>
-          <button type="button" onclick="addRightOption()">Add Right Option</button>
+          <button id="add-right-option-button" type="button" onclick="addRightOption()">Add Right Option</button>
         </div>
       </div>
     </div>

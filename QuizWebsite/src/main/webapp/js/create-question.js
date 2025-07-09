@@ -40,7 +40,6 @@ function showQuestionForm() {
 
 }
 
-
 window.addEventListener("DOMContentLoaded", function (){
     const finishButton = document.getElementById("finishQuizButton");
     if (finishButton && hasQuestionFromSession){
@@ -232,7 +231,6 @@ function renderQuestionWithBlanks() {
     updateFinalQuestion();
 }
 
-
 function insertBlank(index) {
     if (blankInserted) {
         alert("Only one blank is allowed.");
@@ -305,7 +303,9 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             input.setCustomValidity("You must insert a blank into the question.");
             input.reportValidity();
 
-            setTimeout(() => input.setCustomValidity(""), 1000);
+            setTimeout(() => input.setCustomValidity(""), 2000);
+
+            return;
         }
     }
 
@@ -320,7 +320,9 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             firstTextarea.setCustomValidity("You must mark one option as correct.");
             firstTextarea.reportValidity();
 
-            setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+            setTimeout(() => firstTextarea.setCustomValidity(""), 2000);
+
+            return;
         }
     }
 
@@ -335,23 +337,25 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             firstTextarea.setCustomValidity("You must mark at least one option as correct.");
             firstTextarea.reportValidity();
 
-            setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
+            setTimeout(() => firstTextarea.setCustomValidity(""), 2000);
+
+            return;
         }
     }
 
     const container = document.getElementById(`${selectedType}-form`);
 
-    const answers = [...container.querySelectorAll(`[name="answer"]`)];
-    const allAnswersFilled = answers.every(input => input.value.trim() !== "");
+    const answers = container.querySelectorAll(`[name="answer"]`);
 
-    if(!allAnswersFilled){
-        e.preventDefault();
-        const firstTextarea = container.querySelector("textarea[name='answer']");
-        firstTextarea.setCustomValidity("Please fill in all answer fields");
-        firstTextarea.reportValidity();
+    answers.forEach(answerField => {
+        if(answerField.value.trim() === "") {
+            e.preventDefault();
+            answerField.setCustomValidity("Please fill out this field.");
+            answerField.reportValidity();
 
-        setTimeout(() => firstTextarea.setCustomValidity(""), 1000);
-    }
+            setTimeout(() => answerField.setCustomValidity(""), 2000);
+        }
+    })
 
     if(selectedType === "picture-response") {
         const imageUrl = container.querySelector(`[name="imageUrl"]`);
@@ -359,21 +363,43 @@ document.getElementById("create-question-form").addEventListener("submit", funct
         if(imageUrl.value.trim() === "") {
             e.preventDefault();
 
-            imageUrl.setCustomValidity("Please fill in image link field");
+            imageUrl.setCustomValidity("Please fill out this field.");
             imageUrl.reportValidity();
 
-            setTimeout(() => imageUrl.setCustomValidity(""), 1000);
+            setTimeout(() => imageUrl.setCustomValidity(""), 2000);
         }
-    } else {
+    }
+    else if(selectedType === "fill-in-the-blank") {
+        const rawQuestionInput = document.getElementById("rawQuestionInput");
+
+        if(rawQuestionInput.value.trim() === "") {
+            e.preventDefault();
+
+            rawQuestionInput.setCustomValidity("Please fill out this field.");
+            rawQuestionInput.reportValidity();
+
+            setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
+        }
+
+        if(rawQuestionInput.value.includes("_")) {
+            e.preventDefault();
+
+            rawQuestionInput.setCustomValidity("Please do not use underscores (_) in fill-in-the-blank questions — they mark the blanks.");
+            rawQuestionInput.reportValidity();
+
+            setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
+        }
+    }
+    else {
         const questionText = container.querySelector(`[name="questionText"]`);
 
         if(questionText.value.trim() === "") {
             e.preventDefault();
 
-            questionText.setCustomValidity("Please fill in question text field");
+            questionText.setCustomValidity("Please fill out this field.");
             questionText.reportValidity();
 
-            setTimeout(() => questionText.setCustomValidity(""), 1000);
+            setTimeout(() => questionText.setCustomValidity(""), 2000);
         }
     }
 
@@ -381,27 +407,47 @@ document.getElementById("create-question-form").addEventListener("submit", funct
         const textAreas = document.querySelectorAll
         ("#multi-answer-form .answer-group textarea, #multi-answer-form .answer-group input[type='text']");
 
-        let allFilled = true;
-
         textAreas.forEach(textarea => {
             if (textarea.value.trim() === "") {
-                allFilled = false;
+                e.preventDefault();
+
+                textarea.setCustomValidity("Please fill out this field.");
+                textarea.reportValidity();
+
+                setTimeout(() => textarea.setCustomValidity(""), 2000);
             }
         });
-
-        if(!allFilled) {
-            e.preventDefault();
-
-            const firstTextArea = textAreas[0];
-
-            firstTextArea.setCustomValidity("Please fill in all answer fields");
-            firstTextArea.reportValidity();
-
-
-            setTimeout(() => firstTextArea.setCustomValidity(""), 1000);
-        }
     }
 
+    if(selectedType === "matching") {
+        const matchOptions = container.querySelectorAll('.left-group input[type="text"], .right-option-wrapper input[type="text"]');
+
+        matchOptions.forEach(option => {
+            if(option.value.trim() === "") {
+                e.preventDefault();
+
+                option.setCustomValidity("Please fill out this field.");
+                option.reportValidity();
+
+                setTimeout(() => option.setCustomValidity(""), 2000);
+            }
+        })
+    }
+
+    const multiAnswerContainer = document.getElementById("multi-answer-container");
+
+    if (!multiAnswerContainer) return;
+
+    const order = Array.from(multiAnswerContainer.querySelectorAll(".answer-group"))
+        .map(group => group.dataset.groupId); // collect order of groupIds
+
+    let hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "answerOrder";
+    hidden.id = "answerOrderInput";
+    hidden.value = order.join(",");
+
+    this.appendChild(hidden);
 });
 
 let multiAnswerCount = 0;
@@ -409,11 +455,6 @@ let multiAnswerCount = 0;
 function addAnswerGroup(afterElement = null) {
     const container = document.getElementById("multi-answer-container");
     const groupId = multiAnswerCount++;
-
-    if (multiAnswerCount === 10) {
-        document.getElementById("multi-answer-add-button").disabled = true;
-        Array.from(document.getElementsByClassName("insert-below-button")).forEach(btn => btn.disabled = true);
-    }
 
     const group = document.createElement("div");
     group.className = "answer-group";
@@ -425,7 +466,7 @@ function addAnswerGroup(afterElement = null) {
 
         <div class = "options-container" id = "options-${groupId}"></div>
 
-        <button type="button" onclick="addOption(${groupId})">Add Option</button>
+        <button id="add-option-button-${groupId}" type="button" onclick="addOption(${groupId})">Add Option</button>
         <button type="button" class="insert-below-button" onclick="insertAnswerBelow(this)">Insert Answer Below</button>
         <hr/>
     `;
@@ -434,6 +475,11 @@ function addAnswerGroup(afterElement = null) {
         afterElement.insertAdjacentElement("afterend", group);
     } else {
         container.appendChild(group);
+    }
+
+    if (multiAnswerCount === 10) {
+        document.getElementById("multi-answer-add-button").disabled = true;
+        Array.from(document.getElementsByClassName("insert-below-button")).forEach(btn => btn.disabled = true);
     }
 }
 
@@ -451,6 +497,10 @@ function addOption(groupId) {
 
     container.appendChild(label);
     container.appendChild(input);
+
+    if(optionCount === 10) {
+        document.getElementById(`add-option-button-${groupId}`).disabled = true;
+    }
 }
 
 function insertAnswerBelow(button) {
@@ -482,6 +532,10 @@ function addRightOption(value = "") {
 
     updateAllDropdowns();
     rightOptionId++;
+
+    if(rightOptionId === 10) {
+        document.getElementById("add-right-option-button").disabled = true;
+    }
 }
 
 function addLeftOption() {
@@ -508,6 +562,10 @@ function addLeftOption() {
 
     updateDropdown(select);
     leftOptionId++;
+
+    if(leftOptionId === 10) {
+        document.getElementById("add-left-option-button").disabled = true;
+    }
 }
 
 function updateAllDropdowns() {
@@ -540,21 +598,4 @@ function confirmDiscard(){
 function confirmQuestionDiscard(){
     return confirm("Are you sure you want to discard this question?");
 }
-
-document.getElementById("create-question-form").addEventListener("submit", function (e) {
-    const container = document.getElementById("multi-answer-container");
-
-    if (!container) return;
-
-    const order = Array.from(container.querySelectorAll(".answer-group"))
-        .map(group => group.dataset.groupId); // collect order of groupIds
-
-    let hidden = document.createElement("input");
-    hidden.type = "hidden";
-    hidden.name = "answerOrder";
-    hidden.id = "answerOrderInput";
-    hidden.value = order.join(",");
-
-    this.appendChild(hidden);
-});
 

@@ -27,7 +27,7 @@ const otherTagInput = document.getElementById("otherTagInput");
 const quizDescriptionInput = document.getElementById("quizDescription");
 
 /*TODO change this*/
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", async function (e) {
     const quizTitle = quizTitleInput.value.trim();
     const duration = durationInput.value.trim();
     const otherTag = otherTagInput.value.trim();
@@ -36,74 +36,88 @@ form.addEventListener("submit", function (e) {
     if (quizTitle === "") {
         e.preventDefault();
 
-        quizTitleInput.setCustomValidity("Quiz title cannot be empty");
+        quizTitleInput.setCustomValidity("Please fill out this field.");
         quizTitleInput.reportValidity();
+
+        setTimeout(() => quizTitleInput.setCustomValidity(""), 2000);
+
         return;
     }
 
     if(quizDescription === "") {
-        quizDescriptionInput.setCustomValidity("Description cannot be empty");
+        e.preventDefault();
+
+        quizDescriptionInput.setCustomValidity("Please fill out this field.");
         quizDescriptionInput.reportValidity();
+
+        setTimeout(() => quizDescriptionInput.setCustomValidity(""), 2000);
+
         return;
     }
 
     if (!isPositiveInteger(duration)) {
+        e.preventDefault();
+
         durationInput.setCustomValidity("Time must be a positive integer");
         durationInput.reportValidity();
+
+        setTimeout(() => durationInput.setCustomValidity(""), 2000);
+
         return;
     }
 
-    isQuizTitleUnique(quizTitle, function (titleUnique) {
-        if (!titleUnique) {
-            quizTitleInput.setCustomValidity("This quiz title is already taken");
-            quizTitleInput.reportValidity();
+    e.preventDefault();
+
+    const titleUnique = await isQuizTitleUnique(quizTitle);
+
+    if (!titleUnique) {
+        quizTitleInput.setCustomValidity("This quiz title is already taken");
+        quizTitleInput.reportValidity();
+
+        setTimeout(() => quizTitleInput.setCustomValidity(""), 2000);
+        return;
+    }
+
+    if (document.getElementById("tag_other").checked && otherTag !== "") {
+        const tagUnique = await isTagUnique(otherTag);
+
+        if (!tagUnique) {
+            otherTagInput.setCustomValidity("This tag name is already taken");
+            otherTagInput.reportValidity();
+
+            setTimeout(() => otherTagInput.setCustomValidity(""), 2000);
+
             return;
         }
+    }
 
-        if (document.getElementById("tag_other").checked && otherTag !== "") {
-            isTagUnique(otherTag, function (tagUnique) {
-                if (!tagUnique) {
-                    otherTagInput.setCustomValidity("Tag name already exists");
-                    otherTagInput.reportValidity();
-                    return;
-                }
-
-                form.submit();
-            });
-
-            return;
-        }
-
-        form.submit();
-    });
+    form.submit();
 });
 
 function isPositiveInteger(value) {
     return /^\d+$/.test(value) && parseInt(value) > 0;
 }
 
-function isQuizTitleUnique(title, callback) {
-    fetch(`validate-creation?action=validate-quiz-name&title=${encodeURIComponent(title)}`)
-        .then(response => response.text())
-        .then(result => {
-            callback(result === "true");
-        })
-        .catch(error => {
-            console.error("Error checking quiz title:", error);
-            callback(false);
-        });
+async function isQuizTitleUnique(title) {
+    try {
+        const response = await fetch(`validate-creation?action=validate-quiz-name&title=${encodeURIComponent(title)}`);
+        const result = await response.text();
+        return result === "true";
+    } catch (error) {
+        console.error("Error checking quiz title:", error);
+        return false;
+    }
 }
 
-function isTagUnique(tagName, callback) {
-    fetch(`validate-creation?action=validate-tag-name&tag-name=${encodeURIComponent(tagName)}`)
-        .then(response => response.text())
-        .then(result => {
-            callback(result === "true");
-        })
-        .catch(error => {
-            console.error("Error checking tag:", error);
-            callback(false);
-        });
+async function isTagUnique(tagName) {
+    try {
+        const response = await fetch(`validate-creation?action=validate-tag-name&tag-name=${encodeURIComponent(tagName)}`);
+        const result = await response.text();
+        return result === "true";
+    } catch (error) {
+        console.error("Error checking tag:", error);
+        return false;
+    }
 }
 
 // handling placement-correction correlation
@@ -136,20 +150,4 @@ function getSelectedValue(radioNodeList) {
 
 document.getElementsByName("placementType").forEach(radio => {
     radio.addEventListener("change", enforceCorrectionOptions);
-});
-
-quizTitleInput.addEventListener("input", function () {
-    quizTitleInput.setCustomValidity("");
-});
-
-otherTagInput.addEventListener("input", function() {
-    otherTagInput.setCustomValidity("");
-});
-
-quizDescriptionInput.addEventListener("input", function() {
-    quizDescriptionInput.setCustomValidity("");
-});
-
-durationInput.addEventListener("input", function () {
-    durationInput.setCustomValidity("");
 });
