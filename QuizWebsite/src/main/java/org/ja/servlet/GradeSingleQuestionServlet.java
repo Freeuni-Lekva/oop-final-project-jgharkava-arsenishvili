@@ -140,7 +140,7 @@ public class GradeSingleQuestionServlet extends HttpServlet {
             }
 
             session.setAttribute("time-spent-in-minutes", completionTime);
-            long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
+            int totalScore = grades.stream().mapToInt(Integer::intValue).sum();
             Timestamp completionDate = new Timestamp(currTime);
 
             History newHistory = new History(userId, quizId, totalScore, completionTime, completionDate);

@@ -2,35 +2,29 @@ use ja_project_db;
 
 -- Users table with basic information, including id, password, username, registration date, photo (might be null)
 -- and status: one may be an administrator or a basic user.
-create table users
-(
-    user_id           bigint primary key auto_increment,
-    password_hashed   varchar(256)                   not null,
-    salt              varchar(256)                   not null,
-    username          varchar(64) unique             not null,
-    registration_date timestamp                               default current_timestamp,
-    user_photo        varchar(256),
-    user_status       enum ('administrator', 'user') not null default 'user'
+create table users(
+    user_id bigint primary key auto_increment,
+    password_hashed varchar(256) not null,
+    salt varchar(256) not null,
+    username varchar(64) unique not null,
+    registration_date timestamp default current_timestamp,
+    user_photo varchar(256),
+    user_status enum('administrator','user') not null default 'user'
 );
-
 
 -- Categories table.
 -- Might include categories like history, geography etc.
-create table categories
-(
-    category_id   bigint primary key auto_increment,
+create table categories(
+    category_id bigint primary key auto_increment,
     category_name varchar(64) unique not null
 );
 
-
 -- Tags table.
 -- Might include tags like easy, fun, beginner, timed etc.
-create table tags
-(
-    tag_id   bigint primary key auto_increment,
+create table tags(
+    tag_id bigint primary key auto_increment,
     tag_name varchar(64) unique not null
 );
-
 
 -- Quizzes table.
 -- Includes main information on quiz including its name, id, description (if any),
@@ -41,32 +35,33 @@ create table tags
 -- Whether the questions should be presented on a single-page or one question per page;
 -- Whether (in case of multiple pages) the answers should be corrected immediately or together at once
 -- (check constraint is provided so that immediate correction is available only in case of multiple-page option)
-create table quizzes
-(
-    quiz_id                    bigint primary key auto_increment,
-    quiz_name                  varchar(64) unique                 not null,
-    quiz_description           text,
-    quiz_score                 int                                not null,
-    average_rating             double                             not null default 0,
-    participant_count          bigint                             not null default 0,
-    creation_date              timestamp                                   default current_timestamp,
-    time_limit_in_minutes      int                                not null default 0,
-    category_id                bigint                             not null,
-    creator_id                 bigint                             not null,
-    question_order_status      enum ('ordered', 'randomized')     not null default 'ordered',
-    question_placement_status  enum ('one-page', 'multiple-page') not null default 'one-page',
-    question_correction_status enum ('immediate-correction', 'final-correction')
-                                                                  not null default 'final-correction',
+create table quizzes(
+    quiz_id bigint primary key auto_increment,
+    quiz_name varchar(64) unique not null,
+    quiz_description text,
+    quiz_score int not null,
+    average_rating double not null default 0,
+    participant_count bigint not null default 0,
+    creation_date timestamp default current_timestamp,
+    time_limit_in_minutes int not null default 0,
+    category_id bigint not null,
+    creator_id bigint not null,
+
+    question_order_status enum('ordered','randomized') not null default 'ordered',
+    question_placement_status enum('one-page','multiple-page') not null default 'one-page',
+    question_correction_status enum('immediate-correction','final-correction') not null default 'final-correction',
 
     check (
         question_placement_status != 'one-page'
             or question_correction_status = 'final-correction'
-        ),
+    ),
 
-    foreign key (creator_id) references users (user_id) on delete cascade,
-    foreign key (category_id) references categories (category_id) on delete cascade
+    foreign key (creator_id) references users(user_id) on delete cascade,
+    foreign key (category_id) references categories(category_id) on delete cascade,
+
+    index idx_quizzes_category_id (category_id),
+    index idx_quizzes_creator_id (creator_id)
 );
-
 
 -- Questions table.
 -- Includes basic information like question id, quiz id where this question is present,
@@ -105,7 +100,10 @@ create table questions(
         or question_type = 'multi-answer'
     ),
 
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
+
+    index idx_questions_quiz_id (quiz_id),
+    index idx_questions_num_answers (num_answers)
 );
 
 
@@ -120,7 +118,9 @@ create table answers(
     answer_validity boolean not null default true,
 
     foreign key (question_id) references questions(question_id) on delete cascade,
-    unique (question_id, answer_order)
+    unique (question_id, answer_order),
+
+    index idx_answers_question_id (question_id)
 );
 
 
@@ -132,7 +132,9 @@ create table matches(
     left_match text not null,
     right_match text not null,
 
-    foreign key (question_id) references questions(question_id) on delete cascade
+    foreign key (question_id) references questions(question_id) on delete cascade,
+
+    index idx_matches_question_id (question_id)
 );
 
 
@@ -144,7 +146,10 @@ create table quiz_tag(
 
     primary key (quiz_id, tag_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (tag_id) references tags(tag_id) on delete cascade
+    foreign key (tag_id) references tags(tag_id) on delete cascade,
+
+    index idx_quiz_tag_quiz_id (quiz_id),
+    index idx_quiz_tag_tag_id (tag_id)
 );
 
 
@@ -159,7 +164,10 @@ create table friendships(
 
     primary key (first_user_id, second_user_id),
     foreign key (first_user_id) references users(user_id) on delete cascade,
-    foreign key (second_user_id) references users(user_id) on delete cascade
+    foreign key (second_user_id) references users(user_id) on delete cascade,
+
+    index idx_friendships_first_user_id (first_user_id),
+    index idx_friendships_second_user_id (second_user_id)
 );
 
 
@@ -182,7 +190,10 @@ create table user_achievement(
 
     primary key (user_id, achievement_id),
     foreign key (user_id) references users(user_id) on delete cascade,
-    foreign key (achievement_id) references achievements(achievement_id) on delete cascade
+    foreign key (achievement_id) references achievements(achievement_id) on delete cascade,
+
+    index idx_user_achievement_user_id (user_id),
+    index idx_user_achievement_achievement_id (achievement_id)
 );
 
 -- Messages table.
@@ -196,7 +207,10 @@ create table messages(
     message_send_date timestamp default current_timestamp,
 
     foreign key (sender_user_id) references users(user_id) on delete cascade,
-    foreign key (recipient_user_id) references users(user_id) on delete cascade
+    foreign key (recipient_user_id) references users(user_id) on delete cascade,
+
+    index idx_messages_sender_user_id (sender_user_id),
+    index idx_messages_recipient_user_id (recipient_user_id)
 );
 
 -- Challenges table.
@@ -210,22 +224,28 @@ create table challenges(
 
     foreign key (sender_user_id) references users(user_id) on delete cascade,
     foreign key (recipient_user_id) references users(user_id) on delete cascade,
-    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
+    foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
+
+    index idx_challenges_sender_user_id (sender_user_id),
+    index idx_challenges_recipient_user_id (recipient_user_id),
+    index idx_challenges_quiz_id (quiz_id)
 );
 
--- TODO change score to int
 -- History table.
 -- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
 create table history(
     history_id bigint primary key auto_increment,
     user_id bigint not null,
     quiz_id bigint not null,
-    score bigint not null default 0,
+    score int not null default 0,
     completion_time double not null,
     completion_date timestamp default current_timestamp,
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade
+    foreign key (user_id) references users(user_id) on delete cascade,
+
+    index idx_history_quiz_id (quiz_id),
+    index idx_history_user_id (user_id)
 );
 
 -- Quiz Rating table.
@@ -238,7 +258,10 @@ create table quiz_rating(
 
     primary key (quiz_id, user_id),
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
-    foreign key (user_id) references users(user_id) on delete cascade
+    foreign key (user_id) references users(user_id) on delete cascade,
+
+    index idx_quiz_rating_quiz_id (quiz_id),
+    index idx_quiz_rating_user_id (user_id)
 );
 
 -- Announcements table.
@@ -250,7 +273,9 @@ create table announcements(
     announcement_text text not null,
     creation_date timestamp default current_timestamp,
 
-    foreign key (administrator_id) references users(user_id) on delete cascade
+    foreign key (administrator_id) references users(user_id) on delete cascade,
+
+    index idx_announcements_administrator_id (administrator_id)
 );
 
 
