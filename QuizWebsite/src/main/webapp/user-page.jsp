@@ -269,7 +269,7 @@
       %>
       <div class="message-item">
         <p>From: <strong><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=sender.getId()%>"><%=sender.getUsername()%></a></strong></p>
-        <button class="view-message-button" data-message="<%= content %>">View</button>
+        <button class="view-message-button" data-message="<%= content %>" data-message-id="<%=m.getMessageId()%>">View</button>
       </div>
 
     <%
