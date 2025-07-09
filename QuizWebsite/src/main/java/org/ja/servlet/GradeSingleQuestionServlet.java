@@ -57,7 +57,7 @@ public class GradeSingleQuestionServlet extends HttpServlet {
 
         calculateGrade(response, question, grades, responseGrades);
 
-        int grade = grades.getFirst();
+        int grade = grades.get(0);
 
         Map<Question, Integer> masteryMap = (Map<Question, Integer>) session.getAttribute(Constants.SessionAttributes.PRACTICE_QUESTIONS_MASTERY_MAP);
 

@@ -257,7 +257,7 @@ public class HistoriesDao {
                 "    WHERE (first_user_id = ? OR second_user_id = ?) " +
                 "      AND friendship_status = 'friends' " +
                 ") f ON h.user_id = f.friend_id " +
-                "WHERE h.quiz_id = ?;";
+                "WHERE h.quiz_id = ? ORDER BY h.completion_date DESC;";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){

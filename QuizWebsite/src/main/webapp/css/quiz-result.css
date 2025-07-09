@@ -26,6 +26,35 @@
 #user-list-panel {
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #ccc; /* Optional: adds a visual boundary */
+    border: 1px solid #ccc;
     padding: 10px;
+}
+
+.scrollable-history-table {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0;
+    width: fit-content;
+    max-width: 600px;
+    margin-left: 0;
+}
+
+.scrollable-history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.scrollable-history-table th,
+.scrollable-history-table td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.scrollable-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f8f8;
 }

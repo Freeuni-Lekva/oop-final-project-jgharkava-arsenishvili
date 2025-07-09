@@ -4,13 +4,11 @@
 <%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.model.OtherObjects.Match" %>
-<%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Answer" %>
-<%@ page import="org.ja.dao.AnswersDao" %>
 <%@ page import="org.ja.model.user.User" %>
-<%@ page import="org.ja.dao.FriendShipsDao" %>
 <%@ page import="org.ja.model.OtherObjects.Friendship" %>
-<%@ page import="org.ja.dao.UsersDao" %><%--
+<%@ page import="org.ja.dao.*" %>
+<%@ page import="org.ja.model.OtherObjects.History" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/1/2025
@@ -22,6 +20,13 @@
 <%
     MatchesDao matchesDao = (MatchesDao) application.getAttribute(Constants.ContextAttributes.MATCHES_DAO);
     AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
+    HistoriesDao historyDao = (HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
+    UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
+    FriendShipsDao friendShipsDao = (FriendShipsDao) application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
+
+    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
+
+    List<Friendship> friends = friendShipsDao.getFriends(user.getId());
 
     Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
@@ -37,12 +42,14 @@
     int totalSeconds = (int) (timeSpent * 60);
     int minutes = totalSeconds / 60;
     int seconds = totalSeconds % 60;
+
 %>
 
 <html>
 <head>
     <title>Quiz Result</title>
     <link rel="stylesheet" type="text/css" href="css/quiz-result.css">
+    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
     <script src="js/quiz-result.js" defer></script>
 </head>
 <body>
@@ -177,13 +184,6 @@
 
 
 <%--challenge friend--%>
-<%
-    User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
-    UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
-    FriendShipsDao friendShipsDao = (FriendShipsDao) application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
-    List<Friendship> friends = friendShipsDao.getFriends(user.getId());
-%>
-
 <%--TODO make pretty--%>
 <div id="user-list-panel"><%
     if(!friends.isEmpty()) {
@@ -228,6 +228,118 @@
     <p id="rating-status" style="margin-top: 10px;"></p>
 </div>
 
+
+<%-- User's past performance on this quiz--%>
+
+<%
+    List<History> usersPastPerformance = historyDao.getUserHistoryByQuiz(user.getId(), quiz.getId());
+%>
+
+<div class="scrollable-history-table-title">
+    <h3>Your Past attempts on this quiz:</h3>
+</div>
+
+<div class="scrollable-history-table">
+    <table>
+        <thead>
+        <tr>
+            <th>Attempt #</th>
+            <th>Date</th>
+            <th>Score</th>
+            <th>Time taken</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            int attempt = 1;
+            for (History h : usersPastPerformance) {
+        %>
+        <tr>
+            <td><%= attempt++ %></td>
+            <td><%= h.getCompletionDate() %></td>
+            <td><%= h.getScore() %></td>
+
+            <%
+                double time = h.getCompletionTime();
+                int totalSecondsTaken = (int) Math.round(time * 60);
+                int minutesTaken = totalSecondsTaken / 60;
+                int secondsTaken = totalSecondsTaken % 60;
+                String formattedTime = minutesTaken + "min";
+                if (secondsTaken > 0) {
+                    formattedTime += " " + secondsTaken + "sec";
+                }
+            %>
+            <td><%= formattedTime %></td>
+        </tr>
+        <%
+            }
+            if (usersPastPerformance.isEmpty()) {
+        %>
+        <tr>
+            <td colspan="4">No attempts yet.</td>
+        </tr>
+        <%
+            }
+        %>
+        </tbody>
+    </table>
+</div>
+
+<%-- Friends' history on this quiz--%>
+
+<%
+    List<History> friendsHistory = historyDao.getUserFriendsHistoryByQuiz(user.getId(), quiz.getId());
+%>
+
+<div class="scrollable-history-table-title">
+    <h3>Your Friends' attempts on this quiz:</h3>
+</div>
+
+<div class="scrollable-history-table">
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Friend</th>
+            <th>Date</th>
+            <th>Score</th>
+            <th>Time taken</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            int i = 1;
+            for (History h : friendsHistory) {
+                long friendId = h.getUserId();
+                String friendName = usersDao.getUserById(friendId).getUsername();
+
+                double time = h.getCompletionTime();
+                int totalSecondsFriends = (int) Math.round(time * 60);
+                int minutesTakenFriends = totalSecondsFriends / 60;
+                int secondsTakenFriends = totalSecondsFriends % 60;
+                String formattedTime = minutesTakenFriends + "min";
+                if (seconds > 0) formattedTime += " " + secondsTakenFriends + "sec";
+        %>
+        <tr>
+            <td><%= i++ %></td>
+            <td>
+                <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=friendId%>"><%=friendName%></a>
+            </td>
+            <td><%= h.getCompletionDate() %></td>
+            <td><%= h.getScore() %></td>
+            <td><%= formattedTime %></td>
+        </tr>
+        <%
+            }
+            if (friendsHistory.isEmpty()) {
+        %>
+        <tr><td colspan="5">No friends have taken this quiz yet.</td></tr>
+        <%
+            }
+        %>
+        </tbody>
+    </table>
+</div>
 
 <%--return to homepage--%>
 <br><br><br>
