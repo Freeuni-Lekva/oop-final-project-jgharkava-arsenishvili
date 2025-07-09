@@ -37,6 +37,7 @@
 <head>
   <title><%=user.getUsername() %></title>
   <link rel="stylesheet" type="text/css" href="css/user-page.css">
+  <link rel="stylesheet" href="css/hotlink.css">
   <script src="js/user-page.js" defer></script>
 </head>
 
@@ -63,7 +64,7 @@
           if (cnt1 == 3) break;
       %>
       <div class="quiz-item">
-        <strong><%=quiz.getName()%></strong>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
         <p class="text-small">Taken by <%=quiz.getParticipantCount()%> users</p>
       </div>
       <%
@@ -79,11 +80,12 @@
         ArrayList<Quiz> recentlyCreated = quizDao.getQuizzesSortedByCreationDate();
         int cnt2 = 0;
         for (Quiz quiz : recentlyCreated) {
+          User currUser = usersDao.getUserById(quiz.getCreatorId());
           if (cnt2 == 3) break;
       %>
       <div class="quiz-item">
-        <strong><%=quiz.getName()%></strong>
-        <p class="text-small">By: <%=usersDao.getUserById(quiz.getCreatorId()).getUsername()%></p>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
+        <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></p>
         <p class="text-small"><%=quiz.getCreationDate()%></p>
       </div>
       <%
@@ -117,10 +119,11 @@
         if(!recentHistory.isEmpty()){
           int cnt3 = 0;
           for(History h: recentHistory){
+            Quiz quiz = quizDao.getQuizById(h.getQuizId());
             if(cnt3 == 3) break;
       %>
       <div class="history-item">
-        <strong><%=quizDao.getQuizById(h.getQuizId()).getName()%></strong>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
         <p class="text-small">Score: <%=h.getScore()%> | Time: <%=h.getCompletionTime()%></p>
         <p class="text-small"><%=h.getCompletionDate()%></p>
       </div>
@@ -144,7 +147,7 @@
             if(cnt4 == 3) break;
       %>
       <div class="history-item">
-        <strong><%=q.getName()%></strong>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=q.getId()%>"><%=q.getName()%></a></strong>
         <p class="text-small">Rating: <%=q.getAvgRating()%> | Taken by: <%=q.getParticipantCount()%> users</p>
       </div>
       <%
@@ -169,11 +172,13 @@
         if(friendsQuizzes != null && !friendsQuizzes.isEmpty()) {
           int cnt8 = 0;
           for(History h: friendsQuizzes){
+            Quiz quiz = quizDao.getQuizById(h.getQuizId());
+            User currUser = usersDao.getUserById(h.getUserId());
             if(cnt8 == 3) break;
       %>
       <div class="history-item">
-        <strong><%=quizDao.getQuizById(h.getQuizId()).getName()%></strong>
-        <p class="text-small">By: <%=usersDao.getUserById(h.getUserId()).getUsername()%></p>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
+        <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></p>
         <p class="text-small"><%=h.getCompletionDate()%></p>
       </div>
       <%
@@ -192,12 +197,13 @@
         ArrayList<Quiz> quizzesByFriends = quizDao.getFriendsQuizzesSortedByCreationDate(user.getId());
         if(quizzesByFriends != null && !quizzesByFriends.isEmpty()) {
           int cnt9 = 0;
-          for(Quiz q: quizzesByFriends){
+          for(Quiz quiz: quizzesByFriends){
             if(cnt9 == 3) break;
+            User creator = usersDao.getUserById(quiz.getCreatorId());
       %>
       <div class="history-item">
-        <strong><%=q.getName()%></strong>
-        <p class="text-small">By: <%=usersDao.getUserById(q.getCreatorId()).getUsername()%></p>
+        <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
+        <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=creator.getId()%>"><%=creator.getUsername()%></a></p>
       </div>
       <%
           cnt9++;
@@ -211,7 +217,7 @@
 
   <div class="full-history">
     <h4>Full history</h4>
-    <a href="history.jsp">view your full history</a>
+    <a href="history-page.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=user.getId()%>">view your full history</a>
   </div>
 
   <!-- Achievements Section -->
@@ -255,10 +261,11 @@
     <%
       int cnt5 = 0;
       for(Message m: messages){
+        User currUser = usersDao.getUserById(m.getSenderUserId());
         if(cnt5 == 3) break;
     %>
     <div class="message-item">
-      From: <%=usersDao.getUserById(m.getSenderUserId()).getUsername()%>
+      From: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a>
     </div>
     <%
         cnt5++;
@@ -291,11 +298,13 @@
     <%
       int cnt6 = 0;
       for(Challenge c: challenges){
+        Quiz quiz = quizDao.getQuizById(c.getQuizId());
+        User currUser = usersDao.getUserById(c.getSenderUserId());
         if(cnt6 == 3) break;
     %>
     <div class="challenge-item">
-      <strong><%=quizDao.getQuizById(c.getQuizId()).getName()%></strong>
-      <p class="text-small">From: <%=usersDao.getUserById(c.getSenderUserId()).getUsername()%></p>
+      <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
+      <p class="text-small">From: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></p>
     </div>
     <%
         cnt6++;
@@ -314,18 +323,19 @@
     <h3>Announcements by Administrators</h3>
     <%
       ArrayList<Announcement> ann = announcementsDao.getAllAnnouncements();
-      Map<Announcement, String> announcements = new HashMap<Announcement, String>();
+      Map<Announcement, User> announcements = new HashMap<Announcement, User>();
       for (Announcement a : ann) {
         User administrator = usersDao.getUserById(a.getAdministratorId());
-        announcements.put(a, administrator.getUsername());
+        announcements.put(a, administrator);
         if(announcements.size() == 3) break;
       }
       if(!announcements.isEmpty()){
         for(Announcement an : announcements.keySet()){
+          User currUser = announcements.get(an);
     %>
     <div class="announcement-item">
       <strong><%=an.getAnnouncementText() %></strong>
-      <p class="text-small">By: <%=announcements.get(an) %> | <%=an.getCreationDate() %></p>
+      <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a> | <%=an.getCreationDate() %></p>
     </div>
     <%
       }
@@ -347,10 +357,11 @@
     <%
       int cnt10 = 0;
       for(Friendship f: requests){
+        User currUser = usersDao.getUserById(f.getFirstUserId());
         if(cnt10 == 3) break;
     %>
     <div class="friend-request" data-user-id="<%=f.getFirstUserId()%>">
-      <span><%=usersDao.getUserById(f.getFirstUserId()).getUsername()%></span>
+      <span><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></span>
       <div>
         <button class="accept" data-user-id="<%=f.getFirstUserId()%>">Accept</button>
         <button class="delete" data-user-id="<%=f.getFirstUserId()%>">Delete</button>
