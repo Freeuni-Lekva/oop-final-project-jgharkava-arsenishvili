@@ -68,4 +68,8 @@ public class User {
                 salt.equals(((User) o).getSalt());
     }
 
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
 }

@@ -14,8 +14,12 @@
         visitedUser = usersDao.getUserByUsername(request.getParameter("query"));
     else
         visitedUser = usersDao.getUserById(Long.parseLong(request.getParameter(Constants.RequestParameters.USER_ID)));
+
     String name = visitedUser.getUsername();
     User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
+
+    if(visitedUser.getId() == currentUser.getId()) response.sendRedirect("/user-page.jsp");
+
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
     AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);

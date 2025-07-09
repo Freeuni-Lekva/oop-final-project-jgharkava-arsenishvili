@@ -8,8 +8,6 @@
 <%@ page import="org.ja.model.OtherObjects.QuizRating" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--TODO: add categories and tags--%>
-
 <%--TODO add hotlinks--%>
 <%
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
@@ -38,13 +36,11 @@
     for (Long quizTag: quizTagIds)
         quizTags.add(tagsDao.getTagById(quizTag).getTagName());
 
-    Map<String, List<String>> userReviews = new HashMap<String, List<String>>();
+    Map<User, String> userReviews = new HashMap<User, String>();
     for (QuizRating quizRating: quizRatings){
         if (quizRating.getReview() != null){
-            String currUsername = usersDao.getUserById(quizRating.getUserId()).getUsername();
-            userReviews.putIfAbsent(currUsername, new ArrayList<String>());
-            List<String> reviews = userReviews.get(currUsername);
-            reviews.add(quizRating.getReview());
+            User currUser = usersDao.getUserById(quizRating.getUserId());
+            userReviews.put(currUser, quizRating.getReview());
         }
     }
 
@@ -68,14 +64,13 @@
     topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week"));
     topByRange.put("last_month", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_month"));
     topByRange.put("last_year", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_year"));
-
 %>
 
 <html>
 <head>
     <title>Quiz Overview</title>
     <link rel="stylesheet" href="css/quiz-overview.css" />
-    <link rel="stylesheet" type="text/css" href="css/hotlink.css">
+    <link rel="stylesheet" href="css/hotlink.css">
     <script src="js/quiz-overview.js" defer></script>
 </head>
 
@@ -97,16 +92,12 @@
     <div class="quiz-reviews">
         <p><Strong>Reviews:</Strong></p>
 
-        <% for (String username : userReviews.keySet()) {
-            List<String> reviews = userReviews.get(username); %>
+        <% for (User currUser : userReviews.keySet()) {
+            String review = userReviews.get(currUser); %>
 
         <div class="review-block">
-            <h4><%= username %></h4>
-            <ul>
-                <% for (String review : reviews) { %>
-                <li><%= review %></li>
-                <% } %>
-            </ul>
+            <h4><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%= currUser.getUsername() %></a></h4>
+            <%=review%>
         </div>
 
         <% } %>
@@ -185,7 +176,7 @@ No activity to show
             User performer = usersDao.getUserById(h.getUserId());
         %>
         <tr>
-            <td><%= performer.getUsername() %></td>
+            <td><a></a><%= performer.getUsername() %></td>
             <td><%= h.getScore() %></td>
             <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
             <td><%= sdf.format(h.getCompletionDate()) %></td>
@@ -210,7 +201,7 @@ No activity to show
             User performer = usersDao.getUserById(h.getUserId());
         %>
         <tr>
-            <td><%= performer.getUsername() %></td>
+            <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
             <td><%= h.getScore() %></td>
             <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
             <td><%= sdf.format(h.getCompletionDate()) %></td>
@@ -259,7 +250,7 @@ No activity to show
                 User performer = usersDao.getUserById(history.getUserId());
             %>
             <tr>
-                <td><%=performer.getUsername()%></td>
+                <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
                 <td><%=history.getScore()%></td>
                 <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
                 <td><%=sdf.format(history.getCompletionDate())%></td>
@@ -304,7 +295,7 @@ No activity to show
                 User performer = usersDao.getUserById(history.getUserId());
             %>
             <tr>
-                <td><%=performer.getUsername()%></td>
+                <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
                 <td><%=history.getScore()%></td>
                 <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
                 <td><%=sdf.format(history.getCompletionDate())%></td>
@@ -358,7 +349,6 @@ No activity to show
     <input type = "hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value = "<%= quizId %>">
     <button type = "submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
 </form>
-
 
 <br>
 <form action="user-page.jsp" method="get">
