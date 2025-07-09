@@ -1,4 +1,3 @@
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.model.user.User" %>
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="java.util.Map" %>
@@ -269,7 +268,7 @@
           String content = m.getMessageText().replace("\"", "&quot;").replace("\n", "\\n");
       %>
       <div class="message-item">
-        <p>From: <strong><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=sender.getId()%>"><%= sender.getUsername() %></a></strong></p>
+        <p>From: <strong><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=sender.getId()%>"><%=sender.getUsername()%></a></strong></p>
         <button class="view-message-button" data-message="<%= content %>">View</button>
       </div>
 

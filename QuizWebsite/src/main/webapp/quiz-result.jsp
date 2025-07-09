@@ -313,7 +313,7 @@
                 int minutesTakenFriends = totalSecondsFriends / 60;
                 int secondsTakenFriends = totalSecondsFriends % 60;
                 String formattedTime = minutesTakenFriends + "min";
-                if (seconds > 0) formattedTime += " " + secondsTakenFriends + "sec";
+                if (secondsTakenFriends > 0) formattedTime += " " + secondsTakenFriends + "sec";
         %>
         <tr>
             <td><%= i++ %></td>

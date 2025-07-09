@@ -30,7 +30,7 @@ public class StartPracticeServlet extends HttpServlet {
             Collections.shuffle(questions);
 
         Map<Question, Integer> masteryMap = new HashMap<>();
-        for(Question question : questions) masteryMap.put(question, 1);
+        for(Question question : questions) masteryMap.put(question, 3);
 
         HttpSession session = req.getSession();
 
