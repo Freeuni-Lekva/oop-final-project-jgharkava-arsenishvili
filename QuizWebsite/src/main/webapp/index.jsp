@@ -1,7 +1,7 @@
 <%
     String err = (String) request.getAttribute("error");
     if(err != null){ %>
-        <div class="error-message"><%=err%></div>
+    <div id="login-error" class="error-message"><%= err %></div>
 <%  } %>
 
 <!DOCTYPE html>
@@ -9,6 +9,7 @@
 <head>
     <title>Quiz Website</title>
     <link rel="stylesheet" type="text/css" href="css/index.css">
+    <script src="js/user-page.js" defer></script>
 </head>
 
 <body>
@@ -27,7 +28,7 @@
          </label>
         <input type="submit" value="Login" />
     </form>
-    <p class="sign-up-link"><a href="quiz-result.jsp">Sign Up Here</a></p>
+    <p class="sign-up-link"><a href="sign-up.jsp">Sign Up Here</a></p>
 </div>
 </body>
 </html>

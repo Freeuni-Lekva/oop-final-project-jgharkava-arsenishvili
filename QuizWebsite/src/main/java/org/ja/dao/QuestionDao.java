@@ -8,15 +8,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class QuestionDao {
-    private final BasicDataSource dataSource;
-    private long cnt=0;
+/**
+ * Data Access Object for managing questions in the database.
+ */
+public class QuestionDao extends BaseDao{
+
+    /**
+     * Constructs a QuestionDao with the given data source.
+     *
+     * @param dataSource the database connection pool
+     */
     public QuestionDao(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
-    public void insertQuestion(Question question) {
+
+    /**
+     * Inserts a new question into the database.
+     *
+     * @param question the question to insert
+     * @return true if insertion was successful, false otherwise
+     */
+    public boolean insertQuestion(Question question) {
         String sql = "INSERT INTO questions (quiz_id, question, image_url, " +
                 "question_type, num_answers, order_status) VALUES (?,?, ?, ?, ?, ?);";
 
@@ -30,80 +45,69 @@ public class QuestionDao {
             ps.setInt(5, question.getNumAnswers());
             ps.setString(6, question.getOrderStatus());
 
-            ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected == 0){
+                return false;
+            }
 
             try (ResultSet rs = ps.getGeneratedKeys()){
                 if (rs.next()){
-                    cnt++;
                     question.setQuestionId(rs.getLong(1));
+                } else {
+                    throw new RuntimeException("Insert succeeded but no ID was returned.");
                 }
             }
 
+            updateQuizScore(question.getQuizId());
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting Questions into database", e);
         }
     }
 
-    public void removeQuestion(long questionId) {
+
+    /**
+     * Removes a question from the database and updates the quiz score.
+     *
+     * @param questionId the ID of the question to remove
+     * @return true if the question was successfully deleted, false otherwise
+     */
+    public boolean removeQuestion(long questionId) {
         Question question = getQuestionById(questionId);
+
+        if (question == null) return false;
+
         String sql = "DELETE FROM questions WHERE question_id = ?";
 
-        try(Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setLong(1, questionId);
-
-            if(ps.executeUpdate() > 0)
-                cnt--;
-
-            updateQuizScore(question.getQuizId());
-        } catch (SQLException e) {
-            throw new RuntimeException("Error removing question from database", e);
-        }
-    }
-
-    private void updateQuizScore(long quizId){
-        String sql = "UPDATE quizzes " +
-                "SET quiz_score = (" +
-                "  SELECT COALESCE(SUM(num_answers), 0) " +
-                "  FROM questions " +
-                "  WHERE quiz_id = ? " +
-                ") " +
-                "WHERE quiz_id = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-
-            preparedStatement.setLong(1, quizId);
-            preparedStatement.setLong(2, quizId);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException e){
-            throw new RuntimeException("Error updating quiz score by id", e);
-        }
-    }
-
-    public Question getQuestionById(long questionId) {
-        String sql = "SELECT * FROM questions WHERE question_id = ?";
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, questionId);
 
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()){
-                    return retrieveQuestion(rs);
-                }
+            if (ps.executeUpdate() == 0){
+                return false;
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error querying question by id from database", e);
-        }
 
-        return null;
+            updateQuizScore(question.getQuizId());
+
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error removing question from database", e);
+        }
     }
 
-    public ArrayList<Question> getQuizQuestions(long quizId) {
-        ArrayList<Question> questions = new ArrayList<>();
+
+
+    /**
+     * Retrieves all questions for a given quiz.
+     *
+     * @param quizId the ID of the quiz
+     * @return a list of questions belonging to the quiz
+     */
+    public List<Question> getQuizQuestions(long quizId) {
+        List<Question> questions = new ArrayList<>();
 
         String sql = "SELECT * FROM questions WHERE quiz_id = ? ORDER BY question_id";
 
@@ -113,10 +117,9 @@ public class QuestionDao {
             ps.setLong(1, quizId);
 
             try (ResultSet rs = ps.executeQuery()){
-                while(rs.next())
+                while (rs.next())
                     questions.add(retrieveQuestion(rs));
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quiz questions from database", e);
         }
@@ -124,148 +127,54 @@ public class QuestionDao {
         return questions;
     }
 
-    public void updateQuestionText(long questionId, String questionText){
-        String sql = "UPDATE questions SET question = ? WHERE question_id = ?";
 
-        try(Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-        ){
-            ps.setString(1, questionText);
-            ps.setLong(2, questionId);
-
-            ps.executeUpdate();
-        } catch (SQLException e){
-            throw new RuntimeException("Error updating question text", e);
-        }
+    /**
+     * Updates the question text for a specific question.
+     *
+     * @param questionId   the ID of the question to update
+     * @param questionText the new text for the question
+     * @return true if the update was successful, false otherwise
+     */
+    public boolean updateQuestionText(long questionId, String questionText){
+        return updateQuestionField("question", questionText, questionId);
     }
 
-    public void updateQuestionImage(long questionId, String imageUrl){
-        String sql = "UPDATE questions SET image_url = ? WHERE question_id = ?";
-
-        try(Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-        ){
-            ps.setString(1, imageUrl);
-            ps.setLong(2, questionId);
-
-            ps.executeUpdate();
-        } catch (SQLException e){
-            throw new RuntimeException("Error updating question text", e);
-        }
+    /**
+     * Updates the image URL of a question.
+     *
+     * @param questionId the ID of the question to update
+     * @param imageUrl   the new image URL
+     * @return true if the update was successful, false otherwise
+     */
+    public boolean updateQuestionImage(long questionId, String imageUrl){
+        return updateQuestionField("image_url", imageUrl, questionId);
     }
 
-    public void updateQuestion(Question question){
-        String sql = "UPDATE questions SET quiz_Id=?, question = ?, " +
-                "image_url=?, question_type=?, num_answers=?, " +
-                "order_status=? WHERE question_id = ?";
 
-        try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)){
-            ps.setLong(1, question.getQuizId());
-            ps.setString(2, question.getQuestionText());
-            ps.setString(3, question.getImageUrl());
-            ps.setString(4, question.getQuestionType());
-            ps.setInt(5, question.getNumAnswers());
-            ps.setString(6, question.getOrderStatus());
-            ps.setLong(7, question.getQuestionId());
 
-           ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating question into database", e);
-        }
-    }
+    // --- Helper Methods ---
 
-    public boolean contains(Question question){
-        String sql = "SELECT COUNT(*) FROM questions WHERE quiz_id = ? AND question=?" +
-                "AND image_url=? AND question_type = ?" +
-                " AND num_answers = ? AND order_status = ?";
+
+    /**
+     * Updates a specified field of a question in the database.
+     *
+     * @param fieldName   the column name to update (e.g., "question" or "image_url")
+     * @param fieldValue  the new value to set
+     * @param questionId  the ID of the question to update
+     * @return true if update was successful, false otherwise
+     */
+    private boolean updateQuestionField(String fieldName, String fieldValue, long questionId) {
+        String sql = "UPDATE questions SET " + fieldName + " = ? WHERE question_id = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setLong(1, question.getQuizId());
-            ps.setString(2, question.getQuestionText());
-            ps.setString(3, question.getImageUrl());
-            ps.setString(4, question.getQuestionType());
-            ps.setInt(5, question.getNumAnswers());
-            ps.setString(6, question.getOrderStatus());
+            ps.setString(1, fieldValue);
+            ps.setLong(2, questionId);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-            return false;
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException("Error checking user existence", e);
+            throw new RuntimeException("Error updating question field: " + fieldName, e);
         }
-    }
-
-    public long getCount(){
-        return cnt;
-    }
-
-    // TODO add specific constructor to questions
-    private Question retrieveQuestion(ResultSet rs) throws SQLException {
-        String type = rs.getString("question_type");
-
-        switch (type) {
-            case Constants.QuestionTypes.RESPONSE_QUESTION -> {
-                return new ResponseQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION -> {
-                return new PictureResponseQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.MATCHING_QUESTION -> {
-                return new MatchingQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.MULTI_ANSWER_QUESTION -> {
-                return new MultiAnswerQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION -> {
-                return new MultipleChoiceQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION -> {
-                return new MultiChoiceMultiAnswersQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            case Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION -> {
-                return new FillInTheBlankQuestion(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-
-            default -> {
-                return new Question(rs.getLong("question_id"), rs.getLong("quiz_id"),
-                        rs.getString("question"), rs.getString("image_url"),
-                        rs.getString("question_type"), rs.getInt("num_answers"),
-                        rs.getString("order_status"));
-            }
-        }
-
     }
 }

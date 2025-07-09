@@ -1,220 +1,116 @@
 package DaoTests;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.ja.dao.*;
-import org.ja.model.CategoriesAndTags.Category;
 import org.ja.model.OtherObjects.*;
-import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HistoryDaoTest {
-    private BasicDataSource basicDataSource;
+/**
+ * Unit tests for the HistoryDao class using an in-memory H2 database.
+ */
+public class HistoryDaoTest extends BaseDaoTest{
     private HistoriesDao dao;
-    private UsersDao usersDao;
-    private QuizzesDao quizzesDao;
-    private CategoriesDao categoriesDao;
 
     @BeforeEach
     public void setUp() throws Exception {
-        basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
-        basicDataSource.setUsername("sa");
-        basicDataSource.setPassword("");
+        setUpDataSource();
 
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/drop.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-        }
-        try (
-                Connection connection = basicDataSource.getConnection();
-                Statement statement = connection.createStatement()
-        ) {
-            // Read SQL file
-            StringBuilder sqlBuilder = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader("database/schema.sql"))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sqlBuilder.append(line).append("\n");
-                }
-            }
-
-            // Split and execute SQL commands (if there are multiple)
-            String[] sqlStatements = sqlBuilder.toString().split(";");
-            for (String sql : sqlStatements) {
-                if (!sql.trim().isEmpty() && !sql.trim().startsWith("use")) {
-                    statement.execute(sql.trim());
-                }
-            }
-
-            dao=new HistoriesDao(basicDataSource);
-            finishSetup();
-        }
-    }
-    private void finishSetup() throws SQLException, NoSuchAlgorithmException {
-        usersDao=new UsersDao(basicDataSource);
-        User sandro=new User(1, "Sandro", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(sandro);
-        User tornike=new User(2, "Tornike", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(tornike);
-        User liza=new User(3, "Liza", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(liza);
-        User nini=new User(4, "Nini", "123", "2025-6-14",null, "sth.jpg", "administrator");
-        usersDao.insertUser(nini);
-
-        String sql = """
-                    insert into achievements(achievement_name, achievement_description) values
-                    ('First step', 'Complete your first quiz'),
-                    ('Quiz Addict', 'Complete 10 quizzes'),
-                    ('Flawless Victory', 'Complete a quiz with no wrong answers'),
-                    ('Quiz Master', 'Score 100% on 5 quizzes'),
-                    ('Speed Demon', 'Finish a quiz in under 1 minute');
-                    """;
-        try (Connection connection = basicDataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.executeUpdate();
-        }
-
-        categoriesDao=new CategoriesDao(basicDataSource);
-        Category h=new Category(1, "history");
-        categoriesDao.insertCategory(h);
-        Category g=new Category(2, "geography");
-        categoriesDao.insertCategory(g);
-        Category m=new Category(3, "Maths");
-        categoriesDao.insertCategory(m);
-
-        quizzesDao=new QuizzesDao(basicDataSource);
-        Quiz q1 = new Quiz(12, "historyQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-
-        Quiz q2 = new Quiz(12, "geoQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q3 = new Quiz(12, "mathsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 1, 1,
-                "randomized", "one-page", "final-correction");
-        Quiz q4 = new Quiz(12, "physicsQuiz","description",
-                10, 7.3, 0,
-                new Timestamp(123),12, 2, 1,
-                "randomized", "one-page", "final-correction");
-        quizzesDao.insertQuiz(q1);
-        quizzesDao.insertQuiz(q2);
-        quizzesDao.insertQuiz(q3);
-        quizzesDao.insertQuiz(q4);
-
-        h1=new History(-1, 1, 1,7,56,null);
-        h2=new History(-1, 1, 2,8,60,null);
-        h3=new History(-1, 2, 3,7,56,null);
-        h4=new History(-1, 2, 4,7,56,null);
-
-
-
-    }
-    private History h1;
-    private History h2;
-    private History h3;
-    private History h4;
-    private History h5;
-
-    @Test
-    public void testInsert() throws SQLException {
-        dao.insertHistory(h1);
-        assertTrue(dao.contains(h1));
-        assertFalse(dao.contains(h2));
-        dao.insertHistory(h2);
-        dao.insertHistory(h3);
-        dao.insertHistory(h4);
-        assertEquals(4, dao.getCount());
+        dao = new HistoriesDao(basicDataSource);
     }
 
     @Test
-    public void testRemove() throws SQLException {
-        dao.insertHistory(h1);
-        dao.insertHistory(h2);
-        dao.insertHistory(h3);
-        dao.insertHistory(h4);
-        dao.removeHistory(1);
-        assertFalse(dao.contains(h1));
-        assertEquals(3, dao.getCount());
-        dao.removeHistory(1);
-        assertEquals(3, dao.getCount());
-        dao.removeHistory(3);
-        assertFalse(dao.contains(h3));
-        assertEquals(2, dao.getCount());
+    public void testInsertAndRetrieveHistory() throws SQLException {
+        History history = new History(5L, 4L, 5, 12.5, Timestamp.valueOf(LocalDateTime.now()));
+
+        boolean inserted = dao.insertHistory(history);
+        assertTrue(inserted);
+        assertTrue(history.getHistoryId() > 0);
+        assertNotNull(history.getCompletionDate());
+
+        List<History> userHistories = dao.getHistoriesByUserId(5L);
+        assertFalse(userHistories.isEmpty());
+        assertTrue(userHistories.stream().anyMatch(h -> h.getHistoryId() == history.getHistoryId()));
     }
 
     @Test
-    public void testGetHistories() throws SQLException {
-        dao.insertHistory(h1);
-        dao.insertHistory(h2);
-        dao.insertHistory(h3);
-        dao.insertHistory(h4);
-        ArrayList<History> arr=dao.getHistoriesByUserIdSortedByDate(1);
-        assertEquals(2, arr.size());
-        assertTrue(arr.contains(h1));
-        assertTrue(arr.contains(h2));
+    public void testGetHistoriesByQuizId() {
+        List<History> histories = dao.getHistoriesByQuizId(6L);
+        assertFalse(histories.isEmpty());
+
+        // Check whether descending by date
+        for (int i = 1; i < histories.size(); i++)
+            assertTrue(histories.get(i - 1).getCompletionDate().after(histories.get(i).getCompletionDate()));
     }
+
     @Test
-    public void testGetUserHistoriesByQuizId() throws SQLException {
-        dao.insertHistory(h1);
-        dao.insertHistory(h2);
-        dao.insertHistory(h3);
-        dao.insertHistory(h4);
+    public void testGetTopNDistinctHistoriesByQuizId() {
+        List<History> topHistories = dao.getTopNDistinctHistoriesByQuizId(6L, 5);
+        assertNotNull(topHistories);
+        assertTrue(topHistories.size() <= 5);
 
-        h4=new History(-1, 1, 1,9,56,null);
-        h5=new History(-1, 1, 1,10,56,null);
-        dao.insertHistory(h4);
-        dao.insertHistory(h5);
-        ArrayList<History> arr=dao.getUserHistoryByQuiz(1,1);
-        assertEquals(3, arr.size());
-        assertTrue(arr.contains(h4));
+        // Ensure distinct users (userId) among results
+        long distinctUsers = topHistories.stream().map(History::getUserId).distinct().count();
+        assertEquals(topHistories.size(), distinctUsers);
     }
+
     @Test
-    public void testGetHistoriesByQuizId() throws SQLException {
-        dao.insertHistory(h1);
-        dao.insertHistory(h2);
-        dao.insertHistory(h3);
-        dao.insertHistory(h4);
-        h4=new History(-1, 1, 2,9,56,null);
-        h5=new History(-1, 1, 1,10,56,null);
-        dao.insertHistory(h4);
-        dao.insertHistory(h5);
-        ArrayList<History> arr=dao.getHistoriesByQuizIdSortedByDate(2);
-        assertEquals(2, arr.size());
-        assertTrue(arr.contains(h4));
+    public void testDistinctTopHistoriesAll() {
+        List<History> distinctAll = dao.getDistinctTopHistoriesByQuizId(6L);
+
+        assertFalse(distinctAll.isEmpty());
+        assertEquals(distinctAll.stream().map(History::getUserId).distinct().count(), distinctAll.size());
     }
 
+    @Test
+    public void testGetTopPerformersByRange() {
+        List<History> lastDay = dao.getTopPerformersByQuizIdAndRange(6L, "last_day");
+        assertTrue(lastDay.stream().allMatch(h -> h.getCompletionDate().after(Timestamp.valueOf(LocalDateTime.now().minusDays(1)))));
 
+        assertDoesNotThrow(() -> dao.getTopPerformersByQuizIdAndRange(6L, "last_week"));
+    }
 
+    @Test
+    public void testUserHistoryByQuiz() {
+        List<History> userQuiz = dao.getUserHistoryByQuiz(8L, 6L);
 
+        assertFalse(userQuiz.isEmpty());
+        assertTrue(userQuiz.stream().allMatch(h -> h.getUserId() == 8L && h.getQuizId() == 6L));
+    }
+
+    @Test
+    public void testUserFriendsHistoryByQuiz() {
+        // Existing
+        List<History> friendsQuizExisting = dao.getUserFriendsHistoryByQuiz(7L, 6L);
+
+        assertFalse(friendsQuizExisting.isEmpty());
+        assertTrue(friendsQuizExisting.stream().allMatch(h -> h.getQuizId() == 6L && h.getUserId() != 7L));
+
+        // Non-Existing
+        List<History> friendsQuizNonExisting = dao.getUserFriendsHistoryByQuiz(7L, 4L);
+        assertTrue(friendsQuizNonExisting.isEmpty());
+    }
+
+    @Test
+    public void testUserFriendsHistory() {
+        List<History> friendsAll = dao.getUserFriendsHistory(7L);
+
+        assertEquals(2, friendsAll.size());
+        assertTrue(friendsAll.stream().allMatch(h -> h.getUserId() != 7L));
+    }
+
+    @Test
+    public void testStatisticsMethods() {
+        long quizId = 6L;
+
+        assertEquals(2, dao.getTotalAttempts(quizId));
+        assertEquals(4.0, dao.getAverageScore(quizId), 0.001);
+        assertEquals(5, dao.getMaximumScore(quizId));
+        assertEquals(3, dao.getMinimumScore(quizId));
+        assertEquals(8.5, dao.getAverageTime(quizId), 0.001);
+    }
 }

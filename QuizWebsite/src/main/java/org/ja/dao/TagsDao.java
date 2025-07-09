@@ -8,16 +8,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * DAO class for performing operations on the 'tags' table.
+ */
 public class TagsDao {
     private final BasicDataSource dataSource;
-    private long cnt=0;
+
+
+    /**
+     * Constructs a new TagsDao using the given data source.
+     * @param dataSource the database connection pool
+     */
     public TagsDao(BasicDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    ///  if tagName already exists throws RuntimeException
-    public void insertTag(Tag tag) {
+
+    /**
+     * Inserts a new tag into the database. Sets the tag ID in the Tag object.
+     * If the tag name already exists, a RuntimeException is thrown.
+     *
+     * @param tag the tag to insert
+     * @return true if inserted successfully
+     * @throws RuntimeException if tag name already exists or SQL error occurs
+     */
+    public boolean insertTag(Tag tag) {
         String sql = "INSERT INTO tags (tag_name) VALUES (?)";
 
         try (Connection c = dataSource.getConnection();
@@ -25,35 +42,54 @@ public class TagsDao {
 
             preparedStatement.setString(1, tag.getTagName());
 
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0){
+                return false;
+            }
 
             try (ResultSet keys = preparedStatement.getGeneratedKeys()){
                 if (keys.next()) {
-                    cnt++;
                     long newId = keys.getLong(1);
-                    tag.setTagId(newId); // if you want to store it in your object
+                    tag.setTagId(newId);
+                } else {
+                    throw new RuntimeException("Inserting tag failed, no ID obtained.");
                 }
             }
+
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting tag into database", e);
         }
     }
 
-    public void removeTag(Tag tag) {
+
+    /**
+     * Removes a tag from the database using its ID.
+     * @param tag the tag to remove
+     * @return true if deleted successfully
+     */
+    public boolean removeTag(Tag tag) {
         String sql = "DELETE FROM tags WHERE tag_id = ?";
+
         try (Connection c = dataSource.getConnection();
             PreparedStatement preparedStatement = c.prepareStatement(sql)){
 
             preparedStatement.setLong(1, tag.getTagId());
-            if(preparedStatement.executeUpdate() > 0)
-                cnt--;
+
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error removing tag from database", e);
         }
     }
 
+
+    /**
+     * Retrieves a tag by its ID.
+     * @param id the ID of the tag
+     * @return the tag if found, otherwise null
+     */
     public Tag getTagById (long id) {
         String sql = "SELECT * FROM tags WHERE tag_id = ?";
+
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
@@ -70,67 +106,13 @@ public class TagsDao {
         return null;
     }
 
-    public Tag getTagByName(String tagName) {
-        String sql="SELECT * FROM tags WHERE tag_name = ?";
-        try (Connection c=dataSource.getConnection();
-            PreparedStatement ps=c.prepareStatement(sql)){
 
-            ps.setString(1, tagName);
-
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next())
-                    return retrieveTag(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error querying tag from by name database", e);
-        }
-        return null;
-    }
-    public boolean containsTag(String name) {
-        String sql = "SELECT COUNT(*) FROM tags WHERE tag_name = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setString(1, name);
-
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error whilst checking if table contains Tag", e);
-        }
-    }
-
-    public boolean containsTag(long id) {
-        String sql = "SELECT COUNT(*) FROM tags WHERE tag_id = ?";
-
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-
-            return false;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error whilst checking if table contains Tag", e);
-        }
-    }
-    public long getCount() {
-        return cnt;
-    }
-
-    public ArrayList<Tag> getAllTags(){
-        ArrayList<Tag> tags = new ArrayList<>();
+    /**
+     * Retrieves all tags in the database.
+     * @return a list of all tags
+     */
+    public List<Tag> getAllTags(){
+        List<Tag> tags = new ArrayList<>();
 
         String sql = "SELECT * FROM TAGS";
 
@@ -149,6 +131,15 @@ public class TagsDao {
         return tags;
     }
 
+
+    // --- Helper Methods ---
+
+    /**
+     * Helper method to convert a ResultSet row into a Tag object.
+     * @param rs the ResultSet positioned at the desired row
+     * @return the Tag object
+     * @throws SQLException if an error occurs while reading from ResultSet
+     */
     private Tag retrieveTag(ResultSet rs) throws SQLException {
         return new Tag(rs.getLong("tag_id"), rs.getString("tag_name"));
     }
