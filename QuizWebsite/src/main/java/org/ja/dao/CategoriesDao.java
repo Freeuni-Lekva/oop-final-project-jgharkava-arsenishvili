@@ -90,6 +90,33 @@ public class CategoriesDao {
 
 
     /**
+     * Retrieves a category by its unique name.
+     *
+     * @param name the name of the category to retrieve
+     * @return the Category with the specified name
+     * @throws RuntimeException if no category with the given ID exists or if a database error occurs
+     */
+    public Category getCategoryByName(String name) {
+        String sql = "SELECT * FROM categories WHERE category_name = ?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setString(1, name);
+
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return retrieveCategory(rs);
+                } else {
+                    throw new RuntimeException("Category with name " + name + " not found.");
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error querying category by name from database", e);
+        }
+    }
+
+    /**
      * Retrieves all categories from the database.
      *
      * @return a list of all Category objects; empty list if none exist
