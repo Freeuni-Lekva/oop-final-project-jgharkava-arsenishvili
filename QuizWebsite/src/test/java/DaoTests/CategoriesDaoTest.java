@@ -36,6 +36,19 @@ public class CategoriesDaoTest extends BaseDaoTest{
     }
 
     @Test
+    public void testGetCategoryByName() {
+
+        // Existing
+        Category category = dao.getCategoryByName("Math");
+        assertNotNull(category);
+        assertEquals(5, category.getCategoryId());
+
+        // Non-existing
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> dao.getCategoryByName("Dance"));
+        assertTrue(exception.getMessage().contains("not found"));
+    }
+
+    @Test
     public void testInsertCategory() {
         Category newCategory = new Category(0, "Science");
 
