@@ -1,11 +1,9 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.dao.ChallengesDao" %>
 <%@ page import="org.ja.model.OtherObjects.Challenge" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.QuizzesDao" %>
-<%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="org.ja.model.user.User" %>
-<%@ page import="org.ja.dao.UsersDao" %><%--
+<%@ page import="org.ja.dao.UsersDao" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: user
   Date: 7/9/2025
@@ -27,7 +25,8 @@
 </head>
 <body>
 <div class="center-wrapper">
-  <%ArrayList<Challenge> challenges = challengeDao.challengesAsReceiver(userId);
+  <%
+    List<Challenge> challenges = challengeDao.challengesAsReceiver(userId);
     if(challenges != null && !challenges.isEmpty()){
       int num = challenges.size();
   %>

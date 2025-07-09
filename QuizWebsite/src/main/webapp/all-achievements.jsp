@@ -3,7 +3,8 @@
 <%@ page import="org.ja.model.OtherObjects.Achievement" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.UserAchievementsDao" %>
-<%@ page import="org.ja.model.OtherObjects.UserAchievement" %><%--
+<%@ page import="org.ja.model.OtherObjects.UserAchievement" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: user
   Date: 7/9/2025
@@ -24,7 +25,7 @@
 <body>
 <div class="center-wrapper">
   <%
-    ArrayList<UserAchievement> achievements = userAchievementsDao.getUserAchievements(userId);
+    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(userId);
     if(achievements != null && !achievements.isEmpty()){
       int num = achievements.size();
   %>

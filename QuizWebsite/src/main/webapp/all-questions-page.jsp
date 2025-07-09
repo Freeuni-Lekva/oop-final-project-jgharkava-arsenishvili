@@ -79,7 +79,7 @@
 
             /// MULTIPLE CHOICE QUESTION
             else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
-                ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
+                List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
                 Collections.shuffle(answers);%>
 
                 <h3><%=question.getQuestionText()%></h3><%
@@ -93,7 +93,7 @@
 
             /// MULTI CHOICE MULTI ANSWER QUESTION
             else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
-                ArrayList<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
+                List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
 
                 <h3><%=question.getQuestionText()%></h3><%
 
