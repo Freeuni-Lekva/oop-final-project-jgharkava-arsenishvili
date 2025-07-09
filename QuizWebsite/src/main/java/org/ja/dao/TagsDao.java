@@ -112,7 +112,7 @@ public class TagsDao {
      * @param name the name of the tag
      * @return the tag if found, otherwise null
      */
-    public Tag getTagByName (String name) {
+    public Tag getTagByName(String name) {
         String sql = "SELECT * FROM tags WHERE tag_name = ?";
 
         try (Connection c = dataSource.getConnection();

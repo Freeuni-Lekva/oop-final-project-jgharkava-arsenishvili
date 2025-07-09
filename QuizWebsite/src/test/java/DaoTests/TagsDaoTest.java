@@ -53,6 +53,17 @@ public class TagsDaoTest extends BaseDaoTest{
     }
 
     @Test
+    public void testGetTagByName(){
+        Tag tag = dao.getTagByName("timed");
+        assertNotNull(tag);
+        assertEquals(4, tag.getTagId());
+
+        Tag tagNonExisting = dao.getTagByName("Goofy");
+        assertNull(tagNonExisting);
+    }
+
+
+    @Test
     void testGetTagByIdNotFound() {
         Tag tag = dao.getTagById(-1L);
         assertNull(tag);
