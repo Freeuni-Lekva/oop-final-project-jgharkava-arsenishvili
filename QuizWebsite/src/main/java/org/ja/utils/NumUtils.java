@@ -4,7 +4,19 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+
+/**
+ * Utility class for number formatting operations such as formatting decimal numbers
+ * and percentages in a consistent and locale-safe way.
+ */
 public class NumUtils {
+
+
+    /**
+     * A {@link DecimalFormat} instance configured to format numbers with one decimal place,
+     * using a period (".") as the decimal separator (based on {@link Locale#US}).
+     * Example output: 3.3 → "3.3", 3 → "3.0"
+     */
     private static final DecimalFormat oneDecimalPlace = new DecimalFormat(
             "#0.0",
             DecimalFormatSymbols.getInstance(Locale.US)
