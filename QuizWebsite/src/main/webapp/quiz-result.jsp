@@ -316,7 +316,7 @@
             <td>
                 <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=friendId%>"><%=friendName%></a>
             </td>
-            <td><%= h.getCompletionDate() %></td>
+            <td><%= h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
             <td><%= h.getScore() %></td>
             <td><%= TimeUtils.formatDuration(h.getCompletionTime()) %></td>
         </tr>
