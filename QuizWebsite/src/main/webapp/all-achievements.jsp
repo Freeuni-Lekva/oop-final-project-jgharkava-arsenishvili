@@ -44,9 +44,10 @@
     }
   }
   %>
-  <button onclick="window.history.back()" class="back-btn">
-    ← Go Back
-  </button>
+  <br>
+  <form action="user-page.jsp" method="get" >
+    <button type="submit" class="back-btn">Go Home</button>
+  </form>
 </div>
 </body>
 </html>

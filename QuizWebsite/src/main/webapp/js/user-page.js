@@ -149,11 +149,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".view-message-button").forEach(button => {
         button.addEventListener("click", () => {
-        const message = button.dataset.message;
-        modalText.textContent = message;
-        modal.style.display = "flex";
+            const message = button.dataset.message;
+            modalText.textContent = message;
+            modal.style.display = "flex";
 
-        const messageItem = button.closest(".message-item");
+            const messageItem = button.closest(".message-item");
+
             if (messageItem && !messageItem.classList.contains("viewed")) {
                 messageItem.classList.add("viewed");
 
@@ -166,6 +167,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             }
+
+            const messageId = button.dataset.messageId;
+
+            fetch('messages-to-delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `messageId=${encodeURIComponent(messageId)}`
+            }).catch(err => console.error('Fetch error:', err));
+
+            //TODO delete
+            /*.then(response => {
+                    if (response.ok) {
+                        console.log('Message ID sent for deletion:', messageId);
+                    } else {
+                        console.error('Failed to send message ID');
+                    }
+            })*/
         });
     });
 

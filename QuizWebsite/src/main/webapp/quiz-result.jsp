@@ -137,12 +137,17 @@
             } else {
                 for (Answer answer : answers) {
                     boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
-                    if (checked) responseIndex++;%>
+                    String answerClass = "";
+                    if (checked) {
+                        int gr = respGrades.get(responseIndex);
+                        answerClass = gr > 0 ? "correct" : "incorrect";
+                        responseIndex++;
+                    }%>
 
-                    <div class="<%=checked ? "correct" : ""%>">
+                    <div class="<%= answerClass %>">
                         <input type="radio" <%=checked ? "checked" : ""%> disabled>
                         <%--TODO allign next to radio--%>
-                        <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
+                        <%= answer.getAnswerText() %>
                     </div><%
                 }
             }%>
@@ -352,10 +357,10 @@
 </div>
 
 <%--return to homepage--%>
-<br><br><br>
-<a href="user-page.jsp">
-    <button>Back To Homepage</button>
-</a>
+
+<form action="user-page.jsp" method="get">
+    <button type="submit" class="back-btn">Back To Homepage</button>
+</form>
 
 </body>
 </html>

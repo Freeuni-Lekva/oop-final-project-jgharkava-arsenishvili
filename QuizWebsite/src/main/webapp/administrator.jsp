@@ -100,9 +100,9 @@
             <div class="stat-item">Number of users in total: <span class="stat-number"><%=user_cnt%></span></div>
             <div class="stat-item">Number of quizzes taken in total: <span class="stat-number"><%=quiz_cnt%></span></div>
         </div>
-        <button onclick="window.history.back()" class="back-btn">
-            ← Go Back
-        </button>
+        <form action="user-page.jsp" method="get" class="admin-form">
+            <button type="submit" >Go Home</button>
+        </form>
     </div>
 </body>
 </html>

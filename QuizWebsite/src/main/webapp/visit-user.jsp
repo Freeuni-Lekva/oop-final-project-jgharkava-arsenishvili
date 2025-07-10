@@ -1,9 +1,5 @@
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.model.user.User" %>
 <%@ page import="org.ja.utils.Constants" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
 <%@ page import="java.util.List" %>
@@ -14,7 +10,10 @@
     User visitedUser = usersDao.getUserById(id);
     User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
 
-    if(visitedUser.getId() == currentUser.getId()) response.sendRedirect("/user-page.jsp");
+    if(visitedUser.getId() == currentUser.getId()) {
+        response.sendRedirect("/user-page.jsp");
+        return;
+    }
 
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
@@ -55,6 +54,7 @@
             <label for="quizName">Quiz name:</label>
             <input type="text" id="quizName" placeholder="Enter quiz name" required>
             <button type="button" onclick="handleMessageAction('send-challenge', <%=visitedUser.getId()%>)">Challenge</button>
+            <div id="challenge-feedback" style="margin-top: 10px; color: red;"></div>
         </div>
         <!-- send message -->
         <div class="action-section message-action">
@@ -101,10 +101,10 @@
         } else { %>
         <p><%= visitedUser.getUsername() %> has no achievements yet.</p>
         <% } %>
-    </div>
+    </div><br>
 
-    <button onclick="window.history.back()" class="back-btn">
-        ← Go Back
-    </button>
+    <form action="user-page.jsp" method="get">
+        <button type="submit" class="back-btn">Go Home</button>
+    </form>
 </body>
 </html>
