@@ -37,7 +37,8 @@ function showQuestionForm() {
         addAnswerOption('multiple-choice-answer-container');
     else if (selectedType === "multi-choice-multi-answers")
         addAnswerOption('multi-choice-multi-answer-container');
-
+    else if(selectedType === "matching")
+        addRightOption();
 }
 
 window.addEventListener("DOMContentLoaded", function (){
@@ -381,6 +382,14 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
             setTimeout(() => answerField.setCustomValidity(""), 2000);
         }
+
+        if(answerField.value.includes("¶")) {
+            e.preventDefault();
+            answerField.setCustomValidity("This field cannot include symbol - ¶.");
+            answerField.reportValidity();
+
+            setTimeout(() => answerField.setCustomValidity(""), 2000);
+        }
     })
 
     if(selectedType === "picture-response") {
@@ -410,7 +419,7 @@ document.getElementById("create-question-form").addEventListener("submit", funct
         if(rawQuestionInput.value.includes("_")) {
             e.preventDefault();
 
-            rawQuestionInput.setCustomValidity("Please do not use underscores (_) in fill-in-the-blank questions — they mark the blanks.");
+            rawQuestionInput.setCustomValidity("This field cannot contain underscore (_).");
             rawQuestionInput.reportValidity();
 
             setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
@@ -442,6 +451,15 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
                 setTimeout(() => textarea.setCustomValidity(""), 2000);
             }
+
+            if(textarea.value.includes("¶")) {
+                e.preventDefault();
+
+                textarea.setCustomValidity("This field cannot include symbol - ¶");
+                textarea.reportValidity();
+
+                setTimeout(() => textarea.setCustomValidity(""), 2000);
+            }
         });
     }
 
@@ -461,7 +479,6 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             if(option.closest(".right-option-wrapper") && option.value.includes("not selected")) {
                 e.preventDefault();
 
-                // TODO continue
                 option.setCustomValidity("This field cannot include 'not selected'.");
                 option.reportValidity();
 

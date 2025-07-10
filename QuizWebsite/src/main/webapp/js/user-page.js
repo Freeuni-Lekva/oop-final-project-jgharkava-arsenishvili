@@ -175,15 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `messageId=${encodeURIComponent(messageId)}`
             }).catch(err => console.error('Fetch error:', err));
-
-            //TODO delete
-            /*.then(response => {
-                    if (response.ok) {
-                        console.log('Message ID sent for deletion:', messageId);
-                    } else {
-                        console.error('Failed to send message ID');
-                    }
-            })*/
         });
     });
 
@@ -215,8 +206,11 @@ function sendMessage() {
         document.getElementById("recipient").value = "";
         document.getElementById("message").value = "";
       } else if (response.status === 404) {
-        status.textContent = "Recipient not found.";
-        status.style.color = "red";
+          response.text().then(errorMessage => {
+              status.textContent = errorMessage;
+              status.style.color = "red";
+          });
+
       } else {
         status.textContent = "Something went wrong.";
         status.style.color = "red";

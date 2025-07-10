@@ -148,6 +148,5 @@
         <button type="submit">Finish Editing Quiz</button>
     </form>
 </div>
-
 </body>
 </html>
