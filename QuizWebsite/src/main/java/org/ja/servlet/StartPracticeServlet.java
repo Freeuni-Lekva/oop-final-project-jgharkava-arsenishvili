@@ -47,6 +47,7 @@ public class StartPracticeServlet extends HttpServlet {
         responses.add(new Response());
         session.setAttribute(Constants.SessionAttributes.RESPONSES, responses);
 
+        session.setAttribute(Constants.SessionAttributes.QUIZ, quiz);
         session.setAttribute(Constants.SessionAttributes.QUESTIONS, questions);
         session.setAttribute(Constants.SessionAttributes.PRACTICE_QUESTIONS_MASTERY_MAP, masteryMap);
         session.setAttribute(Constants.SessionAttributes.QUIZ_MODE, Constants.QuizMode.PRACTICE);

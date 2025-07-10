@@ -31,8 +31,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
         assertEquals("Math", category.getCategoryName());
 
         // Non-existing
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> dao.getCategoryById(9999L));
-        assertTrue(exception.getMessage().contains("not found"));
+        assertNull(dao.getCategoryById(9999L));
     }
 
     @Test
@@ -44,8 +43,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
         assertEquals(5, category.getCategoryId());
 
         // Non-existing
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> dao.getCategoryByName("Dance"));
-        assertTrue(exception.getMessage().contains("not found"));
+        assertNull(dao.getCategoryByName("Dance"));
     }
 
     @Test

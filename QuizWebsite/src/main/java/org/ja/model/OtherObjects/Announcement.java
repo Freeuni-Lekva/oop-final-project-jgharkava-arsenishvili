@@ -16,6 +16,11 @@ public class Announcement {
         this.creationDate = creationDate;
     }
 
+    public Announcement(long administratorId, String announcementText) {
+        this.administratorId = administratorId;
+        this.announcementText = announcementText;
+    }
+
     public long getAnnouncementId(){return announcementId;};
     public void setAnnouncementId(long announcementId){this.announcementId = announcementId;};
     public long getAdministratorId(){return administratorId;};

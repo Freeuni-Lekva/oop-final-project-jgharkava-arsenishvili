@@ -27,15 +27,27 @@ public class AdministratorServlet extends HttpServlet {
         String action = request.getParameter("action");
         if("create".equals(action)) {
             String text = request.getParameter("announcementText");
-            Announcement announcement = new Announcement();
+            if(text.trim().isEmpty()) {
+                request.setAttribute("message", "Cannot post empty announcement");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             User curUser = (User) request.getSession().getAttribute(Constants.SessionAttributes.USER);
-            announcementsDao.insertAnnouncement(new Announcement(0, curUser.getId(), text, new Timestamp(System.currentTimeMillis())));
+            announcementsDao.insertAnnouncement(new Announcement(curUser.getId(), text));
             request.setAttribute("message", "Successfully posted announcement");
             request.getRequestDispatcher("/administrator.jsp").forward(request, response);
         }else if("promote".equals(action)) {
             String name = request.getParameter("promoteUsername");
+            if(name.trim().isEmpty()) {
+                request.setAttribute("message", "Username cannot be empty");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             User user = usersDao.getUserByUsername(name);
-            if(!user.getStatus().equals("administrator")){
+            if(user == null) {
+                request.setAttribute("message", "User " + name + " was not found");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+            }else if(!user.getStatus().equals("administrator")){
                 adminsDao.promoteToAdministrator(user.getId());
                 request.setAttribute("message", "Successfully promoted user " + name + " to an administrator");
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
@@ -45,6 +57,11 @@ public class AdministratorServlet extends HttpServlet {
             }
         }else if("removeUser".equals(action)) {
             String name = request.getParameter("removeUsername");
+            if(name.trim().isEmpty()) {
+                request.setAttribute("message", "Username cannot be empty");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             User user = usersDao.getUserByUsername(name);
             if(user != null){
                 adminsDao.removeUserById(user.getId());
@@ -56,6 +73,11 @@ public class AdministratorServlet extends HttpServlet {
             }
         }else if("removeQuiz".equals(action)) {
             String name = request.getParameter("removeQuizName");
+            if(name.trim().isEmpty()) {
+                request.setAttribute("message", "Quiz name cannot be empty");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             Quiz quiz = quizzesDao.getQuizByName(name);
             if(quiz != null){
                 quizzesDao.removeQuizById(quiz.getId());
@@ -67,17 +89,27 @@ public class AdministratorServlet extends HttpServlet {
             }
         }else if("clearHistory".equals(action)) {
             String name = request.getParameter("clearQuizHistoryName");
+            if(name.trim().isEmpty()) {
+                request.setAttribute("message", "Quiz name cannot be empty");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             Quiz quiz = quizzesDao.getQuizByName(name);
-            if(quiz != null && quiz.getParticipantCount() != 0){
+            if(quiz == null) {
+                request.setAttribute("message", "Quiz " + name + " was not found");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+            } else {
                 adminsDao.clearQuizHistory(quizzesDao.getQuizByName(name).getId());
                 request.setAttribute("message", "Successfully cleared history of quiz " + name);
-                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
-            }else {
-                request.setAttribute("message", "Quiz " + name + " has no history");
                 request.getRequestDispatcher("/administrator.jsp").forward(request, response);
             }
         }else if("addCategory".equals(action)) {
             String name = request.getParameter("addCategoryName");
+            if(name.trim().isEmpty()) {
+                request.setAttribute("message", "Category name cannot be empty");
+                request.getRequestDispatcher("/administrator.jsp").forward(request, response);
+                return;
+            }
             Category category = categoriesDao.getCategoryByName(name);
             if(category == null){
                 categoriesDao.insertCategory(new Category(name));

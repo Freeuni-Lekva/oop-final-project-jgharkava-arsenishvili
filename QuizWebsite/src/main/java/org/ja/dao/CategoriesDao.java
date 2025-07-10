@@ -65,8 +65,7 @@ public class CategoriesDao {
      * Retrieves a category by its unique ID.
      *
      * @param id the ID of the category to retrieve
-     * @return the Category with the specified ID
-     * @throws RuntimeException if no category with the given ID exists or if a database error occurs
+     * @return the Category object if found, or null otherwise
      */
     public Category getCategoryById(long id) {
         String sql = "SELECT * FROM categories WHERE category_id = ?";
@@ -80,7 +79,7 @@ public class CategoriesDao {
                 if (rs.next()) {
                     return retrieveCategory(rs);
                 } else {
-                    throw new RuntimeException("Category with ID " + id + " not found.");
+                    return null;
                 }
             }
         } catch (SQLException e){
@@ -93,8 +92,7 @@ public class CategoriesDao {
      * Retrieves a category by its unique name.
      *
      * @param name the name of the category to retrieve
-     * @return the Category with the specified name
-     * @throws RuntimeException if no category with the given ID exists or if a database error occurs
+     * @return the Category with the specified name, or null otherwise
      */
     public Category getCategoryByName(String name) {
         String sql = "SELECT * FROM categories WHERE category_name = ?";
@@ -108,7 +106,7 @@ public class CategoriesDao {
                 if (rs.next()) {
                     return retrieveCategory(rs);
                 } else {
-                    throw new RuntimeException("Category with name " + name + " not found.");
+                    return null;
                 }
             }
         } catch (SQLException e){
