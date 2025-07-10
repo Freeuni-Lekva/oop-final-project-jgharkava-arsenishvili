@@ -31,24 +31,26 @@
 <html>
 <head>
     <title>Edit Quiz</title>
+    <link rel="stylesheet" href="css/edit-quiz.css" />
     <script src = "js/edit-quiz.js" defer></script>
 </head>
 <body>
+<div class="container">
     <h2>Edit Quiz</h2>
 
-<%--    Title--%>
+    <%--    Title--%>
     <label for="quizTitle">Edit Quiz Title:</label>
     <h3 contenteditable="true" id="quizTitle"><%=quiz.getName()%></h3>
 
-<%--    Description--%>
+    <%--    Description--%>
     <label for="quizDescription">Edit Quiz Description:</label>
     <h3 contenteditable="true" id="quizDescription"><%=quiz.getDescription()%></h3>
 
-<%--    Time limit--%>
+    <%--    Time limit--%>
     <label for="quizTimeLimit">Edit Quiz time limit:</label>
     <h3 contenteditable="true" id="quizTimeLimit"><%=quiz.getTimeInMinutes()%></h3>
 
-<%--    Category--%>
+    <%--    Category--%>
     <label for="quizCategory">Edit Quiz Category:</label>
     <select id="quizCategory">
         <%
@@ -63,7 +65,7 @@
         %>
     </select>
 
-<%--    current tags--%>
+    <%--    current tags--%>
     <div>
         <h3>Remove Tags for this quiz:</h3>
         <div id="quizTags">
@@ -76,7 +78,7 @@
         </div>
     </div>
 
-<%--    available tags--%>
+    <%--    available tags--%>
     <div>
         <h3>Add Tags for this quiz:</h3>
         <div id="availableTags">
@@ -92,7 +94,7 @@
 
             <%
                     }
-            }
+                }
             %>
 
         </div>
@@ -142,9 +144,10 @@
     </form>
 
     <form action="quiz-overview.jsp" method="get">
-        <input type="hidden" name="quizId" value="<%=quizId%>">
+        <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quizId%>">
         <button type="submit">Finish Editing Quiz</button>
     </form>
+</div>
 
 </body>
 </html>
