@@ -42,7 +42,6 @@
     }
 
     double timeSpent = (Double) session.getAttribute("time-spent-in-minutes");
-
 %>
 
 <html>
@@ -104,7 +103,7 @@
         <div class="label">Your Matches:</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6><%
+                Haven't Chosen In Time<%
             } else {
                 for(int i = 0; i < resp.size(); i++) {
                     Match match = resp.getMatch(i);%>
@@ -132,7 +131,7 @@
         <div class="label">Your Answer(s):</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6>
+                Haven't Chosen In Time
         <%
             } else {
                 for (Answer answer : answers) {
@@ -146,7 +145,6 @@
 
                     <div class="<%= answerClass %>">
                         <input type="radio" <%=checked ? "checked" : ""%> disabled>
-                        <%--TODO allign next to radio--%>
                         <%= answer.getAnswerText() %>
                     </div><%
                 }
@@ -173,7 +171,7 @@
         <div class="label">Your Answer(s):</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6><%
+                Haven't Chosen In Time<%
             } else {
                 for(int i = 0; i < resp.size(); i++) { %>
                     <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i).trim().isEmpty() ? "Left Empty" : resp.getAnswer(i) %></div><%
@@ -202,7 +200,6 @@
 
 
 <%--challenge friend--%>
-<%--TODO make pretty--%>
 <div id="user-list-panel"><%
     if(!friends.isEmpty()) {
             for(Friendship friendship : friends) {
