@@ -1,0 +1,412 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Timer styling */
+.timer-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 20px 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Timer for inline display */
+div {
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 15px 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#timer {
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Warning state for timer */
+.timer-warning {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    animation: pulse 1s infinite;
+}
+
+.timer-warning #timer {
+    color: #721c24;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Body acts as main container */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Center all content */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #739cc8;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    min-height: 100vh;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Question header */
+h2 {
+    background: #3498db;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+/* Question text */
+h3 {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+/* Form styling - targets the actual form in JSP */
+#question-form {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #3498db;
+    margin: 20px auto;
+    max-width: 750px;
+    text-align: center;
+}
+
+/* Regular form styling */
+form {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Text input styling */
+input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background: white;
+    color: #333;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Radio button styling */
+input[type="radio"] {
+    margin-right: 12px;
+    margin-bottom: 10px;
+    transform: scale(1.2);
+    accent-color: #3498db;
+}
+
+/* Radio button container */
+.radio-container {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+/* For JSP radio buttons without containers */
+input[type="radio"] + * {
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 10px auto;
+    padding: 12px 15px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.radio-container:hover {
+    background: #e3f2fd;
+    border-color: #3498db;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    margin-right: 12px;
+    margin-bottom: 10px;
+    transform: scale(1.2);
+    accent-color: #3498db;
+}
+
+/* Checkbox container */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+/* For JSP checkboxes without containers */
+input[type="checkbox"] + * {
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 10px auto;
+    padding: 12px 15px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.checkbox-container:hover {
+    background: #e3f2fd;
+    border-color: #3498db;
+}
+
+/* Multi-answer inputs */
+.multi-answer-container {
+    margin: 15px 0;
+    counter-reset: answer-counter;
+}
+
+.answer-input-container {
+    position: relative;
+    margin-bottom: 15px;
+    padding-left: 40px;
+}
+
+.answer-input-container::before {
+    content: counter(answer-counter);
+    counter-increment: answer-counter;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #3498db;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Matching question styling - works with JSP label and select structure */
+label {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1em;
+    display: inline-block;
+    margin-right: 15px;
+    min-width: 150px;
+    text-align: left;
+}
+
+/* Style matching rows */
+label + select {
+    margin-bottom: 15px;
+}
+
+/* Create matching row appearance */
+label,
+label + select {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+
+/* Select dropdown styling */
+select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background: white;
+    color: #333;
+    min-width: 150px;
+    max-width: 200px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Image styling */
+img {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 15px auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Button styling */
+input[type="submit"],
+button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin: 10px 5px;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    font-weight: bold;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Exit button styling */
+button[type="submit"] {
+    background: #3498db;
+}
+
+button[type="submit"]:hover {
+    background: #c0392b;
+}
+
+/* Form actions container */
+.form-actions {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Hidden input styling */
+input[type="hidden"] {
+    display: none;
+}
+
+/* Focus states for accessibility */
+input:focus, select:focus, button:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Disabled states */
+button:disabled,
+input[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button:disabled:hover,
+input[type="submit"]:disabled:hover {
+    background: #ccc;
+    transform: none;
+}
+
+/* Additional utility classes */
+.text-center {
+    text-align: center;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}

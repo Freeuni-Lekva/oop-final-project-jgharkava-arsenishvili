@@ -55,12 +55,12 @@ body {
 }
 
 .user-info img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 3px solid #d4edda;
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 10px;
     object-fit: cover;
-    margin-top: 10px;
+    margin-bottom: 15px;
 }
 
 .action-row {
@@ -238,12 +238,12 @@ button[value="delete"]:hover, button[value="remove-friend"]:hover, button[value=
 
 .back-btn {
     background: #e3f2fd;
+    margin-top: 30px;
     border: 1px solid #ccc;
-    padding: 8px 16px;
+    padding: 12px 24px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    grid-area: center;
 }
 
 .back-btn:hover {

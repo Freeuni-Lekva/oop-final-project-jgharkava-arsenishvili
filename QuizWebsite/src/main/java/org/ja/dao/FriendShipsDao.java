@@ -77,7 +77,7 @@ public class FriendShipsDao {
                 if (rs.next()) {
                     return retrieveFriendship(rs);
                 } else {
-                    throw new RuntimeException("No friendship found between users " + firstUserId + " and " + secondUserId);
+                    return null;
                 }
             }
         } catch (SQLException e) {

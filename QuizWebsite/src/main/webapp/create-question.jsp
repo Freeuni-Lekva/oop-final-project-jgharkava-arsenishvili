@@ -39,8 +39,6 @@
   <input type = "hidden" name = "questionType" id = "questionTypeHidden">
 
   <div id = "<%=Constants.QuestionTypes.RESPONSE_QUESTION%>-form" class = "questionForm">
-    <h3><%=Constants.QuestionTypes.RESPONSE_QUESTION%></h3>
-
     <label>
       <textarea name = "questionText" placeholder = "Type the question..." rows = "2" required></textarea>
     </label>
@@ -57,8 +55,6 @@
   </div>
 
   <div id = "<%=Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION%>-form" class = "questionForm">
-    <h3><%=Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION%></h3>
-
     <label>
       <textarea name = "imageUrl" placeholder = "Enter image link here..." rows = "2" required></textarea>
     </label>
@@ -78,8 +74,6 @@
   </div>
 
   <div id="<%=Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION%>-form" class="questionForm">
-    <h3><%=Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION%></h3>
-
     <label>Question:</label>
     <input type = "text" id="rawQuestionInput" placeholder = "Type your question here..." oninput="renderQuestionWithBlanks()" required/>
 
@@ -99,7 +93,6 @@
   </div>
 
   <div id="<%=Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION%>-form" class="questionForm">
-    <h3><%=Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION%></h3>
 
     <label>
       <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
@@ -107,22 +100,22 @@
 
     <div id="multiple-choice-answer-container">
       <div class="option-block">
-        <label>Option 1:</label><br>
+        <label>Option 1:</label>
         <textarea name="answer" placeholder="Type the option..." rows="2" required></textarea>
 
         <input type="hidden" name="isCorrect" value="false">
 
         <div class="button-row">
           <button type="button" class="mark-button">Mark as True</button>
-          <button type="button" id="multiple-choice-add-button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
         </div>
       </div>
+    </div>
+    <div class="add-button-container">
+      <button type="button" id="multiple-choice-add-button" onclick="addAnswerOption('multiple-choice-answer-container')">Add another option</button>
     </div>
   </div>
 
   <div id="<%=Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION%>-form" class="questionForm">
-    <h3><%=Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION%></h3>
-
     <label>
       <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
     </label>
@@ -136,15 +129,15 @@
 
         <div class="button-row">
           <button type="button" class="mark-button">Mark as True</button>
-          <button type="button" id="multi-choice-multi-answer-add-button" onclick="addAnswerOption('multi-choice-multi-answer-container')">Add another option</button>
         </div>
       </div>
+    </div>
+    <div class="add-button-container">
+      <button type="button" id="multi-choice-multi-answer-add-button" onclick="addAnswerOption('multi-choice-multi-answer-container')">Add another option</button>
     </div>
   </div>
 
   <div id="<%=Constants.QuestionTypes.MULTI_ANSWER_QUESTION%>-form" class="questionForm">
-    <h3><%=Constants.QuestionTypes.MULTI_ANSWER_QUESTION%></h3>
-
     <label>
       <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
     </label>
@@ -162,8 +155,6 @@
   </div>
 
   <div id="<%=Constants.QuestionTypes.MATCHING_QUESTION%>-form" class="questionForm">
-    <h3><%=Constants.QuestionTypes.MATCHING_QUESTION%></h3>
-
     <label>
       <textarea name="questionText" placeholder="Type the question..." rows="2" required></textarea>
     </label>
@@ -173,7 +164,7 @@
         <div class="left-column">
           <h4>Left Options</h4>
           <div id="left-options"></div>
-          <button id="add-left-option-button"type="button" onclick="addLeftOption()">Add Left Option</button>
+          <button id="add-left-option-button" type="button" onclick="addLeftOption()">Add Left Option</button>
         </div>
 
         <div class="right-column">
@@ -185,24 +176,29 @@
     </div>
   </div>
 
+
+<div class="final-action-buttons">
+
+</div>
   <div class = "save-question-button">
     <button type = "submit" id = "saveQuestionButton">Save Question</button>
   </div>
 </form>
 
-<form id = "finish-quiz-form" action = "finish-quiz" method = "post">
-  <button type = "submit" id = "finishQuizButton" disabled>Finish Creating Quiz</button>
-</form>
-
-<form id = "discard-form" action = "discard-quiz" method = "post" onsubmit = "return confirmDiscard();">
-  <button type = "submit" id = "discardChangesButton">Discard All Changes</button>
-</form>
-
-<div id = "discardQuestionContainer" style = "display: none;">
-  <form id = "discard-question-form" action = "create-question" method = "get" onsubmit = "return confirmQuestionDiscard();">
-    <button type = "submit" id = "discardQuestionButton">Discard Question</button>
+<div class="action-buttons-container">
+  <form id = "finish-quiz-form" action = "finish-quiz" method = "post">
+    <button type = "submit" id = "finishQuizButton" disabled>Finish Creating Quiz</button>
   </form>
 
+  <form id = "discard-form" action = "discard-quiz" method = "post" onsubmit = "return confirmDiscard();">
+    <button type = "submit" id = "discardChangesButton">Discard All Changes</button>
+  </form>
+
+  <div id = "discardQuestionContainer" style = "display: none;">
+    <form id = "discard-question-form" action = "create-question" method = "get" onsubmit = "return confirmQuestionDiscard();">
+      <button type = "submit" id = "discardQuestionButton">Discard Question</button>
+    </form>
+  </div>
 </div>
 
 </body>

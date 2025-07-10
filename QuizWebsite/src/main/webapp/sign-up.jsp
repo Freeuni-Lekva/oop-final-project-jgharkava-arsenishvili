@@ -24,6 +24,10 @@
       Password:
       <input type="password" name="password" required/>
     </label>
+    <label>
+      Photo URL:
+      <input type="text" name="photo" required/>
+    </label>
     <input type="submit" value="Sign Up" />
   </form>
   <p class="back-link"><a href="index.jsp">Back To Log In</a></p>

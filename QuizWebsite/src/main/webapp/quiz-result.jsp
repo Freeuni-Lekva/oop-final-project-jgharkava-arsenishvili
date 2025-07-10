@@ -129,12 +129,17 @@
             } else {
                 for (Answer answer : answers) {
                     boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
-                    if (checked) responseIndex++;%>
+                    String answerClass = "";
+                    if (checked) {
+                        int gr = respGrades.get(responseIndex );
+                        answerClass = grade > 0 ? "correct" : "incorrect";
+                        responseIndex++;
+                    }%>
 
-                    <div class="<%=checked ? "correct" : ""%>">
+                    <div class="<%= answerClass %>">
                         <input type="radio" <%=checked ? "checked" : ""%> disabled>
                         <%--TODO allign next to radio--%>
-                        <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
+                        <%= answer.getAnswerText() %>
                     </div><%
                 }
             }%>
@@ -159,9 +164,11 @@
             if(resp == null) {%>
                 <h6>Haven't Chosen In Time</h6><%
             } else {
-                for(int i = 0; i < resp.size(); i++) { %>
-        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
-        <% }
+                for(int i = 0; i < resp.size(); i++) {
+                    if (resp.getAnswer(i) != null && !resp.getAnswer(i).trim().isEmpty()) {%>
+                        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
+                  <%}
+                }
             } %>
     </div>
 
@@ -337,10 +344,10 @@
 </div>
 
 <%--return to homepage--%>
-<br><br><br>
-<a href="user-page.jsp">
-    <button>Back To Homepage</button>
-</a>
+
+<form action="user-page.jsp" method="get">
+    <button type="submit" class="back-btn">Back To Homepage</button>
+</form>
 
 </body>
 </html>

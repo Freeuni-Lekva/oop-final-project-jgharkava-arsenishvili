@@ -20,6 +20,7 @@ public class SignUpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String photo = request.getParameter("photo");
 
         UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         User check = dao.getUserByUsername(username);
@@ -31,7 +32,7 @@ public class SignUpServlet extends HttpServlet {
             try {
                 String salt = PasswordHasher.getSalt();
                 String hashedPassword = PasswordHasher.hashPassword(password, salt);
-                user = new User(0, username, hashedPassword, salt, null, "", "user");
+                user = new User(0, username, hashedPassword, salt, null, photo, "user");
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }

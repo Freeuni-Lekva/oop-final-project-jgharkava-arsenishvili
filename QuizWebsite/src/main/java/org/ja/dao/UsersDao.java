@@ -107,6 +107,20 @@ public class UsersDao {
         }
     }
 
+    public void updatePhoto(String photo, long id) {
+        String sql = "UPDATE users SET user_photo = ? WHERE user_id = ?";
+
+        try (Connection c = dataSource.getConnection();
+             PreparedStatement preparedStatement = c.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, photo);
+            preparedStatement.setLong(2, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating user photo", e);
+        }
+    }
+
 
     /**
      * Retrieves a user by their ID.
