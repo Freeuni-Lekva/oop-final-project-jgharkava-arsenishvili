@@ -8,6 +8,7 @@
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
+<%@ page import="java.time.Instant" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -29,7 +30,7 @@
 <%
     long startTime = (Long) session.getAttribute("start-time");
     int duration = (Integer) session.getAttribute("time-limit-in-seconds");
-    long now = System.currentTimeMillis();
+    long now = Instant.now().toEpochMilli();
     long timeLeft = duration - (now - startTime) / 1000;
 %>
 

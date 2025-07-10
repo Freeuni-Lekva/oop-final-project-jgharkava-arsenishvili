@@ -7,7 +7,8 @@
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="java.util.List" %><%--
+<%@ page import="java.util.List" %>
+<%@ page import="java.time.Instant" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 6/27/2025
@@ -42,7 +43,7 @@
     if(Constants.QuizMode.TAKING == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {
         startTime = (Long) session.getAttribute("start-time");
         duration = (Integer) session.getAttribute("time-limit-in-seconds");
-        now = System.currentTimeMillis();
+        now = Instant.now().toEpochMilli();
         timeLeft = duration - (now - startTime) / 1000;
 %>
 
