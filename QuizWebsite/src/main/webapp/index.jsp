@@ -28,7 +28,7 @@
          </label>
         <input type="submit" value="Login" />
     </form>
-    <p class="sign-up-link"><a href="create-question.jsp">Sign Up Here</a></p>
+    <p class="sign-up-link"><a href="sign-up.jsp">Sign Up Here</a></p>
 </div>
 </body>
 </html>
