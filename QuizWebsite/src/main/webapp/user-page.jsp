@@ -71,7 +71,7 @@
       %>
       <div class="quiz-item">
         <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
-        <p class="text-small">Taken by <%=quiz.getParticipantCount()%> users</p>
+        <p class="text-small">Taken by <%=quiz.getParticipantCount()%> user(s)</p>
       </div>
       <%
           cnt1++;
