@@ -5,6 +5,8 @@ import org.junit.jupiter.api.AfterAll;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 
 /**
@@ -21,7 +23,9 @@ public abstract class BaseDaoTest {
         basicDataSource.setPassword("");
 
         executeSqlFile("database/drop.sql");
-        executeSqlFile("database/schema.sql");
+        String schema = Files.readString(Path.of("database/schema.sql"));
+        schema = schema.replaceAll(" collate utf8mb4_bin", ""); // unfortunately h2 does not support collate
+        executeSql(schema);
         executeSqlFile("database/testdb.sql");
     }
 
@@ -44,6 +48,24 @@ public abstract class BaseDaoTest {
             for (String sql : sqlBuilder.toString().split(";")) {
                 if (!sql.trim().isEmpty() && !sql.trim().toLowerCase().startsWith("use")) {
                     stmt.execute(sql.trim());
+                }
+            }
+        }
+    }
+
+    /**
+     * Executes multiple SQL statements contained within a single SQL string.
+     *
+     * @param sql the full SQL script containing one or more SQL statements separated by semicolons
+     * @throws Exception if a database access error occurs or any SQL statement fails to execute
+     */
+    protected void executeSql(String sql) throws Exception {
+        try (Connection conn = basicDataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            for (String part : sql.split(";")) {
+                if (!part.trim().isEmpty() && !part.trim().toLowerCase().startsWith("use")) {
+                    stmt.execute(part.trim());
                 }
             }
         }

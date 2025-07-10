@@ -23,7 +23,7 @@ public class TagsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testInsertTagSuccess() {
+    public void testInsertTagSuccess() {
         Tag tag = new Tag();
         tag.setTagName("unit-test-tag");
         boolean inserted = dao.insertTag(tag);
@@ -37,7 +37,7 @@ public class TagsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testInsertTagDuplicate() {
+    public void testInsertTagDuplicate() {
         Tag tag1 = new Tag();
         tag1.setTagName("duplicate-tag");
         assertTrue(dao.insertTag(tag1));
@@ -64,13 +64,13 @@ public class TagsDaoTest extends BaseDaoTest{
 
 
     @Test
-    void testGetTagByIdNotFound() {
+    public void testGetTagByIdNotFound() {
         Tag tag = dao.getTagById(-1L);
         assertNull(tag);
     }
 
     @Test
-    void testRemoveTag() {
+    public void testRemoveTag() {
         Tag tag = new Tag();
         tag.setTagName("temporary-tag");
         dao.insertTag(tag);
@@ -84,7 +84,7 @@ public class TagsDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetAllTags() {
+    public void testGetAllTags() {
         List<Tag> tags = dao.getAllTags();
         assertNotNull(tags);
         assertTrue(tags.size() >= 3);

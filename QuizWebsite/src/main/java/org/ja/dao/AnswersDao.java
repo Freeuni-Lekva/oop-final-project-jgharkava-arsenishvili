@@ -135,7 +135,7 @@ public class AnswersDao extends BaseDao{
     }
 
     /**
-     * Adds a new option text to an existing answer, appending it with a '/' separator.
+     * Adds a new option text to an existing answer, appending it with a '¶' separator.
      *
      * @param answerId the ID of the answer to update
      * @param text     the new option text to append
@@ -164,10 +164,10 @@ public class AnswersDao extends BaseDao{
                 }
             }
 
-            answers += "/" + text;
+            answers += "¶" + text;
 
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
-                ps.setString(1, String.join("/", answers));
+                ps.setString(1, String.join("¶", answers));
                 ps.setLong(2, answerId);
 
                 return ps.executeUpdate() > 0;
@@ -205,7 +205,7 @@ public class AnswersDao extends BaseDao{
                 }
             }
 
-            List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("/")));
+            List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("¶")));
 
             boolean found = false;
 
@@ -222,7 +222,7 @@ public class AnswersDao extends BaseDao{
             }
 
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
-                ps.setString(1, String.join("/", eachAnswer));
+                ps.setString(1, String.join("¶", eachAnswer));
                 ps.setLong(2, answerId);
 
                 return ps.executeUpdate() > 0;
@@ -259,7 +259,7 @@ public class AnswersDao extends BaseDao{
                 }
             }
 
-            List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("/")));
+            List<String> eachAnswer = new ArrayList<>(Arrays.asList(answers.split("¶")));
 
             boolean found = false;
 
@@ -276,7 +276,7 @@ public class AnswersDao extends BaseDao{
             }
 
             try (PreparedStatement ps = connection.prepareStatement(updateAnswerText)){
-                ps.setString(1, String.join("/", eachAnswer));
+                ps.setString(1, String.join("¶", eachAnswer));
                 ps.setLong(2, answerId);
 
                 return ps.executeUpdate() > 0;

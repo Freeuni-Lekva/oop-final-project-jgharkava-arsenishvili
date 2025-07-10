@@ -93,7 +93,7 @@ public class Answer {
     }
 
     public boolean containsAnswer(String answer){
-        return Arrays.stream(answerText.split("/"))
+        return Arrays.stream(answerText.split("¶"))
                 .anyMatch(part -> part.equalsIgnoreCase(answer.trim()));
     }
 

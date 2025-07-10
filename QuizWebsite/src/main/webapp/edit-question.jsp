@@ -67,7 +67,7 @@
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            String[] splitOptions = answers.getFirst().getAnswerText().split("¶");
             List<String> options = new ArrayList<String>(Arrays.asList(splitOptions));
             for (String option: options){
         %>
@@ -140,7 +140,7 @@
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            String[] splitOptions = answers.getFirst().getAnswerText().split("¶");
             List<String> eachOption = new ArrayList<String>(Arrays.asList(splitOptions));
             for (String option: eachOption){
         %>
@@ -187,7 +187,7 @@
         <h5>Possible Options:</h5>
         <%  List<Answer> answers = answersDao.getQuestionAnswers(questionId);
             long answerId = answers.getFirst().getAnswerId();
-            String[] splitOptions = answers.getFirst().getAnswerText().split("/");
+            String[] splitOptions = answers.getFirst().getAnswerText().split("¶");
             List<String> eachOption = new ArrayList<String>(Arrays.asList(splitOptions));
             for (String option: eachOption){
         %>
@@ -208,7 +208,7 @@
             List<Answer> multiAnswers = answersDao.getQuestionAnswers(questionId);
             for (Answer answer : multiAnswers) {
                 long answerId = answer.getAnswerId();
-                String[] splitOptions = answer.getAnswerText().split("/");
+                String[] splitOptions = answer.getAnswerText().split("¶");
                 List<String> options = new ArrayList<String>(Arrays.asList(splitOptions));
         %>
 

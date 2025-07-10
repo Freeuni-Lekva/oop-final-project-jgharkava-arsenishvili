@@ -42,7 +42,7 @@ insert into questions(quiz_id, question, image_url, question_type, num_answers, 
 (3, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered');
 
 insert into answers(question_id, answer_text, answer_order, answer_validity) values
-(1, '1939/39', 1, true),
+(1, '1939¶39', 1, true),
 (2, 'Winston Churchill', 1, true),
 (2, 'Neville Chamberlain', 2, false),
 (2, 'Franklin D. Roosevelt', 3, false),
@@ -57,9 +57,9 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (6, 'Argon', 3, true),
 (6,  'Oxygen', 4, false),
 (6, 'Nitrogen', 5, false),
-(7, 'Hydrogen/H', 1, true),
-(7, 'Helium/He', 2, true),
-(7, 'Lithium/Li', 3, true);
+(7, 'Hydrogen¶H', 1, true),
+(7, 'Helium¶He', 2, true),
+(7, 'Lithium¶Li', 3, true);
 
 insert into matches(question_id, left_match, right_match) values
 (4, 'France', 'Paris'),

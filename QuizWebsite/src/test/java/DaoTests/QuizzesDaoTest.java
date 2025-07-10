@@ -41,14 +41,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetQuizByName() {
+    public void testGetQuizByName() {
         Quiz quiz = dao.getQuizByName("Basic Algebra");
         assertNotNull(quiz);
         assertEquals(4, quiz.getId());
     }
 
     @Test
-    void testGetQuizzesByCreatorId() {
+    public void testGetQuizzesByCreatorId() {
         List<Quiz> quizzes = dao.getQuizzesByCreatorId(5); // Mariam
         assertEquals(1, quizzes.size());
         assertEquals("Oscar Winners", quizzes.get(0).getName());
@@ -67,7 +67,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetFriendsQuizzesSortedByCreationDate() {
+    public void testGetFriendsQuizzesSortedByCreationDate() {
         List<Quiz> quizzes = dao.getFriendsQuizzesSortedByCreationDate(6); // Gio is friends with 5 (Mariam)
         assertFalse(quizzes.isEmpty());
         assertTrue(quizzes.stream().anyMatch(q -> q.getCreatorId() == 5));
@@ -105,28 +105,28 @@ public class QuizzesDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testUpdateQuizDescription() {
+    public void testUpdateQuizDescription() {
         boolean result = dao.updateQuizDescription(4, "New description");
         assertTrue(result);
         assertEquals("New description", dao.getQuizById(4).getDescription());
     }
 
     @Test
-    void testUpdateQuizTimeLimit() {
+    public void testUpdateQuizTimeLimit() {
         boolean result = dao.updateQuizTimeLimit(4, 15);
         assertTrue(result);
         assertEquals(15, dao.getQuizById(4).getTimeInMinutes());
     }
 
     @Test
-    void testUpdateQuizCategory() {
+    public void testUpdateQuizCategory() {
         boolean result = dao.updateQuizCategory(4, 8); // 'Art'
         assertTrue(result);
         assertEquals(8, dao.getQuizById(4).getCategoryId());
     }
 
     @Test
-    void testRemoveQuizById() {
+    public void testRemoveQuizById() {
         long quizId = 6;
         boolean removed = dao.removeQuizById(quizId);
         assertTrue(removed);
@@ -162,7 +162,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testGetQuizzesSortedByParticipantCount() {
+    public void testGetQuizzesSortedByParticipantCount() {
         List<Quiz> quizzes = dao.getQuizzesSortedByParticipantCount();
         assertFalse(quizzes.isEmpty());
         for (int i = 0; i < quizzes.size() - 1; i++) {
@@ -171,21 +171,21 @@ public class QuizzesDaoTest extends BaseDaoTest{
     }
 
     @Test
-    void testUpdateQuizQuestionOrderStatus() {
+    public void testUpdateQuizQuestionOrderStatus() {
         boolean result = dao.updateQuizQuestionOrderStatus(4, Constants.QuizQuestionOrderTypes.QUESTIONS_ORDERED);
         assertTrue(result);
         assertEquals(Constants.QuizQuestionOrderTypes.QUESTIONS_ORDERED, dao.getQuizById(4).getQuestionOrder());
     }
 
     @Test
-    void testUpdateQuizQuestionPlacementStatus() {
+    public void testUpdateQuizQuestionPlacementStatus() {
         boolean result = dao.updateQuizQuestionPlacementStatus(4, Constants.QuizQuestionPlacementTypes.ONE_PAGE);
         assertTrue(result);
         assertEquals(Constants.QuizQuestionPlacementTypes.ONE_PAGE, dao.getQuizById(4).getQuestionPlacement());
     }
 
     @Test
-    void testUpdateQuizQuestionCorrectionStatus() {
+    public void testUpdateQuizQuestionCorrectionStatus() {
         boolean result = dao.updateQuizQuestionCorrectionStatus(4, Constants.QuizQuestionCorrectionTypes.FINAL_CORRECTION);
         assertTrue(result);
         assertEquals(Constants.QuizQuestionCorrectionTypes.FINAL_CORRECTION, dao.getQuizById(4).getQuestionCorrection());

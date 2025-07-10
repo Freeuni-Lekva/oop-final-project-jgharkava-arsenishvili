@@ -79,7 +79,7 @@ public class GradeAllQuestionsServlet extends HttpServlet {
             completionTime = quiz.getTimeInMinutes();
 
         session.setAttribute("time-spent-in-minutes", completionTime);
-        long totalScore = grades.stream().mapToInt(Integer::intValue).sum();
+        int totalScore = grades.stream().mapToInt(Integer::intValue).sum();
 
         Timestamp completionDate = new Timestamp(endTime);
 

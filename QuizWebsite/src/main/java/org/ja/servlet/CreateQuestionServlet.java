@@ -78,7 +78,7 @@ public class CreateQuestionServlet extends HttpServlet {
 
         String joinedAnswers = Arrays.stream(answers)
                 .map(String::trim)
-                .collect(Collectors.joining("/"));
+                .collect(Collectors.joining("¶"));
 
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
@@ -88,7 +88,7 @@ public class CreateQuestionServlet extends HttpServlet {
 
         String joinedAnswers = Arrays.stream(answers)
                 .map(String::trim)
-                .collect(Collectors.joining("/"));
+                .collect(Collectors.joining("¶"));
 
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
@@ -98,7 +98,7 @@ public class CreateQuestionServlet extends HttpServlet {
 
         String joinedAnswers = Arrays.stream(answers)
                 .map(String::trim)
-                .collect(Collectors.joining("/"));
+                .collect(Collectors.joining("¶"));
 
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
@@ -154,9 +154,9 @@ public class CreateQuestionServlet extends HttpServlet {
             String[] options = request.getParameterValues("option-" + groupId);
 
             String joinedAnswers = (options != null) ?
-                    answerText.trim() + "/" + Arrays.stream(options)
+                    answerText.trim() + "¶" + Arrays.stream(options)
                     .map(String::trim)
-                    .collect(Collectors.joining("/")) : answerText.trim();
+                    .collect(Collectors.joining("¶")) : answerText.trim();
 
             answerList.add(new Answer(joinedAnswers, i + 1, true));
         }
