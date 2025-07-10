@@ -90,270 +90,286 @@
     </div>
 
     <div class="quiz-reviews">
-        <p><Strong>Reviews:</Strong></p>
+        <%
+            if(!userReviews.keySet().isEmpty()){%>
+                <p><Strong>Reviews:</Strong></p>
 
-        <% for (User currUser : userReviews.keySet()) {
-            String review = userReviews.get(currUser); %>
+                <% for (User currUser : userReviews.keySet()) {
+                    String review = userReviews.get(currUser); %>
 
-        <div class="review-block">
-            <h4><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%= currUser.getUsername() %></a></h4>
-            <%=review%>
+                <div class="review-block">
+                    <h4><a class="hotlink"
+                           href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%= currUser.getUsername() %>
+                    </a></h4>
+                    <%=review%>
+                </div>
+        <% }}
+        %>
+    </div>
+</div>
+
+
+<div class="first-row">
+    <div class="section-container">
+        <h3>Your Attempts on this Quiz</h3>
+        <% if (histories.isEmpty()){
+        %>
+        No activity to show
+        <%
+        } else {
+        %>
+        <label for="sortBy">Sort by:</label>
+        <select id="sortBy" onchange="sortTable()">
+            <option value="date">Date</option>
+            <option value="time">Time taken</option>
+            <option value="percentage">Percent Correct</option>
+        </select>
+        <button id="sortDirectionBtn" onclick="toggleSortDirection()">Sort Ascending</button>
+
+        <%--user's performance on quiz--%>
+        <table id="historyTable" class="styled-table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time (min)</th>
+                <th>Percent Correct</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for (History h : histories) {
+                double percentage = (double) (100 * h.getScore()) / quizScore;
+            %>
+            <tr data-date="<%= sdf.format(h.getCompletionDate()) %>"
+                data-time="<%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %>"
+                data-percentage="<%= String.format(Locale.US, "%.2f", percentage) %>">
+                <td><%= sdf.format(h.getCompletionDate()) %></td>
+                <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+                <td><%= String.format(Locale.US, "%.2f", percentage) %></td>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+        <%
+            }
+        %>
+    </div>
+
+    <div class="section-container">
+        <%--top performers--%>
+        <h3>Top Performers</h3>
+        <% if (topPerformers.isEmpty()){
+        %>
+        No activity to show
+        <%
+        } else {
+        %>
+        <div class="buttons-section">
+            <button id="showTopBtn" onclick="showTopPerformers()" style="display: none;">Show Top 3</button>
+            <button id="showAllBtn" onclick="showAllPerformers()">Show All</button>
         </div>
 
-        <% } %>
+        <div id="topPerformersContainer">
+            <table id="topPerformersTable" class="styled-table">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Score</th>
+                    <th>Time (min)</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% for (History h : topPerformers) {
+                    User performer = usersDao.getUserById(h.getUserId());
+                %>
+                <tr>
+                    <td><a></a><%= performer.getUsername() %></td>
+                    <td><%= h.getScore() %></td>
+                    <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+                    <td><%= sdf.format(h.getCompletionDate()) %></td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="allPerformersContainer">
+            <table id="allPerformersTable" class="styled-table">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Score</th>
+                    <th>Time (min)</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% for (History h : allPerformers) {
+                    User performer = usersDao.getUserById(h.getUserId());
+                %>
+                <tr>
+                    <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
+                    <td><%= h.getScore() %></td>
+                    <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
+                    <td><%= sdf.format(h.getCompletionDate()) %></td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+        <%
+            }
+        %>
     </div>
-</div>
 
-
-
-<h3>Your Attempts on this Quiz</h3>
-<% if (histories.isEmpty()){
-%>
-No activity to show
-<%
-} else {
-%>
-<label for="sortBy">Sort by:</label>
-<select id="sortBy" onchange="sortTable()">
-    <option value="date">Date</option>
-    <option value="time">Time taken</option>
-    <option value="percentage">Percent Correct</option>
-</select>
-<button id="sortDirectionBtn" onclick="toggleSortDirection()">Sort Ascending</button>
-
-<%--user's performance on quiz--%>
-<table id="historyTable" class="styled-table">
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Time (min)</th>
-        <th>Percent Correct</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% for (History h : histories) {
-        double percentage = (double) (100 * h.getScore()) / quizScore;
-    %>
-    <tr data-date="<%= sdf.format(h.getCompletionDate()) %>"
-        data-time="<%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %>"
-        data-percentage="<%= String.format(Locale.US, "%.2f", percentage) %>">
-        <td><%= sdf.format(h.getCompletionDate()) %></td>
-        <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-        <td><%= String.format(Locale.US, "%.2f", percentage) %></td>
-    </tr>
-    <% } %>
-    </tbody>
-</table>
-<%
-    }
-%>
-
-<%--top performers--%>
-<h3>Top Performers</h3>
-<% if (topPerformers.isEmpty()){
-%>
-No activity to show
-<%
-} else {
-%>
-<div>
-    <button id="showTopBtn" onclick="showTopPerformers()" style="display: none;">Show Top 3</button>
-    <button id="showAllBtn" onclick="showAllPerformers()">Show All</button>
-</div>
-
-<div id="topPerformersContainer">
-    <table id="topPerformersTable" class="styled-table">
-        <thead>
-        <tr>
-            <th>User</th>
-            <th>Score</th>
-            <th>Time (min)</th>
-            <th>Date</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% for (History h : topPerformers) {
-            User performer = usersDao.getUserById(h.getUserId());
+    <div class="section-container">
+        <%--range--%>
+        <h3>Top Performers by Range</h3>
+        <% if (topByRange.isEmpty()){
         %>
-        <tr>
-            <td><a></a><%= performer.getUsername() %></td>
-            <td><%= h.getScore() %></td>
-            <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-            <td><%= sdf.format(h.getCompletionDate()) %></td>
-        </tr>
-        <% } %>
-        </tbody>
-    </table>
-</div>
-
-<div id="allPerformersContainer">
-    <table id="allPerformersTable" class="styled-table">
-        <thead>
-        <tr>
-            <th>User</th>
-            <th>Score</th>
-            <th>Time (min)</th>
-            <th>Date</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% for (History h : allPerformers) {
-            User performer = usersDao.getUserById(h.getUserId());
+        No activity to show
+        <%
+        } else {
         %>
-        <tr>
-            <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
-            <td><%= h.getScore() %></td>
-            <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-            <td><%= sdf.format(h.getCompletionDate()) %></td>
-        </tr>
-        <% } %>
-        </tbody>
-    </table>
-</div>
-<%
-    }
-%>
+        <select id="timeFilter" onchange = "filterByRange()">
+            <option value="last_day">Last Day</option>
+            <option value="last_week">Last Week</option>
+            <option value="last_month">Last Month</option>
+            <option value="last_year">Last Year</option>
+        </select>
 
-<%--range--%>
-<h3>Top Performers by Range</h3>
-<% if (topByRange.isEmpty()){
-%>
-No activity to show
-<%
-} else {
-%>
-<select id = "timeFilter" onchange = "filterByRange()">
-    <option value = "last_day">Last Day</option>
-    <option value = "last_week">Last Week</option>
-    <option value = "last_month">Last Month</option>
-    <option value = "last_year">Last Year</option>
-</select>
-
-<div id = "rangeContainer">
-    <% for (String range: Arrays.asList("last_day", "last_week", "last_month", "last_year")){
-        List<History> list = topByRange.get(range);
-    %>
-
-    <div class = "range-table scrollable-pane" id = "range-<%=range%>" style = "<%="last_day".equals(range) ? "" : "display:none;"%>">
-        <table class = "styled-table">
-            <thead>
-            <tr>
-                <th>User</th>
-                <th>Score</th>
-                <th>Time (min)</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <% for (History history: list){
-                User performer = usersDao.getUserById(history.getUserId());
+        <div id = "rangeContainer">
+            <% for (String range: Arrays.asList("last_day", "last_week", "last_month", "last_year")){
+                List<History> list = topByRange.get(range);
             %>
-            <tr>
-                <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
-                <td><%=history.getScore()%></td>
-                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
-                <td><%=sdf.format(history.getCompletionDate())%></td>
 
-            </tr>
+            <div class="range-table scrollable-pane" id = "range-<%=range%>" style = "<%="last_day".equals(range) ? "" : "display:none;"%>">
+                <table class="styled-table">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Score</th>
+                        <th>Time (min)</th>
+                        <th>Date</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% for (History history: list){
+                        User performer = usersDao.getUserById(history.getUserId());
+                    %>
+                    <tr>
+                        <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
+                        <td><%=history.getScore()%></td>
+                        <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                        <td><%=sdf.format(history.getCompletionDate())%></td>
+
+                    </tr>
+                    <%
+                        }
+                    %>
+                    </tbody>
+                </table>
+            </div>
             <%
                 }
             %>
-            </tbody>
-        </table>
-    </div>
-    <%
-        }
-    %>
-</div>
-<%
-    }
-%>
-
-<%--recent performers--%>
-<h3>Recent Performers</h3>
-<% if (recentPerformers.isEmpty()){
-%>
-No activity to show
-<%
-} else {
-%>
-<div>
-    <div class = "scrollable-pane">
-        <table class = "styled-table">
-            <thead>
-            <tr>
-                <th>User</th>
-                <th>Score</th>
-                <th>Time (min)</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <% for (History history: recentPerformers){
-                User performer = usersDao.getUserById(history.getUserId());
-            %>
-            <tr>
-                <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
-                <td><%=history.getScore()%></td>
-                <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
-                <td><%=sdf.format(history.getCompletionDate())%></td>
-
-            </tr>
-            <%
-                }
-            %>
-            </tbody>
-        </table>
+        </div>
+        <%
+            }
+        %>
     </div>
 </div>
-<%
-    }
-%>
 
-<%--statistics --%>
-<%--TODO: would be great to use chart.js--%>
-<h3>Summary Statistics</h3>
-<% if (recentPerformers.isEmpty()){
-%>
-No activity to show
-<%
-} else {
-%>
-<div class = "summary-statistics">
-    <ul>
-        <li>Total attempts: <%=totalAttempts%></li>
-        <li>Average Score: <%=averageScore%></li>
-        <li>Highest Score: <%=maxScore%></li>
-        <li>Lowest Score: <%=minScore%></li>
-        <li>Average Time: <%=averageTime%></li>
-    </ul>
+<div class="second-row">
+    <div class="section-container">
+        <%--recent performers--%>
+        <h3>Recent Performers</h3>
+        <% if (recentPerformers.isEmpty()){
+        %>
+        No activity to show
+        <%
+        } else {
+        %>
+        <div>
+            <div class="scrollable-pane">
+                <table class="styled-table">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Score</th>
+                        <th>Time (min)</th>
+                        <th>Date</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <% for (History history: recentPerformers){
+                        User performer = usersDao.getUserById(history.getUserId());
+                    %>
+                    <tr>
+                        <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
+                        <td><%=history.getScore()%></td>
+                        <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
+                        <td><%=sdf.format(history.getCompletionDate())%></td>
+
+                    </tr>
+                    <%
+                        }
+                    %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <%
+            }
+        %>
+    </div>
+    <div class="section-container">
+        <%--statistics --%>
+        <%--TODO: would be great to use chart.js--%>
+        <h3>Summary Statistics</h3>
+        <% if (recentPerformers.isEmpty()){
+        %>
+        No activity to show
+        <%
+        } else {
+        %>
+        <div class="summary-statistics">
+            <ul>
+                <li>Total attempts: <%=totalAttempts%></li>
+                <li>Average Score: <%=averageScore%></li>
+                <li>Highest Score: <%=maxScore%></li>
+                <li>Lowest Score: <%=minScore%></li>
+                <li>Average Time: <%=averageTime%></li>
+            </ul>
+        </div>
+        <%
+            }
+        %>
+    </div>
+    <div class="buttons-section">
+        <%--buttons--%>
+        <form action="start-quiz" method="get">
+            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quizId%>">
+            <button type="submit">Start Quiz</button>
+        </form>
+        <form action="practice-quiz" method="post">
+            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quizId%>">
+            <button type="submit">Start Quiz in Practice Mode</button>
+        </form>
+        <form action="edit-quiz" method="post">
+            <input type="hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value="<%= quizId %>">
+            <button type="submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
+        </form>
+        <form action="quiz-search.jsp" method="get" >
+            <button type="submit">Go Back to Quiz Search </button>
+        </form>
+        <form action="user-page.jsp" method="get">
+            <button type="submit">Go Home</button>
+        </form>
+    </div>
 </div>
-<%
-    }
-%>
-
-<%--buttons--%>
-<form action = "start-quiz" method = "get">
-    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
-    <button type = "submit">Start Quiz</button>
-</form>
-
-<form action = "practice-quiz" method = "post">
-    <input type = "hidden" name = "<%=Constants.RequestParameters.QUIZ_ID%>" value = "<%=quizId%>">
-    <button type = "submit">Start Quiz in Practice Mode</button>
-</form>
-
-<form action="edit-quiz.jsp" method="post">
-    <input type = "hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value = "<%= quizId %>">
-    <button type = "submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
-</form>
-
-<br>
-<form action="user-page.jsp" method="get">
-    <button type="submit" >Home</button>
-</form>
 </body>
 </html>
 

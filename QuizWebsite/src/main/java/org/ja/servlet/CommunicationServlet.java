@@ -45,11 +45,13 @@ public class CommunicationServlet extends HttpServlet {
         } else if("send-challenge".equals(action)) {
             String quizName = request.getParameter("quizName");
             Quiz quiz = quizzesDao.getQuizByName(quizName);
+            response.setContentType("text/plain");
             if(quiz != null) {
                 Challenge challenge = new Challenge(curUser.getId(), friendId, quiz.getId());
                 challengesDao.insertChallenge(challenge);
-                response.setContentType("text/plain");
                 response.getWriter().write("OK");
+            }else{
+                response.getWriter().write("NOT_FOUND");
             }
         }else if("remove-request".equals(action)) {
             friendShipsDao.removeFriendShip(fr);

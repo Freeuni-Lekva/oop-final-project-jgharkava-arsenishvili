@@ -54,6 +54,7 @@
             <label for="quizName">Quiz name:</label>
             <input type="text" id="quizName" placeholder="Enter quiz name" required>
             <button type="button" onclick="handleMessageAction('send-challenge', <%=visitedUser.getId()%>)">Challenge</button>
+            <div id="challenge-feedback" style="margin-top: 10px; color: red;"></div>
         </div>
         <!-- send message -->
         <div class="action-section message-action">
@@ -100,10 +101,10 @@
         } else { %>
         <p><%= visitedUser.getUsername() %> has no achievements yet.</p>
         <% } %>
-    </div>
+    </div><br>
 
-    <button onclick="window.history.back()" class="back-btn">
-        ← Go Back
-    </button>
+    <form action="user-page.jsp" method="get">
+        <button type="submit" class="back-btn">Go Home</button>
+    </form>
 </body>
 </html>

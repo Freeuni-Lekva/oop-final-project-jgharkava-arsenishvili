@@ -148,14 +148,16 @@ body {
 }
 
 .back-btn {
-    margin-top: 10px;
-    background: #e3f2fd;
-    border: 1px solid #ccc;
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 12px 20px;
+    border: none;
+    background: #a7c8f2;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
-    grid-area: center;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .back-btn:hover {

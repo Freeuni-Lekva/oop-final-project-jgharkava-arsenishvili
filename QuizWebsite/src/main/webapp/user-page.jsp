@@ -48,6 +48,11 @@
   <div class="card profile-card">
     <h1><%=user.getUsername()%></h1>
     <img src="<%=user.getPhoto()%>" alt="Profile Picture">
+    <form action="upload" method="post">
+      <label for="newPhoto">Change Picture URL:</label>
+      <input type="text" id="newPhoto" name="newPhoto" placeholder="Enter image URL">
+      <button type="submit">Submit</button>
+    </form>
   </div>
 
   <!-- Quiz Highlights Section -->

@@ -32,6 +32,7 @@
 <html>
 <head>
     <title>Question Feedback</title>
+    <link rel="stylesheet" href="css/immediate-correction.css">
 </head>
 <body>
 
@@ -155,7 +156,13 @@
     <% } %>
 
     <div class="score-display">
-        Score: <%=grades.getFirst()%> out of <%=question.getNumAnswers()%>
+        <%
+            if(Constants.QuizMode.PRACTICE == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {%>
+        Score: <%=grades.getFirst()%> out of <%=question.getNumAnswers()%><%
+    } else {%>
+        Score: <%=grades.get(index - 1)%> out of <%=question.getNumAnswers()%><%
+        }
+    %>
     </div>
 </div>
 

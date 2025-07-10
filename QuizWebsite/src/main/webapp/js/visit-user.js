@@ -52,15 +52,29 @@ function handleMessageAction(action, friendId) {
         },
         body: bodyParams
     })
-        .then(res => res.ok ? res.text() : Promise.reject("Request failed"))
+        .then(res => res.text())
         .then(response => {
-            // clear inputs after success
+            const feedback = document.getElementById("challenge-feedback");
+            const quizInput = document.getElementById("quizName");
+
+            quizInput.value = "";
+
             if (action === "send-message") {
                 document.getElementById("message").value = "";
               //  alert("Message sent successfully!");
             } else if (action === "send-challenge") {
-                document.getElementById("quizName").value = "";
-              //  alert("Challenge sent successfully!");
+                if (response === "OK") {
+                    document.getElementById("quizName").value = "";
+                    feedback.style.color = "green";
+                    feedback.textContent = "Challenge sent successfully!";
+                } else {
+                    feedback.style.color = "red";
+                    feedback.textContent = "Quiz not found. Please enter a valid quiz name.";
+                }
+
+                setTimeout(() => {
+                    feedback.textContent = "";
+                }, 3000);
             }
         })
         .catch(err => {

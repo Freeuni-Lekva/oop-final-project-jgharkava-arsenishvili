@@ -54,10 +54,50 @@ body {
 }
 
 .profile-card img {
-    width: 80px;
-    height: 80px;
-    border: #d4edda;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 10px;
     object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.profile-card form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-card label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #34495e;
+}
+
+.profile-card input[type="text"] {
+    padding: 8px;
+    width: 80%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.profile-card button {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.profile-card button:hover {
+    background-color: #2980b9;
 }
 
 /* Quiz highlights */
