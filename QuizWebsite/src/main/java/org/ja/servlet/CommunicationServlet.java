@@ -64,14 +64,18 @@ public class CommunicationServlet extends HttpServlet {
             response.setContentType("text/plain");
             response.getWriter().write("OK");
         } else if("send-message".equals(action)) {
-            long recipientId =  Integer.parseInt(request.getParameter("friendId"));
+            String friendName = request.getParameter("recipient");
             String message = request.getParameter("message");
-            User recipient = usersDao.getUserById(recipientId);
+            User recipient = usersDao.getUserByUsername(friendName);
             if(recipient != null){
                 Message m = new Message(curUser.getId(), recipient.getId(), message);
                 messageDao.insertMessage(m);
                 response.setContentType("text/plain");
                 response.getWriter().write("OK");
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentType("text/plain");
+                response.getWriter().write("Recipient not found.");
             }
         }else if("delete-challenge".equals(action)) {
             long challengeId = Long.parseLong(request.getParameter("challengeId"));

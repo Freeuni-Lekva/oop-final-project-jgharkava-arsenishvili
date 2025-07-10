@@ -1,9 +1,5 @@
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.model.user.User" %>
 <%@ page import="org.ja.utils.Constants" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
 <%@ page import="java.util.List" %>
@@ -14,7 +10,10 @@
     User visitedUser = usersDao.getUserById(id);
     User currentUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
 
-    if(visitedUser.getId() == currentUser.getId()) response.sendRedirect("/user-page.jsp");
+    if(visitedUser.getId() == currentUser.getId()) {
+        response.sendRedirect("/user-page.jsp");
+        return;
+    }
 
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
