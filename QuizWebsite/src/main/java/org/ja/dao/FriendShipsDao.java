@@ -59,8 +59,7 @@ public class FriendShipsDao {
      *
      * @param firstUserId first user
      * @param secondUserId second user
-     * @return the Friendship object
-     * @throws RuntimeException if no friendship is found or a database error occurs
+     * @return the Friendship object if found, or null otherwise
      */
     public Friendship getFriendshipByIds(long firstUserId, long secondUserId){
         String sql = "SELECT * FROM friendships WHERE (first_user_id = ? AND second_user_id = ?) OR (first_user_id = ? AND second_user_id = ?)";
@@ -77,7 +76,7 @@ public class FriendShipsDao {
                 if (rs.next()) {
                     return retrieveFriendship(rs);
                 } else {
-                    throw new RuntimeException("No friendship found between users " + firstUserId + " and " + secondUserId);
+                    return null;
                 }
             }
         } catch (SQLException e) {

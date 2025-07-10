@@ -48,7 +48,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
         assertEquals("friends", friendship.getFriendshipStatus());
 
         // Non-existing
-        assertThrows(RuntimeException.class, () -> dao.getFriendshipByIds(1, 2));
+        assertNull(dao.getFriendshipByIds(1, 2));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
         boolean removed = dao.removeFriendShip(friendship);
         assertTrue(removed, "Friendship should be removed");
 
-        assertThrows(RuntimeException.class, () -> dao.getFriendshipByIds(6, 5));
+        assertNull(dao.getFriendshipByIds(6, 5));
     }
 
     @Test
