@@ -257,9 +257,14 @@
     <%
       List<Message> messages = messageDao.getMessagesForUser(user.getId());
       if(messages != null && !messages.isEmpty()){
+        List<Long> alreadyViewedMessages = (List<Long>) session.getAttribute(Constants.SessionAttributes.MESSAGES_TO_DELETE);
+        int newMessagesNum = 0;
+
+        for(Message m : messages)
+          if(!alreadyViewedMessages.contains(m.getMessageId())) newMessagesNum++;
     %>
     <p class="mb-10" id="message-count-wrapper">
-      You have <span id="message-count"><%= messages.size() %></span> new message(s).
+      You have <span id="message-count"><%= newMessagesNum %></span> unread message(s).
     </p>
     <div class="scrollable-pane">
       <%
@@ -267,7 +272,7 @@
           User sender = usersDao.getUserById(m.getSenderUserId());
           String content = m.getMessageText().replace("\"", "&quot;").replace("\n", "\\n");
       %>
-      <div class="message-item">
+      <div class="message-item <%=alreadyViewedMessages.contains(m.getMessageId()) ? "viewed" : ""%>">
         <p>From: <strong><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=sender.getId()%>"><%=sender.getUsername()%></a></strong></p>
         <button class="view-message-button" data-message="<%= content %>" data-message-id="<%=m.getMessageId()%>">View</button>
       </div>

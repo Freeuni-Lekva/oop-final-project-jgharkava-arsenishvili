@@ -174,15 +174,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `messageId=${encodeURIComponent(messageId)}`
-            }).then(response => {
+            }).catch(err => console.error('Fetch error:', err));
+
+            //TODO delete
+            /*.then(response => {
                     if (response.ok) {
                         console.log('Message ID sent for deletion:', messageId);
                     } else {
                         console.error('Failed to send message ID');
                     }
-            }).catch(err => console.error('Fetch error:', err));
-
-
+            })*/
         });
     });
 
