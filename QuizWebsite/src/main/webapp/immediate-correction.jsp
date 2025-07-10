@@ -32,6 +32,7 @@
 <html>
 <head>
     <title>Question Feedback</title>
+    <link rel="stylesheet" href="css/immediate-correction.css">
 </head>
 <body>
 
@@ -76,8 +77,14 @@
 
 <div class="question-block">
     <div class="question-text">
-        Question <%=quizMode == Constants.QuizMode.TAKING ? index : ""%>:
-        <%=question.getQuestionText() != null ? question.getQuestionText() : ""%>
+        Question <%=quizMode == Constants.QuizMode.TAKING ? index : ""%>:<%
+
+        if(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION.equals(question.getQuestionType())) { %>
+            <%=question.getQuestionText().replace("_", "_____")%><%
+        } else { %>
+            <%=question.getQuestionText() != null ? question.getQuestionText() : ""%> <%
+        }%>
+
     </div>
 
     <% if(question.getImageUrl() != null) { %>
@@ -106,7 +113,9 @@
         <% } %>
     </div>
 
-    <% } else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
+    <% }
+        /// MULTI CHOICE QUESTIONS
+        else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
         AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
         int responseIndex = 0;
@@ -134,28 +143,44 @@
         <% } %>
     </div>
 
-    <% } else {
+    <% }
+
+        /// OTHER QUESTIONS
+        else {
         AnswersDao answersDao = (AnswersDao) application.getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
     %>
     <div class="answer-block">
-        <div class="label">Your Response:</div>
-        <% for(int i = 0; i < resp.size(); i++) { %>
-        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
-        <% } %>
+        <div class="label">Your Response:</div><%
+            for(int i = 0; i < resp.size(); i++) { %>
+                <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i).trim().isEmpty() ? "Left Empty" : resp.getAnswer(i) %></div><%
+            }
+
+            for(int i = resp.size(); i < question.getNumAnswers(); i++) {%>
+                <div class="incorrect">Left Empty</div>
+        <%
+            }
+
+        %>
     </div>
 
     <div class="answer-block">
         <div class="label">Correct Answer(s):</div>
         <% for(Answer answer : answers) {
             String answerText = answer.getAnswerText();%>
-        <div><%= answerText.contains("/") ? answerText.substring(0, answerText.indexOf('/')) : answerText %></div>
+        <div><%= answerText.contains("¶") ? answerText.substring(0, answerText.indexOf('¶')) : answerText %></div>
         <% } %>
     </div>
     <% } %>
 
     <div class="score-display">
-        Score: <%=grades.getFirst()%> out of <%=question.getNumAnswers()%>
+        <%
+            if(Constants.QuizMode.PRACTICE == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {%>
+        Score: <%=grades.getFirst()%> out of <%=question.getNumAnswers()%><%
+    } else {%>
+        Score: <%=grades.get(index - 1)%> out of <%=question.getNumAnswers()%><%
+        }
+    %>
     </div>
 </div>
 

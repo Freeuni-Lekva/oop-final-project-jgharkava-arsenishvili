@@ -45,7 +45,7 @@ public class HistoriesDao {
 
             ps.setLong(1, history.getUserId());
             ps.setLong(2, history.getQuizId());
-            ps.setLong(3, history.getScore());
+            ps.setInt(3, history.getScore());
             ps.setDouble(4, history.getCompletionTime());
 
             int rowsAffected = ps.executeUpdate();
@@ -700,7 +700,7 @@ public class HistoriesDao {
      */
     private History retrieveHistory(ResultSet rs) throws SQLException {
         return new History(rs.getLong("history_id"), rs.getLong("user_id"),
-                rs.getLong("quiz_id"), rs.getLong("score"),
+                rs.getLong("quiz_id"), rs.getInt("score"),
                 rs.getDouble("completion_time"), rs.getTimestamp("completion_date"));
     }
 }

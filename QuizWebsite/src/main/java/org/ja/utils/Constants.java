@@ -65,6 +65,8 @@ public class Constants {
     }
 
     public static class SessionAttributes {
+        public static final String MESSAGES_TO_DELETE = "messages-to-delete";
+
         public static final String USER = "current-user";
         public static final String QUIZ = "current-quiz";
         public static final String RESPONSES = "current-responses";

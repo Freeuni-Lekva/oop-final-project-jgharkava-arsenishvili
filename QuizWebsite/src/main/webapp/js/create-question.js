@@ -186,47 +186,65 @@ function renderQuestionWithBlanks() {
     const input = document.getElementById("rawQuestionInput").value;
     const container = document.getElementById("interactiveQuestionPreview");
 
-    if(input === "") {
-        container.innerHTML = "";
+    container.innerHTML = "";
+
+    if (input.trim() === "") {
         return;
     }
 
-    if (blankInserted) {
-        blankInserted = false;
-        selectedIndex = -1;
-    }
-
-    container.innerHTML = "";
     const words = input.trim().split(/\s+/);
+    blankInserted = false;
+    selectedIndex = -1;
 
+    // Add + button before first word
+    const startWrapper = document.createElement("span");
+    startWrapper.className = "word-button-wrapper";
 
-    const btn = document.createElement("button");
-    btn.textContent = "+";
-    btn.type = "button";
-    btn.onclick = () => insertBlank(-1);
-    container.appendChild(btn);
+    const startBtn = document.createElement("button");
+    startBtn.textContent = "+";
+    startBtn.type = "button";
+    startBtn.onclick = () => insertBlank(-1);
+
+    startWrapper.appendChild(startBtn);
+    container.appendChild(startWrapper);
 
     words.forEach((word, index) => {
-        const wordSpan = document.createElement("span");
-        wordSpan.textContent = " " + word + " ";
-        container.appendChild(wordSpan);
+        // Word
+        const wordWrapper = document.createElement("span");
+        wordWrapper.className = "word-button-wrapper";
 
-        if (!blankInserted && index < words.length - 1) {
-            const btn = document.createElement("button");
-            btn.textContent = "+";
-            btn.type = "button";
-            btn.onclick = () => insertBlank(index);
-            container.appendChild(btn);
+        const wordSpan = document.createElement("span");
+        wordSpan.textContent = word;
+
+        wordWrapper.appendChild(wordSpan);
+        container.appendChild(wordWrapper);
+
+        // + button between words
+        if (index < words.length - 1) {
+            const plusWrapper = document.createElement("span");
+            plusWrapper.className = "word-button-wrapper";
+
+            const plusBtn = document.createElement("button");
+            plusBtn.textContent = "+";
+            plusBtn.type = "button";
+            plusBtn.onclick = () => insertBlank(index);
+
+            plusWrapper.appendChild(plusBtn);
+            container.appendChild(plusWrapper);
         }
     });
 
-    if (!blankInserted && words.length > 0) {
-        const endBtn = document.createElement("button");
-        endBtn.textContent = "+";
-        endBtn.type = "button";
-        endBtn.onclick = () => insertBlank(words.length);
-        container.appendChild(endBtn);
-    }
+    // + button at end
+    const endWrapper = document.createElement("span");
+    endWrapper.className = "word-button-wrapper";
+
+    const endBtn = document.createElement("button");
+    endBtn.textContent = "+";
+    endBtn.type = "button";
+    endBtn.onclick = () => insertBlank(words.length);
+
+    endWrapper.appendChild(endBtn);
+    container.appendChild(endWrapper);
 
     updateFinalQuestion();
 }
@@ -248,28 +266,36 @@ function renderQuestionWithBlankApplied() {
 
     const words = input.trim().split(/\s+/);
 
-    words.forEach((word, index) => {
-        if (index === 0 && selectedIndex === -1) {
-            const blankSpan = document.createElement("span");
-            blankSpan.innerHTML = "<strong>_____</strong> ";
-            container.appendChild(blankSpan);
-        }
+    if (selectedIndex === -1) {
+        const blankSpan = document.createElement("span");
+        blankSpan.innerHTML = "<strong>_____</strong>";
+        container.appendChild(blankSpan);
 
+        if (words.length > 0) {
+            container.appendChild(document.createTextNode(" "));
+        }
+    }
+
+    words.forEach((word, index) => {
         const span = document.createElement("span");
-        span.textContent = word + " ";
+        span.textContent = word;
         container.appendChild(span);
 
         if (index === selectedIndex) {
+            container.appendChild(document.createTextNode(" "));
             const blankSpan = document.createElement("span");
-            blankSpan.innerHTML = "<strong>_____</strong> ";
+            blankSpan.innerHTML = "<strong>_____</strong>";
             container.appendChild(blankSpan);
         }
+
+        container.appendChild(document.createTextNode(" "));
     });
 
     if (selectedIndex === words.length) {
         const blankSpan = document.createElement("span");
-        blankSpan.innerHTML = "<strong>_____</strong> ";
+        blankSpan.innerHTML = "<strong>_____</strong>";
         container.appendChild(blankSpan);
+        container.appendChild(document.createTextNode(" "));
     }
 
     updateFinalQuestion();
@@ -427,6 +453,16 @@ document.getElementById("create-question-form").addEventListener("submit", funct
                 e.preventDefault();
 
                 option.setCustomValidity("Please fill out this field.");
+                option.reportValidity();
+
+                setTimeout(() => option.setCustomValidity(""), 2000);
+            }
+
+            if(option.closest(".right-option-wrapper") && option.value.includes("not selected")) {
+                e.preventDefault();
+
+                // TODO continue
+                option.setCustomValidity("This field cannot include 'not selected'.");
                 option.reportValidity();
 
                 setTimeout(() => option.setCustomValidity(""), 2000);

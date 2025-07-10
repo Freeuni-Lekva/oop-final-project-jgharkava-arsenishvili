@@ -67,7 +67,7 @@ public class AnswersDaoTest extends BaseDaoTest{
         List<Answer> updated = dao.getQuestionAnswers(5);
         String newText = updated.stream().filter(a -> a.getAnswerId() == apple.getAnswerId()).findFirst().get().getAnswerText();
 
-        assertEquals("Apple/IBM", newText);
+        assertEquals("Apple¶IBM", newText);
     }
 
     @Test

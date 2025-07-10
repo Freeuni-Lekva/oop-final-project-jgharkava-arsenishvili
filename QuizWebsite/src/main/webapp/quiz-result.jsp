@@ -85,7 +85,12 @@
 %>
 <div class="question-block">
     <div class="question-text">
-        Question <%= j + 1 %>: <%= question.getQuestionText() != null ? question.getQuestionText() : ""%>
+        Question <%= j + 1 %>:
+        <%if(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION.equals(type)) {%>
+            <%=question.getQuestionText().replace("_", "_____")%><%
+        } else {%>
+            <%=question.getQuestionText() != null ? question.getQuestionText() : ""%><%
+        }%>
     </div>
 
     <% if (question.getImageUrl() != null) { %>
@@ -116,7 +121,10 @@
         <% } %>
     </div>
 
-    <% } else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
+    <% }
+
+    /// MULTI CHOICE QUESTIONS
+    else if(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION.equals(type) || Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION.equals(type)) {
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
         int responseIndex = 0;
     %>
@@ -129,12 +137,17 @@
             } else {
                 for (Answer answer : answers) {
                     boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
-                    if (checked) responseIndex++;%>
+                    String answerClass = "";
+                    if (checked) {
+                        int gr = respGrades.get(responseIndex);
+                        answerClass = gr > 0 ? "correct" : "incorrect";
+                        responseIndex++;
+                    }%>
 
-                    <div class="<%=checked ? "correct" : ""%>">
+                    <div class="<%= answerClass %>">
                         <input type="radio" <%=checked ? "checked" : ""%> disabled>
                         <%--TODO allign next to radio--%>
-                        <div class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></div>
+                        <%= answer.getAnswerText() %>
                     </div><%
                 }
             }%>
@@ -150,7 +163,10 @@
         <% } %>
     </div>
 
-    <% } else {
+    <% }
+
+    /// OTHER TYPE OF QUESTIONS
+    else {
         List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
     %>
     <div class="answer-block">
@@ -160,8 +176,12 @@
                 <h6>Haven't Chosen In Time</h6><%
             } else {
                 for(int i = 0; i < resp.size(); i++) { %>
-        <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i) %></div>
-        <% }
+                    <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i).trim().isEmpty() ? "Left Empty" : resp.getAnswer(i) %></div><%
+                }
+
+                for(int i = resp.size(); i < question.getNumAnswers(); i++) { %>
+                    <div class="incorrect">Left Empty</div><%
+                }
             } %>
     </div>
 
@@ -169,7 +189,7 @@
         <div class="label">Correct Answer(s):</div>
         <% for(Answer answer : answers) {
             String answerText = answer.getAnswerText();%>
-        <div><%= answerText.contains("/") ? answerText.substring(0, answerText.indexOf('/')) : answerText %></div>
+        <div><%= answerText.contains("¶") ? answerText.substring(0, answerText.indexOf('¶')) : answerText %></div>
         <% } %>
     </div>
     <% } %>
@@ -337,10 +357,10 @@
 </div>
 
 <%--return to homepage--%>
-<br><br><br>
-<a href="user-page.jsp">
-    <button>Back To Homepage</button>
-</a>
+
+<form action="user-page.jsp" method="get">
+    <button type="submit" class="back-btn">Back To Homepage</button>
+</form>
 
 </body>
 </html>
