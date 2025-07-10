@@ -42,7 +42,6 @@
     int totalSeconds = (int) (timeSpent * 60);
     int minutes = totalSeconds / 60;
     int seconds = totalSeconds % 60;
-
 %>
 
 <html>
@@ -104,7 +103,7 @@
         <div class="label">Your Matches:</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6><%
+                Haven't Chosen In Time<%
             } else {
                 for(int i = 0; i < resp.size(); i++) {
                     Match match = resp.getMatch(i);%>
@@ -132,7 +131,7 @@
         <div class="label">Your Answer(s):</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6>
+                Haven't Chosen In Time
         <%
             } else {
                 for (Answer answer : answers) {
@@ -173,7 +172,7 @@
         <div class="label">Your Answer(s):</div>
         <%
             if(resp == null) {%>
-                <h6>Haven't Chosen In Time</h6><%
+                Haven't Chosen In Time<%
             } else {
                 for(int i = 0; i < resp.size(); i++) { %>
                     <div class="<%=respGrades.get(i) > 0 ? "correct" : "incorrect"%>"><%= resp.getAnswer(i).trim().isEmpty() ? "Left Empty" : resp.getAnswer(i) %></div><%
