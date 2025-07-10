@@ -41,11 +41,6 @@ public class GradeAllQuestionsServlet extends HttpServlet {
         List<Integer> grades = new ArrayList<>();
         List<List<Integer>> responseGrades = new ArrayList<>();
 
-        System.out.println(questions.size());
-        System.out.println(responses.size());
-        System.out.println(Collections.list(req.getParameterNames()));
-
-        // TODO response size is less than questions.size if some field if left unused same may be in single question grader
         for(int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
             Response response = responses.size() > i ? responses.get(i) : new Response();
@@ -91,6 +86,6 @@ public class GradeAllQuestionsServlet extends HttpServlet {
             throw new RuntimeException("Error Inserting New History In Database");
         }
 
-        req.getRequestDispatcher("/quiz-result.jsp").forward(req, resp);
+        resp.sendRedirect("quiz-result.jsp");
     }
 }

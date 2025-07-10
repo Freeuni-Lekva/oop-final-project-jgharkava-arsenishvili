@@ -13,10 +13,7 @@
 <%
     Integer index = (Integer) session.getAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX);
     List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
-
-    /// question amomaqvs arasworad
     Question question = (Question) request.getAttribute("question");
-
     Constants.QuizMode quizMode = (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
     List<Integer> respGrades = ((List<List<Integer>>) session.getAttribute("responseGrades"))
@@ -24,6 +21,7 @@
     Response resp = ((List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES))
             .get(quizMode == Constants.QuizMode.TAKING ? index - 1 : 0);
 %>
+
 <style>
     .incorrect { color: red; }
     .correct { color: green; }
@@ -60,7 +58,7 @@
 
             function updateTimer() {
                 if (timeLeft <= 0) {
-                    document.getElementById("question-form").submit();
+                    window.location.href = "quiz-result.jsp";
                 } else {
                     document.getElementById("timer").textContent = formatTime(timeLeft);
                     timeLeft--;
@@ -203,6 +201,8 @@
         }
     }
 %>
+
+
 
 <form action="quiz-overview.jsp" method="get">
     <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=((Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ)).getId()%>">
