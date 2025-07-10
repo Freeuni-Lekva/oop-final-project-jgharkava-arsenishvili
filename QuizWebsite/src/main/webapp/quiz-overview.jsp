@@ -366,8 +366,8 @@
             <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quizId%>">
             <button type="submit">Start Quiz in Practice Mode</button>
         </form>
-        <form action="edit-quiz" method="post">
-            <input type="hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value="<%= quizId %>">
+        <form action="edit-quiz.jsp" method="post">
+            <input type="hidden" name="<%= Constants.RequestParameters.QUIZ_ID %>" value="<%=quizId%>">
             <button type="submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
         </form>
         <form action="quiz-search.jsp" method="get" >
