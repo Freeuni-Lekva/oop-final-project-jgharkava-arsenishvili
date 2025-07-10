@@ -33,7 +33,7 @@
     <!-- user info-->
     <div class="user-info">
         <h2><%=visitedUser.getUsername()%></h2>
-        <img src="<%=visitedUser.getPhoto()%>" alt="Profile Picture" width="100" height="100">
+        <img src="<%=visitedUser.getPhoto()%>" alt="Profile Picture" width="100" height="100" onerror="this.src='<%=Constants.IMAGE_URL_NOT_FOUND%>'">
     </div>
 
     <!-- feedback message -->

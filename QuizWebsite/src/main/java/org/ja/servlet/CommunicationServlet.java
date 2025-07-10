@@ -69,15 +69,22 @@ public class CommunicationServlet extends HttpServlet {
             String friendName = request.getParameter("recipient");
             String message = request.getParameter("message");
             User recipient = usersDao.getUserByUsername(friendName);
-            if(recipient != null){
+            if (recipient == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentType("text/plain");
+                response.getWriter().write("Recipient not found.");
+                return;
+            }
+            Friendship friendship = friendShipsDao.getFriendshipByIds(curUser.getId(), recipient.getId());
+            if(friendship == null || "pending".equals(friendship.getFriendshipStatus())){
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentType("text/plain");
+                response.getWriter().write("You are not friends with " + recipient.getUsername() + ".");
+            } else {
                 Message m = new Message(curUser.getId(), recipient.getId(), message);
                 messageDao.insertMessage(m);
                 response.setContentType("text/plain");
                 response.getWriter().write("OK");
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.setContentType("text/plain");
-                response.getWriter().write("Recipient not found.");
             }
         }else if("delete-challenge".equals(action)) {
             long challengeId = Long.parseLong(request.getParameter("challengeId"));

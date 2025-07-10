@@ -147,6 +147,12 @@ public class Constants {
 
 
     /**
+     * Constant image_url when the user photo not found.
+     */
+    public static String IMAGE_URL_NOT_FOUND = "https://i.imgur.com/VDR01iL.png";
+
+
+    /**
      * Enum representing different quiz modes.
      */
     public enum QuizMode {
