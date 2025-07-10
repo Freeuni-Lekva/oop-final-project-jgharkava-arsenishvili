@@ -1,4 +1,3 @@
-<%@ page import="java.lang.*" %>
 <%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="java.util.ArrayList" %>
@@ -68,12 +67,19 @@
         <div class="question-block">
             <div class="question-numbers">Question <%=i+1%></div><%
 
-            ///  RESPONSE OF FILL_IN_THE_BLANK questions
-            if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION) || type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
+            ///  RESPONSE QUESTION
+            if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION)) {%>
                 <h3><%=question.getQuestionText()%></h3>
                 <input type="text" name="response_<%=i+1%>_1"><br><br><%
             }
-                /// PICTURE RESPONSE QUESTION
+
+            /// FILL_IN_THE_BLANK QUESTION
+            else if (type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
+                <h3><%=question.getQuestionText().replace("_", "_____")%></h3>
+                <input type="text" name="response_<%=i+1%>_1"><br><br><%
+            }
+
+            /// PICTURE RESPONSE QUESTION
             else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
                 if (!(question.getQuestionText() == null)  && !question.getQuestionText().trim().isEmpty()) {%>
                     <h3><%=question.getQuestionText()%></h3><%
