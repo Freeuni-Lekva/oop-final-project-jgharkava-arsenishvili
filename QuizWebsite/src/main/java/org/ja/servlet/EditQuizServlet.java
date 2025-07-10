@@ -3,6 +3,7 @@ package org.ja.servlet;
 import org.ja.dao.QuizTagsDao;
 import org.ja.dao.QuizzesDao;
 import org.ja.model.OtherObjects.QuizTag;
+import org.ja.model.quiz.Quiz;
 import org.ja.utils.Constants;
 
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +14,7 @@ import java.io.IOException;
 
 @WebServlet("/edit-quiz")
 public class EditQuizServlet extends HttpServlet {
-
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
         QuizTagsDao quizTagsDao = (QuizTagsDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZ_TAG_DAO);
@@ -24,6 +25,13 @@ public class EditQuizServlet extends HttpServlet {
         switch (field) {
             case "title":
                 String newTitle = request.getParameter("title");
+                Quiz withSameName = quizzesDao.getQuizByName(newTitle);
+                if (withSameName != null) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setContentType("text/plain");
+                    response.getWriter().write("A quiz with this title already exists.");
+                    return;
+                }
                 quizzesDao.updateQuizTitle(quizId, newTitle);
                 response.setStatus(HttpServletResponse.SC_OK);
                 break;

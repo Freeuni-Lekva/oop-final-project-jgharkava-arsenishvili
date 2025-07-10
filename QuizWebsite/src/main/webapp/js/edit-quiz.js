@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     const quizId = document.getElementById("quizId").value;
-
     const titleElem = document.getElementById("quizTitle");
     const descriptionElem = document.getElementById("quizDescription");
     const limitElem = document.getElementById("quizTimeLimit");
@@ -9,9 +8,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const placementSelect = document.getElementById("placementStatus");
     const correctionSelect = document.getElementById("correctionStatus");
 
+    const originalTitle = titleElem.innerText.trim();
+    const originalDescription = descriptionElem.innerText.trim();
+    const originalLimit = limitElem.innerText.trim();
+    const originalCategory = categoryElem.value;
+    const originalOrder = orderSelect.value;
+    const originalPlacement = placementSelect.value;
+    const originalCorrection = correctionSelect.value;
+    const originalRemoveTags = document.querySelectorAll('.removeTagBtn');
+    const originalAddTags = document.querySelectorAll('.addTagBtn');
+
+    let lastTitle = originalTitle;
+    let lastDescription = originalDescription;
+    let lastLimit = originalLimit;
+
     titleElem.addEventListener("blur", function () {
         const title = titleElem.innerText.trim();
 
+        if(!title.trim()) {
+            titleElem.innerText = lastTitle;
+            alert("Quiz title cannot be empty");
+            return;
+        }
         fetch("edit-quiz", {
             method: "POST",
             headers: {
@@ -19,15 +37,32 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: `current-quiz-id=${encodeURIComponent(quizId)}&title=${encodeURIComponent(title)}&field=title`
         }).then(res => {
-            if (!res.ok) console.error("Failed to update title");
+            if (!res.ok) {
+                if (res.status === 409) {
+                    return res.text().then(msg => {
+                        titleElem.innerText = lastTitle;
+                        alert(msg); // "A quiz with this title already exists."
+                    });
+                } else {
+                    console.error("Failed to update title");
+                }
+            } else {
+                lastTitle = title;
+            }
         }).catch(err => {
-            alert("Error updating title");
-            console.error(err);
+                alert("Error updating title");
+                console.error(err);
         });
     });
 
     descriptionElem.addEventListener("blur", function () {
         const description = descriptionElem.innerText.trim();
+
+        if(!description.trim()) {
+            descriptionElem.innerText = lastDescription;
+            alert("Quiz description cannot be empty");
+            return;
+        }
 
         fetch("edit-quiz", {
             method: "POST",
@@ -37,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: `current-quiz-id=${encodeURIComponent(quizId)}&description=${encodeURIComponent(description)}&field=description`
         }).then(res => {
             if (!res.ok) console.error("Failed to update description");
+            else lastDescription = description;
         }).catch(err => {
             alert("Error updating description");
             console.error(err);
@@ -46,6 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
     limitElem.addEventListener("blur", function () {
         const limit = limitElem.innerText.trim();
 
+        if(!isPositiveInteger(limit)) {
+            limitElem.innerText = lastLimit;
+            alert("Quiz time limit field must be a positive integer");
+            return;
+        }
+
         fetch("edit-quiz", {
             method: "POST",
             headers: {
@@ -54,6 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: `current-quiz-id=${encodeURIComponent(quizId)}&limit=${encodeURIComponent(limit)}&field=limit`
         }).then(res => {
             if (!res.ok) console.error("Failed to update description");
+            else lastLimit = limit;
         }).catch(err => {
             alert("Error updating description");
             console.error(err);
@@ -107,6 +150,11 @@ document.addEventListener("DOMContentLoaded", function () {
     placementSelect.addEventListener('change', function () {
         const newStatus = this.value;
 
+        if(newStatus === "one-page" && correctionSelect.value === "immediate-correction") {
+            correctionSelect.value = "final-correction";
+            correctionSelect.dispatchEvent(new Event("change"));
+        }
+
         fetch('edit-quiz', {
             method: 'POST',
             headers: {
@@ -126,6 +174,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     correctionSelect.addEventListener('change', function () {
         const newStatus = this.value;
+
+        if(newStatus === "immediate-correction" && placementSelect.value === "one-page") {
+            placementSelect.value = "multiple-page";
+            placementSelect.dispatchEvent(new Event("change"));
+        }
 
         fetch('edit-quiz', {
             method: 'POST',
@@ -176,7 +229,6 @@ function handleRemoveTagBtnClick(btn, quizId){
     });
 }
 
-
 function handleAddTagBtnClick(btn, quizId){
     btn.addEventListener('click', function () {
         const tagId = this.getAttribute('data-id');
@@ -207,3 +259,8 @@ function handleAddTagBtnClick(btn, quizId){
         });
     });
 }
+
+function isPositiveInteger(value) {
+    return /^\d+$/.test(value) && parseInt(value) > 0;
+}
+
