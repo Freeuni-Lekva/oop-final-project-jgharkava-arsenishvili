@@ -48,7 +48,7 @@
   <!-- Profile Section -->
   <div class="card profile-card">
     <h1><%=user.getUsername()%></h1>
-    <img src="<%=user.getPhoto()%>" alt="Profile Picture">
+    <img src="<%=user.getPhoto()%>" alt="Profile Picture" onerror="this.src='<%=Constants.IMAGE_URL_NOT_FOUND%>'">
     <form action="upload" method="post">
       <label for="newPhoto">Change Picture URL:</label>
       <input type="text" id="newPhoto" name="newPhoto" placeholder="Enter image URL">
@@ -71,7 +71,7 @@
       %>
       <div class="quiz-item">
         <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
-        <p class="text-small">Taken by <%=quiz.getParticipantCount()%> users</p>
+        <p class="text-small">Taken by <%=quiz.getParticipantCount()%> user(s)</p>
       </div>
       <%
           cnt1++;

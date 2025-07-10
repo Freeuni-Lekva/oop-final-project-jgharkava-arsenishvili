@@ -26,7 +26,7 @@ public abstract class BaseDaoTest {
         String schema = Files.readString(Path.of("database/schema.sql"));
         schema = schema.replaceAll(" collate utf8mb4_bin", ""); // unfortunately h2 does not support collate
         executeSql(schema);
-        executeSqlFile("database/testdb.sql");
+        executeSqlFile("database/test_schema.sql");
     }
 
     /**
