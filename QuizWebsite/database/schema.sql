@@ -1,5 +1,6 @@
 use ja_project_db;
 
+
 -- Users table with basic information, including id, password, username, registration date, photo (might be null)
 -- and status: one may be an administrator or a basic user.
 create table users(
@@ -12,12 +13,14 @@ create table users(
     user_status enum('administrator','user') not null default 'user'
 );
 
+
 -- Categories table.
 -- Might include categories like history, geography etc.
 create table categories(
     category_id bigint primary key auto_increment,
     category_name varchar(64) unique not null
 );
+
 
 -- Tags table.
 -- Might include tags like easy, fun, beginner, timed etc.
@@ -59,6 +62,7 @@ create table quizzes(
     foreign key (creator_id) references users(user_id) on delete cascade,
     foreign key (category_id) references categories(category_id) on delete cascade
 );
+
 
 -- Questions table.
 -- Includes basic information like question id, quiz id where this question is present,
@@ -127,6 +131,7 @@ create table matches(
     foreign key (question_id) references questions(question_id) on delete cascade
 );
 
+
 -- Quiz Tag table.
 -- Associates tags to quizzes.
 create table quiz_tag(
@@ -137,6 +142,7 @@ create table quiz_tag(
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade,
     foreign key (tag_id) references tags(tag_id) on delete cascade
 );
+
 
 -- Friendships table.
 -- Shows the relationship between two users. It may be a ng friend request (from the first to the second user) or
@@ -175,6 +181,7 @@ create table user_achievement(
     foreign key (achievement_id) references achievements(achievement_id) on delete cascade
 );
 
+
 -- Messages table.
 -- Stores information about the messages sent from sender to recipient.
 -- It includes the message text and send date.
@@ -189,6 +196,7 @@ create table messages(
     foreign key (recipient_user_id) references users(user_id) on delete cascade
 );
 
+
 -- Challenges table.
 -- Stores information about the challenges sent from sender to recipient.
 -- Includes the quiz id that the participant has been challenged to complete.
@@ -202,6 +210,7 @@ create table challenges(
     foreign key (recipient_user_id) references users(user_id) on delete cascade,
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
+
 
 -- History table.
 -- Includes information on quizzes completed by a user. Includes the users' score on the test and the completion time.
