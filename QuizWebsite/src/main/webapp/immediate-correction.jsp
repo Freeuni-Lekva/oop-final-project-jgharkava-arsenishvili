@@ -22,11 +22,6 @@
             .get(quizMode == Constants.QuizMode.TAKING ? index - 1 : 0);
 %>
 
-<style>
-    .incorrect { color: red; }
-    .correct { color: green; }
-</style>
-
 <html>
 <head>
     <title>Question Feedback</title>
@@ -124,7 +119,7 @@
             boolean checked = responseIndex < resp.size() && answer.containsAnswer(resp.getAnswer(responseIndex));
             if (checked) responseIndex++;
         %>
-        <div class="<%= checked ? "correct" : "" %>">
+        <div class="<%= checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : "" %>">
             <input type="radio" <%= checked ? "checked" : "" %> disabled>
             <p class="<%=checked ? (respGrades.get(responseIndex-1) > 0 ? "correct" : "incorrect") : ""%>"><%= answer.getAnswerText() %></p>
         </div>
