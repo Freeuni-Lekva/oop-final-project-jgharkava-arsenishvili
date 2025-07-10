@@ -31,7 +31,7 @@ public class MultiChoiceMultiAnswersQuestion extends Question{
                 boolean isCorrect = false;
 
                 for (int j = 0; j < correctAnswers.size(); j++){
-                    if (correctAnswers.get(j).containsAnswer(currResponse)) {
+                    if (correctAnswers.get(j).getAnswerValidity() && correctAnswers.get(j).containsAnswer(currResponse)) {
                         grades.add(1);
                         isCorrect = true;
                         break;
