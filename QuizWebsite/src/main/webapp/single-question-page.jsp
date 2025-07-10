@@ -28,6 +28,7 @@
 <html>
 <head>
     <title>Quiz Questions</title>
+    <link rel="stylesheet" href="css/single-question.css">
 </head>
 <body>
 

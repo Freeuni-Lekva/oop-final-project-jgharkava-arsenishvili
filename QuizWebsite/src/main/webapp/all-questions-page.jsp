@@ -20,6 +20,9 @@
 <html>
 <head>
     <title>Quiz Questions</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/all-questions-page.css">
 </head>
 <body>
 
@@ -52,29 +55,30 @@
     window.onload = updateTimer;
 </script>
 
-<div>Time left: <span id="timer"></span></div>
+<div class="timer-container">Time left: <span id="timer"></span></div>
 
-<form id="questions-form" action="grade-single-page-quiz" method="post">
-    <%
-        for (int i = 0; i < questions.size(); i++) {
-            Question question = questions.get(i);
-            String type = question.getQuestionType();%>
+<div class="quiz-container">
+    <form id="questions-form" action="grade-single-page-quiz" method="post">
+        <%
+            for (int i = 0; i < questions.size(); i++) {
+                Question question = questions.get(i);
+                String type = question.getQuestionType();%>
 
-            <h2>Question <%=i+1%></h2><%
+        <div class="question-block">
+            <div class="question-numbers">Question <%=i+1%></div><%
 
             ///  RESPONSE OF FILL_IN_THE_BLANK questions
             if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION) || type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
                 <h3><%=question.getQuestionText()%></h3>
                 <input type="text" name="response_<%=i+1%>_1"><br><br><%
             }
-
-            /// PICTURE RESPONSE QUESTION
+                /// PICTURE RESPONSE QUESTION
             else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
                 if (!(question.getQuestionText() == null)  && !question.getQuestionText().trim().isEmpty()) {%>
                     <h3><%=question.getQuestionText()%></h3><%
                 }%>
-                <img src="<%=question.getImageUrl()%>" width="300" height="200"><br>
-                <input type="text" name="response_<%=i+1%>_1"><br><br><%
+                    <img src="<%=question.getImageUrl()%>" width="300" height="200"><br>
+                    <input type="text" name="response_<%=i+1%>_1"><br><br><%
             }
 
             /// MULTIPLE CHOICE QUESTION
@@ -82,7 +86,7 @@
                 List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
                 Collections.shuffle(answers);%>
 
-                <h3><%=question.getQuestionText()%></h3><%
+                    <h3><%=question.getQuestionText()%></h3><%
 
                 for(int j = 0; j < answers.size(); j++) {
                     Answer answer = answers.get(j);%>
@@ -95,7 +99,7 @@
             else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
                 List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
 
-                <h3><%=question.getQuestionText()%></h3><%
+                    <h3><%=question.getQuestionText()%></h3><%
 
                 for (int j = 0; j < answers.size(); j++) {
                     Answer answer = answers.get(j);%>
@@ -107,13 +111,12 @@
 
             /// MULTI ANSWER QUESTION
             else if (type.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) {%>
-                <h3><%=question.getQuestionText()%></h3><%
+                    <h3><%=question.getQuestionText()%></h3><%
 
                 for (int j = 0; j < question.getNumAnswers(); j++) {%>
-                        <input type="text" name="response_<%=i+1%>_<%=j+1%>"><br><%
+                    <input type="text" name="response_<%=i+1%>_<%=j+1%>"><br><%
                 }
             }
-
             /// MATCHING QUESTION
             else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
                 List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
@@ -129,26 +132,46 @@
                         rightMatches.add(right);
                     }
                 }%>
+            <h3 class="question-text"><%=question.getQuestionText()%></h3>
+            <div class="matching-container"><%
 
-                <h3><%=question.getQuestionText()%></h3><%
-
-                for (String left : leftMatches) {%>
-                    <label><%=left%></label>
-                    <select name="response_<%=i+1%>_<%=left%>">
-                        <option value="not selected">select</option> <%
+            for (String left : leftMatches) {%>
+            <div class="matching-row">
+                <div class="matching-label"><%=left%></div>
+                <select name="response_<%=i+1%>_<%=left%>">
+                    <option value="not selected">-- Select Match --</option><%
                     for (String right : rightMatches) {%>
-                        <option value="<%=right%>"><%=right%></option><%
+                    <option value="<%=right%>"><%=right%></option><%
                     }%>
-                    </select><br><%
-                }
-            }
-        }%>
-    <br><br>
-    <input type="submit" value="Submit Quiz">
-</form>
-<form action="quiz-overview.jsp" method="get">
-    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-    <button type="submit">Exit Quiz</button>
-</form>
+                </select>
+            </div><%
+                    }%>
+            </div><%
+            }%>
+        </div><%
+            }%>
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Submit Quiz</button>
+                <button type="button" class="exit-btn" onclick="exitQuiz()">Exit Quiz</button>
+            </div>
+    </form>
+</div>
+
+<script>
+    function exitQuiz() {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = 'quiz-overview.jsp';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '<%=Constants.RequestParameters.QUIZ_ID%>';
+        input.value = '<%=quiz.getId()%>';
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
 </body>
 </html>

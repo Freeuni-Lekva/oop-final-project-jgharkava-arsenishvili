@@ -25,61 +25,87 @@
 <html>
 <head>
     <title>Quiz Search</title>
+    <link rel="stylesheet" type="text/css" href="css/quiz-search.css">
     <link rel="stylesheet" type="text/css" href="css/hotlink.css">
 </head>
 <body>
 
 <form action="quiz-search" method="get">
-    <label>
-        <input type="text" name="<%=Constants.FilterFields.QUIZ_NAME%>">
-    </label>
+    <!-- Quiz name input -->
+    <div class="quiz-name-section">
+        <label for="quiz-name">Quiz name:</label>
+        <input type="text" id="quiz-name" name="<%=Constants.FilterFields.QUIZ_NAME%>" placeholder="Enter quiz name...">
+    </div>
 
-    <%
-        for(Category category : categories) {%>
-    <input type="checkbox" id="category<%=category.getCategoryId()%>" name="<%=Constants.FilterFields.CATEGORY%>" value="<%=category.getCategoryName()%>">
-    <label for="category<%=category.getCategoryId()%>"><%=category.getCategoryName()%></label>
-    <%
-        }
-    %>
+    <!-- Categories section -->
+    <div class="categories-section">
+        <h3>Select categories:</h3>
+        <div class="checkbox-group">
+            <%
+                for(Category category : categories) {%>
+            <div class="checkbox-item">
+                <input type="checkbox" id="category<%=category.getCategoryId()%>" name="<%=Constants.FilterFields.CATEGORY%>" value="<%=category.getCategoryName()%>">
+                <label for="category<%=category.getCategoryId()%>"><%=category.getCategoryName()%></label>
+            </div>
+            <%
+                }
+            %>
+        </div>
+    </div>
 
-    <%
-        for(Tag tag : tags) {%>
-    <input type="checkbox" id="tag<%=tag.getTagId()%>" name="<%=Constants.FilterFields.TAG%>" value="<%=tag.getTagName()%>">
-    <label for="tag<%=tag.getTagId()%>"><%=tag.getTagName()%></label>
-    <%
-        }
-    %>
+    <!-- Tags section -->
+    <div class="tags-section">
+        <h3>Select tags:</h3>
+        <div class="checkbox-group">
+            <%
+                for(Tag tag : tags) {%>
+            <div class="checkbox-item">
+                <input type="checkbox" id="tag<%=tag.getTagId()%>" name="<%=Constants.FilterFields.TAG%>" value="<%=tag.getTagName()%>">
+                <label for="tag<%=tag.getTagId()%>"><%=tag.getTagName()%></label>
+            </div>
+            <%
+                }
+            %>
+        </div>
+    </div>
 
-    <label>
-        <select name="<%=Constants.FilterFields.ORDER%>">
-            <option value="<%=Constants.FilterFields.ORDER_PLACEHOLDER%>">Select</option>
+    <!-- Order section -->
+    <div class="order-section">
+        <label for="order-select">Sort by:</label>
+        <select id="order-select" name="<%=Constants.FilterFields.ORDER%>">
+            <option value="<%=Constants.FilterFields.ORDER_PLACEHOLDER%>">Select sorting option</option>
             <option value="average_rating">Rating</option>
             <option value="creation_date">Creation Date</option>
             <option value="participant_count">Participant Count</option>
         </select>
-    </label>
+    </div>
 
-    <input type="submit" value="search">
+    <!-- Search button -->
+    <div class="search-button">
+        <input type="submit" value="Search">
+    </div>
 </form>
 
-<%
+<!-- Quiz results -->
+<div class="quiz-results">
+    <h2>Quizzes:</h2>
+    <%
+        if(request.getAttribute("quizzes") == null) {
+            List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
 
-    if(request.getAttribute("quizzes") == null) {
-        List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
+            for(Quiz quiz : quizzes) {%>
+    <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a>
+    <%
+        }
+    } else {
+        List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
 
         for(Quiz quiz : quizzes) {%>
-
-        <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a><br>
-<%
-    }
-} else {
-    List<Quiz> quizzes = (List<Quiz>) request.getAttribute("quizzes");
-
-    for(Quiz quiz : quizzes) {%>
-        <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a><br>
-<%
+    <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a>
+    <%
+            }
         }
-    }
-%>
+    %>
+</div>
 </body>
 </html>
