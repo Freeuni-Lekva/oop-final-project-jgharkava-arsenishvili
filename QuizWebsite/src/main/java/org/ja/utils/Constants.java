@@ -1,6 +1,15 @@
 package org.ja.utils;
 
+/**
+ * A utility class that contains constants used across the application,
+ * including filter field names, context attributes, session keys, and formatters.
+ */
 public class Constants {
+
+
+    /**
+     * Constants used for filter field names in UI forms or tables.
+     */
     public static class FilterFields {
         public static final String USERNAME = "username-filter";
         public static final String QUIZ_NAME = "quiz-name-filter";
@@ -10,6 +19,10 @@ public class Constants {
         public static final String ORDER_PLACEHOLDER = "order-placeholder";
     }
 
+
+    /**
+     * Attribute names used for storing DAO instances in servlet context.
+     */
     public static class ContextAttributes {
         public static final String USERS_DAO = "userDao";
         public static final String QUIZZES_DAO = "quizzesDao";
@@ -30,6 +43,10 @@ public class Constants {
         public static final String USER_ACHIEVEMENTS_DAO = "userAchievementsDao";
     }
 
+
+    /**
+     * Constants representing the different types of quiz questions.
+     */
     public static class QuestionTypes {
         public static final String RESPONSE_QUESTION = "question-response";
         public static final String FILL_IN_THE_BLANK_QUESTION = "fill-in-the-blank";
@@ -40,30 +57,46 @@ public class Constants {
         public static final String MATCHING_QUESTION = "matching";
     }
 
+
+    /**
+     * Constants representing ordering types of questions.
+     */
     public static class OrderTypes {
         public static final String ORDERED = "ordered";
         public static final String UNORDERED = "unordered";
     }
 
+
+    /**
+     * Constants for how quiz questions are ordered (ordered or randomized).
+     */
     public static class QuizQuestionOrderTypes {
         public static final String QUESTIONS_ORDERED = "ordered";
         public static final String QUESTIONS_UNORDERED = "randomized";
     }
 
+
+    /**
+     * Constants for how quiz questions are displayed (one page or multiple pages).
+     */
     public static class QuizQuestionPlacementTypes {
         public static final String ONE_PAGE = "one-page";
         public static final String MULTIPLE_PAGE = "multiple-page";
     }
 
+
+    /**
+     * Constants for quiz correction strategies (immediate-correction or final-correction).
+     */
     public static class QuizQuestionCorrectionTypes {
         public static final String IMMEDIATE_CORRECTION = "immediate-correction";
         public static final String FINAL_CORRECTION = "final-correction";
     }
 
-    public static class ResponseFields {
 
-    }
-
+    /**
+     * Constants used to store attributes in the HTTP session.
+     */
     public static class SessionAttributes {
         public static final String MESSAGES_TO_DELETE = "messages-to-delete";
 
@@ -82,11 +115,19 @@ public class Constants {
         public static final String PRACTICE_QUESTIONS_MASTERY_MAP = "practice-question-mastery-map";
     }
 
+
+    /**
+     * Constants for HTTP request parameters.
+     */
     public static class RequestParameters {
         public static final String QUIZ_ID = "current-quiz-id";
         public static final String USER_ID = "current-user-id";
     }
 
+
+    /**
+     * Constants representing IDs of default achievements of this project.
+     */
     public static class AchievementIds {
         public static final long FIRST_STEP = 1;
         public static final long QUIZ_ADDICT = 2;
@@ -95,13 +136,22 @@ public class Constants {
         public static final long SPEED_DEMON = 5;
     }
 
+
+    /**
+     * Constants defining different user types.
+     */
     public static class UserTypes {
         public static final String USER = "user";
         public static final String ADMINISTRATOR = "administrator";
     }
 
+
+    /**
+     * Enum representing different quiz modes.
+     */
     public enum QuizMode {
         TAKING,
         PRACTICE
     }
+
 }

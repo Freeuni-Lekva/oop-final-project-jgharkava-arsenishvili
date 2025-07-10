@@ -6,9 +6,10 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.QuizRating" %>
+<%@ page import="org.ja.utils.NumUtils" %>
+<%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%--TODO add hotlinks--%>
 <%
     QuizzesDao quizzesDao = (QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
     UsersDao usersDao = (UsersDao) application.getAttribute(Constants.ContextAttributes.USERS_DAO);
@@ -22,7 +23,6 @@
     long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
 
-    // TODO: add participant count
     String quizName = quiz.getName();
     String quizDescription = quiz.getDescription();
     int quizScore = quiz.getScore();
@@ -31,6 +31,7 @@
     List<Long> quizTagIds = quizTagsDao.getTagsByQuizId(quizId);
     double averageRating = quiz.getAvgRating();
     List<QuizRating> quizRatings = quizRatingsDao.getQuizRatingsByQuizIdLimit(quizId, 3);
+    long participantCount = quiz.getParticipantCount();
 
     List<String> quizTags = new ArrayList<String>();
     for (Long quizTag: quizTagIds)
@@ -84,7 +85,8 @@
 
     <div class="quiz-meta">
         <p><strong>Max Score:</strong> <%= quizScore %></p>
-        <p><strong>Average Rating:</strong> <%= averageRating %></p>
+        <p><strong>Average Rating:</strong> <%= NumUtils.formatOneDecimal(averageRating) %></p>
+        <p><strong>Participant Count:</strong> <%=participantCount%></p>
         <p><strong>Category:</strong> <%= categoryName %></p>
         <p><strong>Tags:</strong> <%= String.join(", ", quizTags) %></p>
     </div>
@@ -131,20 +133,25 @@
             <thead>
             <tr>
                 <th>Date</th>
-                <th>Time (min)</th>
+                <th>Time</th>
                 <th>Percent Correct</th>
             </tr>
             </thead>
             <tbody>
             <% for (History h : histories) {
-                double percentage = (double) (100 * h.getScore()) / quizScore;
+                String dateInfo = h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER);
+                String timeInfo = TimeUtils.formatDuration(h.getCompletionTime());
+                String percentInfo = NumUtils.formatPercentage((double) h.getScore() / quizScore);
             %>
-            <tr data-date="<%= sdf.format(h.getCompletionDate()) %>"
-                data-time="<%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %>"
-                data-percentage="<%= String.format(Locale.US, "%.2f", percentage) %>">
-                <td><%= sdf.format(h.getCompletionDate()) %></td>
-                <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-                <td><%= String.format(Locale.US, "%.2f", percentage) %></td>
+
+            <tr data-date="<%=dateInfo%>"
+                data-time="<%=timeInfo%>"
+                data-percentage="<%=percentInfo%>">
+
+<%--             TODO:   Check this out later--%>
+                <td><%=dateInfo%></td>
+                <td><%=timeInfo%></td>
+                <td><%=percentInfo%></td>
             </tr>
             <% } %>
             </tbody>
@@ -174,7 +181,7 @@
                 <tr>
                     <th>User</th>
                     <th>Score</th>
-                    <th>Time (min)</th>
+                    <th>Time</th>
                     <th>Date</th>
                 </tr>
                 </thead>
@@ -183,10 +190,11 @@
                     User performer = usersDao.getUserById(h.getUserId());
                 %>
                 <tr>
-                    <td><a></a><%= performer.getUsername() %></td>
+                    <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=h.getUserId()%>">
+                        <%= performer.getUsername() %></a></td>
                     <td><%= h.getScore() %></td>
-                    <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-                    <td><%= sdf.format(h.getCompletionDate()) %></td>
+                    <td><%= TimeUtils.formatDuration(h.getCompletionTime()) %></td>
+                    <td><%= h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
                 </tr>
                 <% } %>
                 </tbody>
@@ -199,7 +207,7 @@
                 <tr>
                     <th>User</th>
                     <th>Score</th>
-                    <th>Time (min)</th>
+                    <th>Time</th>
                     <th>Date</th>
                 </tr>
                 </thead>
@@ -208,10 +216,10 @@
                     User performer = usersDao.getUserById(h.getUserId());
                 %>
                 <tr>
-                    <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
+                    <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=h.getUserId()%>"><%= performer.getUsername() %></a></td>
                     <td><%= h.getScore() %></td>
-                    <td><%= String.format(Locale.US, "%.2f", h.getCompletionTime()) %></td>
-                    <td><%= sdf.format(h.getCompletionDate()) %></td>
+                    <td><%= TimeUtils.formatDuration(h.getCompletionTime()) %></td>
+                    <td><%= h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
                 </tr>
                 <% } %>
                 </tbody>
@@ -249,7 +257,7 @@
                     <tr>
                         <th>User</th>
                         <th>Score</th>
-                        <th>Time (min)</th>
+                        <th>Time</th>
                         <th>Date</th>
                     </tr>
                     </thead>
@@ -261,8 +269,8 @@
                     <tr>
                         <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
                         <td><%=history.getScore()%></td>
-                        <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
-                        <td><%=sdf.format(history.getCompletionDate())%></td>
+                        <td><%= TimeUtils.formatDuration(history.getCompletionTime()) %></td>
+                        <td><%= history.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
 
                     </tr>
                     <%
@@ -310,8 +318,8 @@
                     <tr>
                         <td><a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=performer.getId()%>"><%= performer.getUsername() %></a></td>
                         <td><%=history.getScore()%></td>
-                        <td><%=String.format(Locale.US, "%.2f", history.getCompletionTime())%></td>
-                        <td><%=sdf.format(history.getCompletionDate())%></td>
+                        <td><%= TimeUtils.formatDuration(history.getCompletionTime()) %></td>
+                        <td><%= history.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
 
                     </tr>
                     <%
@@ -338,10 +346,10 @@
         <div class="summary-statistics">
             <ul>
                 <li>Total attempts: <%=totalAttempts%></li>
-                <li>Average Score: <%=averageScore%></li>
+                <li>Average Score: <%=NumUtils.formatOneDecimal(averageScore)%></li>
                 <li>Highest Score: <%=maxScore%></li>
                 <li>Lowest Score: <%=minScore%></li>
-                <li>Average Time: <%=averageTime%></li>
+                <li>Average Time: <%=TimeUtils.formatDuration(averageTime)%></li>
             </ul>
         </div>
         <%

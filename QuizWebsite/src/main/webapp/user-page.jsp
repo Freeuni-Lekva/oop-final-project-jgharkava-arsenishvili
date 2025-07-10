@@ -6,6 +6,7 @@
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   AnnouncementsDao announcementsDao = (AnnouncementsDao)application.getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
@@ -91,7 +92,7 @@
       <div class="quiz-item">
         <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
         <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></p>
-        <p class="text-small"><%=quiz.getCreationDate()%></p>
+        <p class="text-small"><%=quiz.getCreationDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER)%></p>
       </div>
       <%
           cnt2++;
@@ -129,8 +130,8 @@
       %>
       <div class="history-item">
         <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
-        <p class="text-small">Score: <%=h.getScore()%> | Time: <%=h.getCompletionTime()%></p>
-        <p class="text-small"><%=h.getCompletionDate()%></p>
+        <p class="text-small">Score: <%=h.getScore()%> | Time: <%=TimeUtils.formatDuration(h.getCompletionTime())%></p>
+        <p class="text-small"><%=h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER)%></p>
       </div>
       <%
           cnt3++;
@@ -184,7 +185,7 @@
       <div class="history-item">
         <strong><a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a></strong>
         <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a></p>
-        <p class="text-small"><%=h.getCompletionDate()%></p>
+        <p class="text-small"><%=h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER)%></p>
       </div>
       <%
           cnt8++;
@@ -360,7 +361,7 @@
     %>
     <div class="announcement-item">
       <strong><%=an.getAnnouncementText() %></strong>
-      <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a> | <%=an.getCreationDate() %></p>
+      <p class="text-small">By: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=currUser.getId()%>"><%=currUser.getUsername()%></a> | <%=an.getCreationDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></p>
     </div>
     <%
       }

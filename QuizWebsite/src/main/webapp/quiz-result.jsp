@@ -8,7 +8,9 @@
 <%@ page import="org.ja.model.user.User" %>
 <%@ page import="org.ja.model.OtherObjects.Friendship" %>
 <%@ page import="org.ja.dao.*" %>
-<%@ page import="org.ja.model.OtherObjects.History" %><%--
+<%@ page import="org.ja.model.OtherObjects.History" %>
+<%@ page import="org.ja.utils.NumUtils" %>
+<%@ page import="org.ja.utils.TimeUtils" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/1/2025
@@ -33,15 +35,13 @@
     List<List<Integer>> responseGrades = (List<List<Integer>>) session.getAttribute("responseGrades");
     List<Response> responses = (List<Response>) session.getAttribute(Constants.SessionAttributes.RESPONSES);
     List<Question> questions = (List<Question>) session.getAttribute(Constants.SessionAttributes.QUESTIONS);
+
     int totalScore = 0;
     for (Integer g : grades) {
         totalScore += g;
     }
 
     double timeSpent = (Double) session.getAttribute("time-spent-in-minutes");
-    int totalSeconds = (int) (timeSpent * 60);
-    int minutes = totalSeconds / 60;
-    int seconds = totalSeconds % 60;
 
 %>
 
@@ -59,7 +59,7 @@
 <div class="score-box">
     <h2>Quiz Result</h2>
     <p><span class="label">Your Total Score:</span> <%= totalScore %> / <%= quiz.getScore() %></p>
-    <p><span class="label">Your Time Spent: <%= minutes %> minutes <%= seconds %> seconds </span> </p>
+    <p><span class="label">Your Time Spent: <%= TimeUtils.formatDuration(timeSpent) %> </span> </p>
 </div>
 
 <h2 class="section-title">Review Your Answers</h2>
@@ -271,20 +271,9 @@
         %>
         <tr>
             <td><%= attempt++ %></td>
-            <td><%= h.getCompletionDate() %></td>
+            <td><%= h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER) %></td>
             <td><%= h.getScore() %></td>
-
-            <%
-                double time = h.getCompletionTime();
-                int totalSecondsTaken = (int) Math.round(time * 60);
-                int minutesTaken = totalSecondsTaken / 60;
-                int secondsTaken = totalSecondsTaken % 60;
-                String formattedTime = minutesTaken + "min";
-                if (secondsTaken > 0) {
-                    formattedTime += " " + secondsTaken + "sec";
-                }
-            %>
-            <td><%= formattedTime %></td>
+            <td><%= TimeUtils.formatDuration(h.getCompletionTime()) %></td>
         </tr>
         <%
             }
@@ -314,7 +303,6 @@
     <table>
         <thead>
         <tr>
-            <th>#</th>
             <th>Friend</th>
             <th>Date</th>
             <th>Score</th>
@@ -323,26 +311,17 @@
         </thead>
         <tbody>
         <%
-            int i = 1;
             for (History h : friendsHistory) {
                 long friendId = h.getUserId();
                 String friendName = usersDao.getUserById(friendId).getUsername();
-
-                double time = h.getCompletionTime();
-                int totalSecondsFriends = (int) Math.round(time * 60);
-                int minutesTakenFriends = totalSecondsFriends / 60;
-                int secondsTakenFriends = totalSecondsFriends % 60;
-                String formattedTime = minutesTakenFriends + "min";
-                if (secondsTakenFriends > 0) formattedTime += " " + secondsTakenFriends + "sec";
         %>
         <tr>
-            <td><%= i++ %></td>
             <td>
                 <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=friendId%>"><%=friendName%></a>
             </td>
             <td><%= h.getCompletionDate() %></td>
             <td><%= h.getScore() %></td>
-            <td><%= formattedTime %></td>
+            <td><%= TimeUtils.formatDuration(h.getCompletionTime()) %></td>
         </tr>
         <%
             }

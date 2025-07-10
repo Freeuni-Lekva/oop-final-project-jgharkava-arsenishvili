@@ -5,7 +5,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.QuizzesDao" %>
 <%@ page import="org.ja.dao.UsersDao" %>
-<%@ page import="java.util.List" %><%--
+<%@ page import="java.util.List" %>
+<%@ page import="static org.ja.utils.TimeUtils.DATE_TIME_FORMATTER" %>
+<%@ page import="static org.ja.utils.TimeUtils.formatDuration" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/6/2025
@@ -51,6 +53,7 @@
     </div>
 
     <% if (arr != null && !arr.isEmpty()) { %>
+
     <ul class="history-list">
         <%
             for(History h: arr){
@@ -68,11 +71,11 @@
                 </div>
                 <div class="detail-item time">
                     <span class="detail-label">Time</span>
-                    <span class="detail-value"><%=h.getCompletionTime()%></span>
+                    <span class="detail-value"><%=formatDuration(h.getCompletionTime())%></span>
                 </div>
                 <div class="detail-item date">
                     <span class="detail-label">Taken On</span>
-                    <span class="detail-value"><%=h.getCompletionDate()%></span>
+                    <span class="detail-value"><%=h.getCompletionDate().toLocalDateTime().format(DATE_TIME_FORMATTER)%></span>
                 </div>
             </div>
         </li>
