@@ -442,12 +442,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".matching-question-block").forEach(questionBlock => {
         // dropdown logic
-        questionBlock.querySelectorAll(".left-group").forEach(group => {
-            const rightSelect = group.querySelector("select.right-select");
-            if (!rightSelect) return;
 
-            rightSelect.addEventListener("change", () => {
-                const newRightText = rightSelect.value;
+        // Function to bind dropdown change event
+        function bindDropdownChangeEvent(select) {
+            select.addEventListener("change", () => {
+                const newRightText = select.value;
+                const group = select.closest(".left-group");
                 const matchId = group.dataset.matchId;
 
                 if (!matchId || matchId === "") {
@@ -457,7 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 console.log(matchId);
-
 
                 fetch("edit-question", {
                     method: "POST",
@@ -481,8 +480,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         alert("Error updating right match.");
                     });
             });
-        });
+        }
 
+
+
+        // Bind dropdown logic to existing elements
+        questionBlock.querySelectorAll(".left-group").forEach(group => {
+            const rightSelect = group.querySelector("select.right-select");
+            if (rightSelect) {
+                bindDropdownChangeEvent(rightSelect);
+            }
+        });
         const leftOptionsContainer = questionBlock.querySelector(".left-options");
 
         // if initially only one, disable delete
@@ -722,6 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 leftOptionsContainer.appendChild(group);
 
                 bindSaveToggle(group);
+                bindDropdownChangeEvent(select);
                 updateDeleteButtonStateLeftMatches(leftOptionsContainer);
             });
         }
@@ -1322,9 +1331,24 @@ function updateDeleteButtonStateMultipleChoices(choicesContainer){
 function updateDeleteButtonStateChoices(choicesContainer) {
     const choiceBlocks = choicesContainer.querySelectorAll(".choice-block");
     const deleteButtons = choicesContainer.querySelectorAll(".delete-choice-btn");
-    const shouldDisable = choiceBlocks.length <= 1;
 
-    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+    // If only one choice or fewer, disable all delete buttons
+    if (choiceBlocks.length <= 1) {
+        deleteButtons.forEach(btn => btn.disabled = true);
+    } else {
+        // Multiple choices: enable all delete buttons first, then disable marked ones
+        deleteButtons.forEach(btn => btn.disabled = false);
+
+        // Find and disable delete button for any choice marked as true
+        choiceBlocks.forEach(block => {
+            const markBtn = block.querySelector(".mark-as-true-btn");
+            const deleteBtn = block.querySelector(".delete-choice-btn");
+
+            if (markBtn.textContent.trim() === "Marked as true") {
+                deleteBtn.disabled = true;
+            }
+        });
+    }
 
     // if only one choice left, mark it as true and send info to server
     if (choiceBlocks.length === 1){
