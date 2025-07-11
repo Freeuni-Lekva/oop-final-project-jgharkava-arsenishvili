@@ -162,8 +162,19 @@
         <div class="answer-block">
             <div class="label">Correct Answer(s):</div>
             <% for(Answer answer : answers) {
-                String answerText = answer.getAnswerText();%>
-            <div><%= answerText.contains("¶") ? answerText.substring(0, answerText.indexOf('¶')) : answerText %></div>
+                String answerText = answer.getAnswerText();
+                String[] parts = answerText.split("¶");
+                String correctAnswer = "";
+
+                for (String part : parts) {
+                    if (!part.trim().isEmpty()) {
+                        correctAnswer = part.trim();
+                        break;
+                    }
+                }
+
+            %>
+            <div><%= correctAnswer %></div>
             <% } %>
         </div>
         <% } %>

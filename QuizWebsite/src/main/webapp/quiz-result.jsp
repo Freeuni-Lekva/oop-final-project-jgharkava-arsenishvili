@@ -3,13 +3,9 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="org.ja.model.data.Match" %>
-<%@ page import="org.ja.model.data.Answer" %>
-<%@ page import="org.ja.model.data.User" %>
-<%@ page import="org.ja.model.data.Friendship" %>
 <%@ page import="org.ja.dao.*" %>
-<%@ page import="org.ja.model.data.History" %>
-<%@ page import="org.ja.utils.TimeUtils" %><%--
+<%@ page import="org.ja.utils.TimeUtils" %>
+<%@ page import="org.ja.model.data.*" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/1/2025
@@ -185,8 +181,19 @@
     <div class="answer-block">
         <div class="label">Correct Answer(s):</div>
         <% for(Answer answer : answers) {
-            String answerText = answer.getAnswerText();%>
-        <div><%= answerText.contains("¶") ? answerText.substring(0, answerText.indexOf('¶')) : answerText %></div>
+            String answerText = answer.getAnswerText();
+            String[] parts = answerText.split("¶");
+            String correctAnswer = "";
+
+            for (String part : parts) {
+                if (!part.trim().isEmpty()) {
+                    correctAnswer = part.trim();
+                    break;
+                }
+            }
+
+        %>
+        <div><%= correctAnswer %></div>
         <% } %>
     </div>
     <% } %>
@@ -221,6 +228,15 @@
 
 
 <!-- Quiz Review & Rating -->
+<%
+    QuizRatingsDao quizRatingsDao = (QuizRatingsDao) application.getAttribute(Constants.ContextAttributes.QUIZ_RATING_DAO);
+    QuizRating quizRating = quizRatingsDao.getQuizRatingByUserIdQuizId(user.getId(), quiz.getId());
+    int prevRating = quizRating != null ? quizRating.getRating() : 0;
+    String prevComment = quizRating != null ? quizRating.getReview() : null;
+    boolean hasComment = (prevComment != null && !prevComment.trim().isEmpty());
+    String safeComment = hasComment ? prevComment.replace("\"", "&quot;") : "Leave a comment about the quiz...";
+%>
+
 <div class="quiz-feedback-section">
     <h3>Rate This Quiz</h3>
 
@@ -232,7 +248,9 @@
         <span data-value="1">&#9733;</span>
     </div>
 
-    <textarea id="quiz-review" rows="4" cols="50" placeholder="Leave a comment about the quiz..." style="margin-top: 10px; width: 100%; max-width: 600px;"></textarea>
+    <textarea id="quiz-review" rows="4" cols="50"
+              placeholder="<%= safeComment %>"
+              style="margin-top: 10px; width: 100%; max-width: 600px;"></textarea>
 
     <br><br>
     <button onclick="submitReview()">Submit Rating & Review</button>
@@ -336,6 +354,10 @@
 <form action="user-page.jsp" method="get">
     <button type="submit" class="back-btn">Back To Homepage</button>
 </form>
+
+<script>
+    let selectedRating = <%=prevRating%>;
+</script>
 
 </body>
 </html>
