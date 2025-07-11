@@ -8,28 +8,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const placementSelect = document.getElementById("placementStatus");
     const correctionSelect = document.getElementById("correctionStatus");
 
-    const originalTitle = titleElem.innerText.trim();
-    const originalDescription = descriptionElem.innerText.trim();
-    const originalLimit = limitElem.innerText.trim();
-    const originalCategory = categoryElem.value;
-    const originalOrder = orderSelect.value;
-    const originalPlacement = placementSelect.value;
-    const originalCorrection = correctionSelect.value;
-    const originalRemoveTags = document.querySelectorAll('.removeTagBtn');
-    const originalAddTags = document.querySelectorAll('.addTagBtn');
-
-    let lastTitle = originalTitle;
-    let lastDescription = originalDescription;
-    let lastLimit = originalLimit;
+    let lastTitle = titleElem.innerText.trim();
+    let lastDescription = descriptionElem.innerText.trim();
+    let lastLimit = limitElem.innerText.trim();
 
     titleElem.addEventListener("blur", function () {
         const title = titleElem.innerText.trim();
+
+        if(title === lastTitle) return;
 
         if(!title.trim()) {
             titleElem.innerText = lastTitle;
             alert("Quiz title cannot be empty");
             return;
         }
+
+        if(title.length >= 64) {
+            titleElem.innerText = lastTitle;
+            alert("Quiz title is too long");
+            return;
+        }
+
         fetch("edit-quiz", {
             method: "POST",
             headers: {
@@ -58,9 +57,17 @@ document.addEventListener("DOMContentLoaded", function () {
     descriptionElem.addEventListener("blur", function () {
         const description = descriptionElem.innerText.trim();
 
+        if(description === lastDescription) return;
+
         if(!description.trim()) {
             descriptionElem.innerText = lastDescription;
             alert("Quiz description cannot be empty");
+            return;
+        }
+
+        if(description.length >= 1000) {
+            descriptionElem.innerText = lastDescription;
+            alert("Quiz description is too long");
             return;
         }
 
@@ -82,9 +89,17 @@ document.addEventListener("DOMContentLoaded", function () {
     limitElem.addEventListener("blur", function () {
         const limit = limitElem.innerText.trim();
 
-        if(!isPositiveInteger(limit)) {
+        if(limit === lastLimit) return;
+
+        if(!isPositiveInteger(limit) || limit.startsWith("0")) {
             limitElem.innerText = lastLimit;
             alert("Quiz time limit field must be a positive integer");
+            return;
+        }
+
+        if(limit.length >= 3) {
+            limitElem.innerText = lastLimit;
+            alert("Quiz time limit it too big");
             return;
         }
 
