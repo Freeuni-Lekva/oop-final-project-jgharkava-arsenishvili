@@ -58,8 +58,6 @@
     long minScore = historiesDao.getMinimumScore(quizId);
     double averageTime = historiesDao.getAverageTime(quizId);
 
-    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");
-
     Map<String, List<History>> topByRange = new HashMap<String, List<History>>();
     topByRange.put("last_day", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_day"));
     topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week"));
@@ -76,10 +74,13 @@
 </head>
 
 <body>
+
+<%--Basic Info--%>
 <div class="information-container">
     <h1 class="quiz-title"><%= quizName %></h1>
 
     <h2 class="creator-name">Creator: <a class="hotlink" href="visit-user.jsp?<%=Constants.RequestParameters.USER_ID%>=<%=quiz.getCreatorId()%>"><%= creatorName %></a></h2>
+    <h2 class="creation-date">Created on: <%=quiz.getCreationDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER)%></h2>
 
     <p class="quiz-description"><%= quizDescription %></p>
 
@@ -111,6 +112,7 @@
 </div>
 
 
+<%--Upper Row--%>
 <div class="first-row">
     <div class="section-container">
         <h3>Your Attempts on this Quiz</h3>
@@ -129,33 +131,35 @@
         <button id="sortDirectionBtn" onclick="toggleSortDirection()">Sort Ascending</button>
 
         <%--user's performance on quiz--%>
-        <table id="historyTable" class="styled-table">
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Percent Correct</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% for (History h : histories) {
-                String dateInfo = h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER);
-                String timeInfo = TimeUtils.formatDuration(h.getCompletionTime());
-                String percentInfo = NumUtils.formatPercentage((double) h.getScore() / quizScore);
-            %>
+        <div class="scrollable-pane">
+            <table id="historyTable" class="styled-table">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Percent Correct</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% for (History h : histories) {
+                    String dateInfo = h.getCompletionDate().toLocalDateTime().format(TimeUtils.DATE_TIME_FORMATTER);
+                    String timeInfo = TimeUtils.formatDuration(h.getCompletionTime());
+                    String percentInfo = NumUtils.formatPercentage((double) h.getScore() / quizScore);
+                %>
 
-            <tr data-date="<%=dateInfo%>"
-                data-time="<%=timeInfo%>"
-                data-percentage="<%=percentInfo%>">
+                <tr data-date="<%=dateInfo%>"
+                    data-time="<%=timeInfo%>"
+                    data-percentage="<%=percentInfo%>">
 
-<%--             TODO:   Check this out later--%>
-                <td><%=dateInfo%></td>
-                <td><%=timeInfo%></td>
-                <td><%=percentInfo%></td>
-            </tr>
-            <% } %>
-            </tbody>
-        </table>
+                    <td><%=dateInfo%></td>
+                    <td><%=timeInfo%></td>
+                    <td><%=percentInfo%></td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+
         <%
             }
         %>
@@ -175,7 +179,7 @@
             <button id="showAllBtn" onclick="showAllPerformers()">Show All</button>
         </div>
 
-        <div id="topPerformersContainer">
+        <div id="topPerformersContainer" class="scrollable-pane">
             <table id="topPerformersTable" class="styled-table">
                 <thead>
                 <tr>
@@ -201,7 +205,7 @@
             </table>
         </div>
 
-        <div id="allPerformersContainer">
+        <div class="scrollable-pane" id="allPerformersContainer">
             <table id="allPerformersTable" class="styled-table">
                 <thead>
                 <tr>
@@ -289,6 +293,8 @@
     </div>
 </div>
 
+
+<%--Lower Row--%>
 <div class="second-row">
     <div class="section-container">
         <%--recent performers--%>
@@ -306,7 +312,7 @@
                     <tr>
                         <th>User</th>
                         <th>Score</th>
-                        <th>Time (min)</th>
+                        <th>Time</th>
                         <th>Date</th>
                     </tr>
                     </thead>

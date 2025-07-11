@@ -16,6 +16,14 @@ public class TimeUtils {
 
 
     /**
+     * Formatter for consistent date and time display across the site.
+     * Example format: "10 Jul 2025"
+     */
+    public static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd, yyyy");
+
+
+    /**
      * Formats a double representing a duration in minutes into a human-readable string.
      * - If both minutes and seconds are present: "X minutes Y seconds"
      * - If only minutes: "X minutes"

@@ -8,6 +8,7 @@
 <%@ page import="org.ja.model.OtherObjects.Match" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
+<%@ page import="java.time.Instant" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -44,7 +45,7 @@
     if(Constants.QuizMode.TAKING == (Constants.QuizMode) session.getAttribute(Constants.SessionAttributes.QUIZ_MODE)) {
         startTime = (Long) session.getAttribute("start-time");
         duration = (Integer) session.getAttribute("time-limit-in-seconds");
-        now = System.currentTimeMillis();
+        now = Instant.now().toEpochMilli();
         timeLeft = duration - (now - startTime) / 1000;%>
 
         <script>
