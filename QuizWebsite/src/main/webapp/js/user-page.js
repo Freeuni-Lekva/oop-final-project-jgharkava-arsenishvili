@@ -276,5 +276,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+document.getElementById("new-photo-form").addEventListener("submit", function(e) {
+    const photo = document.getElementById("newPhoto");
 
+    if(photo.value.trim().length >= 2040) {
+        e.preventDefault();
+
+        photo.setCustomValidity("This field is too long.");
+        photo.reportValidity();
+
+        setTimeout(() => photo.setCustomValidity(""), 2000);
+    }
+});
 
