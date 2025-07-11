@@ -25,7 +25,7 @@ import java.io.IOException;
  *   <li>title: the quiz name to validate (if action is "validate-quiz-name")</li>
  *   <li>tag-name: the tag name to validate (if action is not "validate-quiz-name")</li>
  * </ul>
- * </p>
+ *
  */
 @WebServlet("/validate-creation")
 public class ValidateQuizCreationServlet extends HttpServlet {

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 /**
- * DAO class for accessing and managing user achievements stored in the 'user_achievement' table.
+ * Data Access Object for accessing and managing user achievements stored in the 'user_achievement' table.
  */
 public class UserAchievementsDao {
     private final BasicDataSource dataSource;

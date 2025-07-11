@@ -47,7 +47,7 @@ import java.util.Map;
  *   <li>{@code USER} - the user taking the quiz</li>
  *   <li>{@code start-time} - quiz start timestamp in milliseconds</li>
  * </ul>
- * </p>
+ *
  *
  * <p>
  * The servlet forwards to appropriate JSP pages:
@@ -56,7 +56,7 @@ import java.util.Map;
  *   <li>{@code single-question-page.jsp} for the next question page</li>
  *   <li>{@code quiz-result.jsp} to show final results</li>
  * </ul>
- * </p>
+ *
  */
 @WebServlet("/grade-single-question")
 public class GradeSingleQuestionServlet extends HttpServlet {
