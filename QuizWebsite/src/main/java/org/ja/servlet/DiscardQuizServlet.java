@@ -27,6 +27,6 @@ public class DiscardQuizServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.TAG_TO_CREATE, null);
         session.setAttribute(Constants.SessionAttributes.HAS_QUESTIONS, false);
 
-        response.sendRedirect("create-quiz.jsp");
+        response.sendRedirect("user-page.jsp");
     }
 }

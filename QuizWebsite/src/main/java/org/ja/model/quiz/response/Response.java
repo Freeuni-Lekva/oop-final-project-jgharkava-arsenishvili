@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Response {
-    // TODO make private
     private final List<Object> list;
 
     public Response(){

@@ -151,3 +151,7 @@ function getSelectedValue(radioNodeList) {
 document.getElementsByName("placementType").forEach(radio => {
     radio.addEventListener("change", enforceCorrectionOptions);
 });
+
+function confirmDiscard(){
+    return confirm("Are you sure you want to discard all changes? This cannot be undone.");
+}
