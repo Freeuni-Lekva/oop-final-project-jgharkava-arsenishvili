@@ -49,7 +49,7 @@
   <div class="card profile-card">
     <h1><%=user.getUsername()%></h1>
     <img src="<%=user.getPhoto()%>" alt="Profile Picture" onerror="this.src='<%=Constants.IMAGE_URL_NOT_FOUND%>'">
-    <form action="upload" method="post">
+    <form action="upload" method="post" id="new-photo-form">
       <label for="newPhoto">Change Picture URL:</label>
       <input type="text" id="newPhoto" name="newPhoto" placeholder="Enter image URL">
       <button type="submit">Submit</button>

@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        if(title.length >= 64) {
+        if(title.length >= 60) {
             titleElem.innerText = lastTitle;
             alert("Quiz title is too long");
             return;

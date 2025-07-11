@@ -44,7 +44,7 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    if (quizTitle.length >= 64) {
+    if (quizTitle.length >= 60) {
         e.preventDefault();
 
         quizTitleInput.setCustomValidity("Quiz title is too long.");
@@ -100,7 +100,7 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    if(document.getElementById("tag_other").checked && otherTag.length >= 64) {
+    if(document.getElementById("tag_other").checked && otherTag.length >= 25) {
         e.preventDefault();
 
         otherTagInput.setCustomValidity("Tag name is too long.");
