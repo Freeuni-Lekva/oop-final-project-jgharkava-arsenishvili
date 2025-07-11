@@ -1,6 +1,5 @@
 package FilterTests;
 
-import org.ja.model.filters.AndFilter;
 import org.ja.model.filters.CategoryFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
