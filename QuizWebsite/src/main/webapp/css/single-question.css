@@ -69,7 +69,7 @@ div {
     100% { transform: scale(1); }
 }
 
-/* Body acts as main container */
+/* Center all content */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #739cc8;
@@ -82,17 +82,13 @@ body {
     text-align: center;
 }
 
-/* Center all content */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #739cc8;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
-    min-height: 100vh;
-    max-width: 900px;
-    margin: 0 auto;
-    text-align: center;
+.question-container {
+    width: 800px;
+    background: #e3f2fd;
+    border: 2px solid #d4edda;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Question header */
@@ -333,35 +329,40 @@ img {
     display: block;
 }
 
-/* Button styling */
-input[type="submit"],
-button {
-    background: #3498db;
+.next-button{
+    background: #28a745;
     color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 5px;
     font-size: 1em;
     cursor: pointer;
-    margin: 10px 5px;
+    margin-top:20px;
     transition: all 0.3s ease;
-    min-width: 150px;
     font-weight: bold;
 }
 
-input[type="submit"]:hover,
-button:hover {
-    background: #2980b9;
+.next-button:hover{
+    background: #218838;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Exit button styling */
-button[type="submit"] {
-    background: #3498db;
+.exit-button{
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top:20px;
+    transition: all 0.3s ease;
+    font-weight: bold;
 }
 
-button[type="submit"]:hover {
+.exit-button:hover{
     background: #c0392b;
 }
 
