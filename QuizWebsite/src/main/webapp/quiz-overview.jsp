@@ -3,7 +3,6 @@
 <%@ page import="java.util.*" %>
 <%@ page import="org.ja.model.data.History" %>
 <%@ page import="org.ja.model.data.User" %>
-<%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.data.QuizRating" %>
 <%@ page import="org.ja.utils.NumUtils" %>
@@ -341,7 +340,6 @@
     </div>
     <div class="section-container">
         <%--statistics --%>
-        <%--TODO: would be great to use chart.js--%>
         <h3>Summary Statistics</h3>
         <% if (recentPerformers.isEmpty()){
         %>
@@ -377,7 +375,7 @@
             <button type="submit" <%= isCreator ? "" : "disabled" %>>Edit quiz</button>
         </form>
         <form action="quiz-search.jsp" method="get" >
-            <button type="submit">Go Back to Quiz Search </button>
+            <button type="submit">Go to Quiz Search </button>
         </form>
         <form action="user-page.jsp" method="get">
             <button type="submit">Go Home</button>

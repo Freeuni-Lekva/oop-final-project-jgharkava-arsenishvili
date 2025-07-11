@@ -1,7 +1,5 @@
 <%@ page import="org.ja.dao.AchievementsDao" %>
 <%@ page import="org.ja.utils.Constants" %>
-<%@ page import="org.ja.model.data.Achievement" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.UserAchievementsDao" %>
 <%@ page import="org.ja.model.data.UserAchievement" %>
 <%@ page import="java.util.List" %><%--

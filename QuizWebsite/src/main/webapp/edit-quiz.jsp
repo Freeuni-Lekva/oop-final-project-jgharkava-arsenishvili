@@ -1,11 +1,10 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
-<%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.ja.model.data.Category" %>
 <%@ page import="org.ja.model.data.Tag" %>
 <%@ page import="org.ja.dao.*" %>
-<%@ page import="java.util.ArrayList" %><%--
+<%--
   Created by IntelliJ IDEA.
   User: lizamarsagishvili
   Date: 01.07.25

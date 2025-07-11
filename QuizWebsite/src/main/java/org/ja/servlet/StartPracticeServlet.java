@@ -83,6 +83,6 @@ public class StartPracticeServlet extends HttpServlet {
         session.setAttribute(Constants.SessionAttributes.QUIZ_MODE, Constants.QuizMode.PRACTICE);
         session.setAttribute(Constants.SessionAttributes.CURRENT_QUESTION_INDEX, 0);
 
-        req.getRequestDispatcher("/single-question-page.jsp").forward(req, resp);
+        resp.sendRedirect("/single-question-page.jsp");
     }
 }

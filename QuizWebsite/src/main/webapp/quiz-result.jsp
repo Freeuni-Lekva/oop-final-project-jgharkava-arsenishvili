@@ -9,7 +9,6 @@
 <%@ page import="org.ja.model.data.Friendship" %>
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.data.History" %>
-<%@ page import="org.ja.utils.NumUtils" %>
 <%@ page import="org.ja.utils.TimeUtils" %><%--
   Created by IntelliJ IDEA.
   User: tober

@@ -3,7 +3,6 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.AnswersDao" %>
 <%@ page import="org.ja.model.data.Answer" %>
-<%@ page import="java.util.Collections" %>
 <%@ page import="org.ja.model.data.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="java.util.List" %>
