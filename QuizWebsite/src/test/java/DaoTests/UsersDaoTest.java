@@ -83,4 +83,16 @@ public class UsersDaoTest extends BaseDaoTest{
         assertFalse(dao.removeUserByName(name));
     }
 
+    @Test
+    public void testUpdatePhoto() {
+        long testUserId = 5L;
+        String newPhotoUrl = "https://example.com/new-photo.jpg";
+
+        dao.updatePhoto(newPhotoUrl, testUserId);
+
+        User updatedUser = dao.getUserById(testUserId);
+        assertNotNull(updatedUser);
+        assertEquals(newPhotoUrl, updatedUser.getPhoto());
+    }
+
 }

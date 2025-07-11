@@ -107,6 +107,14 @@ public class UsersDao {
         }
     }
 
+
+    /**
+     * Updates the profile photo of a specific user.
+     *
+     * @param photo the new photo URL or path to set for the user
+     * @param id the ID of the user whose photo is to be updated
+     * @throws RuntimeException if a database error occurs
+     */
     public void updatePhoto(String photo, long id) {
         String sql = "UPDATE users SET user_photo = ? WHERE user_id = ?";
 

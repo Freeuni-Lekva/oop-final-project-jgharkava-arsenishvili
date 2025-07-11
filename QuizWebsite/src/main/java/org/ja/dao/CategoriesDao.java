@@ -114,19 +114,23 @@ public class CategoriesDao {
         }
     }
 
+
     /**
-     * Retrieves all categories from the database.
+     * Retrieves a limited number of categories from the database.
      *
-     * @return a list of all Category objects; empty list if none exist
+     * @param limit the maximum number of categories to retrieve
+     * @return a list of Category objects, up to the specified limit; empty list if none exist
      * @throws RuntimeException if a database error occurs
      */
-    public List<Category> getAllCategories(){
+    public List<Category> getAllCategories(int limit){
         List<Category> categories = new ArrayList<>();
 
-        String sql = "SELECT * FROM categories";
+        String sql = "SELECT * FROM categories LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
+
+            ps.setInt(1, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next()) {
@@ -140,6 +144,7 @@ public class CategoriesDao {
 
         return categories;
     }
+
 
 
     // --- Helper Methods ---

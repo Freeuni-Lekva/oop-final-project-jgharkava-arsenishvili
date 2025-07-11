@@ -65,22 +65,26 @@ public class AnnouncementsDao {
 
 
     /**
-     * Retrieves all announcements ordered by creation date descending.
+     * Retrieves a limited number of announcements ordered by creation date descending.
      *
-     * @return a list of announcements, newest first
+     * @param limit the maximum number of announcements to retrieve
+     * @return a list of announcements, newest first, up to the specified limit
      * @throws RuntimeException if a database error occurs
      */
-    public List<Announcement> getAllAnnouncements(){
+    public List<Announcement> getAllAnnouncements(int limit){
         ArrayList<Announcement> announcements = new ArrayList<>();
 
-        String sql = "SELECT * FROM announcements ORDER BY creation_date DESC";
+        String sql = "SELECT * FROM announcements ORDER BY creation_date DESC LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()){
+             PreparedStatement ps = c.prepareStatement(sql)){
 
-            while (rs.next()) {
-                announcements.add(retrieveAnnouncement(rs));
+            ps.setInt(1, limit);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next()) {
+                    announcements.add(retrieveAnnouncement(rs));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error querying announcements from database", e);

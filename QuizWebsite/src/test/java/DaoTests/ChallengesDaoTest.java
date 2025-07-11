@@ -2,6 +2,7 @@ package DaoTests;
 
 import org.ja.dao.*;
 import org.ja.model.OtherObjects.*;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -33,20 +34,20 @@ public class ChallengesDaoTest extends BaseDaoTest{
 
     @Test
     public void testRemoveChallenge() {
-        List<Challenge> challenges = dao.challengesAsReceiver(5);
+        List<Challenge> challenges = dao.challengesAsReceiver(5, Constants.FETCH_LIMIT);
         assertFalse(challenges.isEmpty());
 
         Challenge challenge = challenges.get(0);
         boolean removed = dao.removeChallenge(challenge.getChallengeId());
         assertTrue(removed);
 
-        List<Challenge> updated = dao.challengesAsReceiver(5);
+        List<Challenge> updated = dao.challengesAsReceiver(5, Constants.FETCH_LIMIT);
         assertFalse(updated.contains(challenge));
     }
 
     @Test
     public void testChallengesAsReceiver() {
-        List<Challenge> receiverChallenges = dao.challengesAsReceiver(5); // Mariam <- quiz_id 5 from Ani
+        List<Challenge> receiverChallenges = dao.challengesAsReceiver(5, Constants.FETCH_LIMIT); // Mariam <- quiz_id 5 from Ani
         assertEquals(1, receiverChallenges.size());
         Challenge challenge = receiverChallenges.get(0);
         assertEquals(5, challenge.getQuizId());
@@ -55,7 +56,7 @@ public class ChallengesDaoTest extends BaseDaoTest{
 
     @Test
     public void testChallengesForUserWithNoEntries() {
-        List<Challenge> receiver = dao.challengesAsReceiver(1225);
+        List<Challenge> receiver = dao.challengesAsReceiver(1225, Constants.FETCH_LIMIT);
         assertTrue(receiver.isEmpty());
     }
 }

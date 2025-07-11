@@ -119,7 +119,7 @@ public class QuizRatingsDao {
      * @return a list of QuizRating objects for the given quiz
      * @throws RuntimeException if the query fails
      */
-    public List<QuizRating> getQuizRatingsByQuizIdLimit(long quizId, int limit){
+    public List<QuizRating> getQuizRatingsByQuizId(long quizId, int limit){
         List<QuizRating> quizRatings = new ArrayList<>();
 
         String sql = "SELECT DISTINCT * FROM quiz_rating WHERE quiz_id = ? LIMIT ?";

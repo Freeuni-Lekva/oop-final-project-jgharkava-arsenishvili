@@ -2,6 +2,7 @@ package DaoTests;
 
 import org.ja.dao.TagsDao;
 import org.ja.model.CategoriesAndTags.Tag;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -85,7 +86,7 @@ public class TagsDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetAllTags() {
-        List<Tag> tags = dao.getAllTags();
+        List<Tag> tags = dao.getAllTags(Constants.FETCH_LIMIT);
         assertNotNull(tags);
         assertTrue(tags.size() >= 3);
         assertTrue(tags.stream().anyMatch(tag -> tag.getTagName().equals("timed")));

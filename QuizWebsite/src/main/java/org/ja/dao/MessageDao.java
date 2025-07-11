@@ -114,57 +114,23 @@ public class MessageDao {
 
 
     /**
-     * Retrieves all messages exchanged between two users, sorted by send date descending.
-     *
-     * @param senderId    the ID of the first user
-     * @param recipientId the ID of the second user
-     * @return a List of Message objects sorted by most recent first
-     * @throws RuntimeException if a database error occurs
-     */
-    public List<Message> getMutualMessages(long senderId, long recipientId){
-        List<Message> mutualMessages = new ArrayList<>();
-
-        String sql = "SELECT * FROM messages " +
-                "WHERE (sender_user_id = ? AND recipient_user_id = ?) " +
-                "OR (sender_user_id = ? AND recipient_user_id = ?) " +
-                "ORDER BY message_send_date DESC";
-
-        try (Connection c = dataSource.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
-
-            ps.setLong(1, senderId);
-            ps.setLong(2, recipientId);
-            ps.setLong(3, recipientId);
-            ps.setLong(4, senderId);
-
-            try (ResultSet rs = ps.executeQuery()){
-                while (rs.next())
-                    mutualMessages.add(retrieveMessage(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error querying Messages for users from database", e);
-        }
-
-        return mutualMessages;
-    }
-
-
-    /**
-     * Retrieves all messages sent to a particular user, sorted by send date descending.
+     * Retrieves recent messages sent to a particular user, sorted by send date descending.
      *
      * @param userId the recipient user's ID
-     * @return a List of Message objects sorted by most recent first
+     * @param limit the maximum number of messages to retrieve
+     * @return a list of Message objects sorted from most recent to oldest; empty list if none found
      * @throws RuntimeException if a database error occurs
      */
-    public List<Message> getMessagesForUser(long userId){
+    public List<Message> getMessagesForUser(long userId, int limit){
         List<Message> messages = new ArrayList<>();
 
-        String sql = "SELECT * FROM messages WHERE recipient_user_id = ? ORDER BY message_send_date DESC";
+        String sql = "SELECT * FROM messages WHERE recipient_user_id = ? ORDER BY message_send_date DESC LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, userId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while(rs.next())

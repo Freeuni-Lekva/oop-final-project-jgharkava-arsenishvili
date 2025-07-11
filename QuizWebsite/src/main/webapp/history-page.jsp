@@ -20,7 +20,7 @@
     User user = ((UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO)).getUserById(userId);
     User sessionUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
     HistoriesDao hd=(HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
-    List<History> arr=hd.getHistoriesByUserId(user.getId());
+    List<History> arr=hd.getHistoriesByUserId(user.getId(), Constants.FETCH_LIMIT);
     QuizzesDao quizDao = (QuizzesDao)application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
 %>
 <html>

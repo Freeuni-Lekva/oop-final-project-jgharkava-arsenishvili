@@ -153,6 +153,13 @@ public class Constants {
 
 
     /**
+     * The default maximum number of records to fetch in a single database query.
+     * Used to limit result sets and prevent excessive memory usage.
+     */
+    public static int FETCH_LIMIT = 50;
+
+
+    /**
      * Enum representing different quiz modes.
      */
     public enum QuizMode {

@@ -145,17 +145,18 @@ public class FriendShipsDao {
      * @param userId the user ID
      * @return a list of friendships (with status 'friends')
      */
-    public List<Friendship> getFriends(long userId) {
+    public List<Friendship> getFriends(long userId, int limit) {
         List<Friendship> friendships = new ArrayList<>();
 
         String sql = "SELECT * FROM friendships where friendship_status = 'friends' " +
-                "AND (first_user_id = ? OR second_user_id = ?)";
+                "AND (first_user_id = ? OR second_user_id = ?) LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, userId);
             ps.setLong(2, userId);
+            ps.setInt(3, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next()){
@@ -177,15 +178,16 @@ public class FriendShipsDao {
      * @param userId the recipient user ID
      * @return list of pending friendships
      */
-    public List<Friendship> getFriendRequests(long userId) {
+    public List<Friendship> getFriendRequests(long userId, int limit) {
         List<Friendship> friendships = new ArrayList<>();
 
-        String sql = "SELECT * FROM friendships where friendship_status = 'pending' AND second_user_id = ?";
+        String sql = "SELECT * FROM friendships where friendship_status = 'pending' AND second_user_id = ? LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, userId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
