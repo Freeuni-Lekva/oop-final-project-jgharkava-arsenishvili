@@ -1,6 +1,7 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.PictureResponseQuestion;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
@@ -10,6 +11,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * Unit tests for the {@link PictureResponseQuestion} class.
+ */
 public class PictureResponseQuestionTest {
 
     @Test

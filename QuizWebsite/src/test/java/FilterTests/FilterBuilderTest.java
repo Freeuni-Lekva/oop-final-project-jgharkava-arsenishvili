@@ -1,7 +1,8 @@
 package FilterTests;
 
-import org.ja.model.Filters.Filter;
-import org.ja.model.Filters.FilterBuilder;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.Filter;
+import org.ja.model.filters.FilterBuilder;
 import org.ja.utils.Constants;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +13,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link FilterBuilder} class.
+ */
 public class FilterBuilderTest {
-    private FilterBuilder builder;
 
     @Test
     public void testUsernameOnly() {

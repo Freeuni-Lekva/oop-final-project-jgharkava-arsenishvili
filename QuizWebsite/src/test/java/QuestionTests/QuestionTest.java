@@ -1,5 +1,6 @@
 package QuestionTests;
 
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.Question;
 import org.ja.utils.Constants;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+
+/**
+ * Unit tests for the {@link Question} class.
+ */
 public class QuestionTest {
 
     @Test

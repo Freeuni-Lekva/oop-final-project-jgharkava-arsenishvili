@@ -1,8 +1,8 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
+import org.ja.model.filters.AndFilter;
 import org.ja.model.quiz.question.FillInTheBlankQuestion;
-import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link FillInTheBlankQuestion} class.
+ */
 public class FillInTheBlankQuestionTest {
 
     @Test

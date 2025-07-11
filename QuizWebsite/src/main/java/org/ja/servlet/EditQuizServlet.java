@@ -2,7 +2,7 @@ package org.ja.servlet;
 
 import org.ja.dao.QuizTagsDao;
 import org.ja.dao.QuizzesDao;
-import org.ja.model.OtherObjects.QuizTag;
+import org.ja.model.data.QuizTag;
 import org.ja.model.quiz.Quiz;
 import org.ja.utils.Constants;
 
@@ -12,8 +12,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+/**
+ * Servlet to handle editing properties of a Quiz, such as title, description,
+ * time limit, category, tags, and question ordering/placement/correction statuses.
+ *
+ * <p>Receives POST requests with parameters identifying which quiz and which field
+ * to update. Responds with appropriate HTTP status codes and messages.</p>
+ */
 @WebServlet("/edit-quiz")
 public class EditQuizServlet extends HttpServlet {
+
+
+    /**
+     * Handles POST requests to update quiz properties.
+     *
+     * Supported fields include:
+     * <ul>
+     *     <li>title - updates quiz title (checks for duplicate title)</li>
+     *     <li>description - updates quiz description</li>
+     *     <li>limit - updates quiz time limit</li>
+     *     <li>category - updates quiz category ID</li>
+     *     <li>removeTag - removes a tag association</li>
+     *     <li>addTag - adds a tag association</li>
+     *     <li>orderStatus - updates question order status</li>
+     *     <li>placementStatus - updates question placement status</li>
+     *     <li>correctionStatus - updates question correction status</li>
+     * </ul>
+     *
+     * @param request  HttpServletRequest containing parameters: quizId, field, and relevant values
+     * @param response HttpServletResponse used to return success or error status
+     * @throws IOException if an I/O error occurs during response writing
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);

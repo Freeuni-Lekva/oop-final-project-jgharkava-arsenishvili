@@ -1,6 +1,7 @@
 package ResponseTests;
 
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Match;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * Unit tests for the {@link ResponseBuilder} class.
+ */
 public class ResponseBuilderTest {
 
     @Test

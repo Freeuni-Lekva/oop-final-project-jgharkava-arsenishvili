@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.OtherObjects.QuizRating;
+import org.ja.model.data.QuizRating;
 
 import java.sql.*;
 import java.util.ArrayList;

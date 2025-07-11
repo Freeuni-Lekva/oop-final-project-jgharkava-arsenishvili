@@ -1,8 +1,8 @@
 package DaoTests;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.Friendship;
 import org.ja.utils.Constants;
+import org.ja.model.data.Friendship;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

@@ -3,14 +3,14 @@ package org.ja.servlet;
 import org.ja.dao.AnswersDao;
 import org.ja.dao.HistoriesDao;
 import org.ja.dao.MatchesDao;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.History;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Answer;
+import org.ja.model.data.History;
+import org.ja.model.data.Match;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -23,11 +23,47 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+
+/**
+ * Servlet that handles grading of all questions in a single-page quiz submission.
+ *
+ * <p>
+ * This servlet retrieves the user's responses from the request, compares them
+ * against correct answers or matches from the database, computes the grades per question,
+ * and stores grading results in the session.
+ * </p>
+ *
+ * <p>
+ * Additionally, it records the quiz completion history, including total score
+ * and time spent, in the database, then redirects the user to the quiz result page.
+ * </p>
+ */
 @WebServlet("/grade-single-page-quiz")
 public class GradeAllQuestionsServlet extends HttpServlet {
+
+
+    /**
+     * Processes POST request to grade the entire quiz at once.
+     *
+     * <p>
+     * Steps:
+     * <ol>
+     *   <li>Retrieve quiz questions and user responses from session and request</li>
+     *   <li>For each question, fetch correct answers/matches from the database</li>
+     *   <li>Compute grade for each question and store detailed grades</li>
+     *   <li>Calculate total score and time spent, update quiz history in the database</li>
+     *   <li>Store grading results in session attributes</li>
+     *   <li>Redirect to the quiz results page</li>
+     * </ol>
+     * </p>
+     *
+     * @param req  HttpServletRequest containing user responses and session data
+     * @param resp HttpServletResponse used to redirect to the quiz result page
+     * @throws ServletException if servlet-specific error occurs
+     * @throws IOException      if I/O error occurs during request processing
+     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();

@@ -1,10 +1,10 @@
 package org.ja.servlet;
 
 import org.ja.dao.*;
-import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.Match;
-import org.ja.model.OtherObjects.QuizTag;
+import org.ja.model.data.Tag;
+import org.ja.model.data.Answer;
+import org.ja.model.data.Match;
+import org.ja.model.data.QuizTag;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.utils.Constants;
@@ -15,9 +15,49 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 
+
+/**
+ * Servlet responsible for finalizing quiz creation.
+ *
+ * <p>
+ * This servlet processes the quiz, questions, answers, matches, and tags stored
+ * in the user's session, persists them to the database, clears the session data,
+ * and then forwards the user to the quiz overview page.
+ * </p>
+ *
+ * <p>
+ * Expected session attributes:
+ * <ul>
+ *   <li>QUESTIONS: Map<Question, List<Answer>> — all created questions and their answers</li>
+ *   <li>MATCHES: Map<Question, List<Match>> — all matching questions and their pairs</li>
+ *   <li>QUIZ: Quiz — the quiz object being created</li>
+ *   <li>TAGS_TO_ADD: List<Long> — IDs of tags associated with the quiz</li>
+ *   <li>TAG_TO_CREATE: Tag — a new tag to create and associate with the quiz</li>
+ * </ul>
+ * </p>
+ */
 @WebServlet("/finish-quiz")
 public class FinishQuizServlet extends HttpServlet {
 
+
+    /**
+     * Handles the POST request to finish and save a quiz.
+     *
+     * <p>The method:
+     * <ul>
+     *   <li>Retrieves quiz data, questions, answers, matches, and tags from the session</li>
+     *   <li>Calculates and sets the total score (sum of all answers/matches counts)</li>
+     *   <li>Inserts the quiz, questions, answers, matches, and tags into the database</li>
+     *   <li>Resets the related session attributes</li>
+     *   <li>Forwards to the quiz overview page showing the newly created quiz</li>
+     * </ul>
+     * </p>
+     *
+     * @param request  the HttpServletRequest containing session and request parameters
+     * @param response the HttpServletResponse to forward or redirect the client
+     * @throws IOException      if an input or output error occurs while handling the request
+     * @throws ServletException if the request could not be handled
+     */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();

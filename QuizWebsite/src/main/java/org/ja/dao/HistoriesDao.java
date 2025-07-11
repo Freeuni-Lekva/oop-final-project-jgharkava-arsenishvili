@@ -3,7 +3,7 @@ package org.ja.dao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ja.model.OtherObjects.History;
+import org.ja.model.data.History;
 import org.ja.utils.Constants;
 
 import java.sql.*;

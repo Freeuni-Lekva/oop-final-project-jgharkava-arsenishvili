@@ -3,14 +3,14 @@ package org.ja.servlet;
 import org.ja.dao.AnswersDao;
 import org.ja.dao.HistoriesDao;
 import org.ja.dao.MatchesDao;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.History;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Answer;
+import org.ja.model.data.History;
+import org.ja.model.data.Match;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
 import org.ja.model.quiz.response.Response;
 import org.ja.model.quiz.response.ResponseBuilder;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,10 +24,48 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Servlet to grade a single question in a quiz, supporting both practice mode and taking mode.
+ *
+ * <p>
+ * In practice mode, it updates mastery levels per question and cycles through questions until
+ * mastery is achieved. In taking mode, it records the user response, calculates grades, and
+ * manages quiz completion including timing and final grading.
+ * </p>
+ *
+ * <p>
+ * This servlet expects the following session attributes:
+ * <ul>
+ *   <li>{@code QUIZ_MODE} - the current quiz mode (TAKING or PRACTICE)</li>
+ *   <li>{@code RESPONSES} - the list of user responses collected so far</li>
+ *   <li>{@code QUESTIONS} - the list of questions in the quiz</li>
+ *   <li>{@code CURRENT_QUESTION_INDEX} - index of the current question being graded</li>
+ *   <li>{@code grades} - list of integer grades per question</li>
+ *   <li>{@code responseGrades} - list of detailed grades per response</li>
+ *   <li>{@code PRACTICE_QUESTIONS_MASTERY_MAP} - mastery counts for questions in practice mode</li>
+ *   <li>{@code QUIZ} - the quiz metadata, including time limit and correction settings</li>
+ *   <li>{@code USER} - the user taking the quiz</li>
+ *   <li>{@code start-time} - quiz start timestamp in milliseconds</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * The servlet forwards to appropriate JSP pages:
+ * <ul>
+ *   <li>{@code immediate-correction.jsp} for immediate feedback</li>
+ *   <li>{@code single-question-page.jsp} for the next question page</li>
+ *   <li>{@code quiz-result.jsp} to show final results</li>
+ * </ul>
+ * </p>
+ */
 @WebServlet("/grade-single-question")
 public class GradeSingleQuestionServlet extends HttpServlet {
 
 
+    /**
+     * Handles POST requests to grade the submitted answer for the current question.
+     * Delegates grading logic depending on the current quiz mode (practice or taking).
+     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Constants.QuizMode quizMode = (Constants.QuizMode) req.getSession().getAttribute(Constants.SessionAttributes.QUIZ_MODE);
@@ -37,6 +75,15 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         else analyzePracticeMode(req, resp);
     }
 
+
+    // --- Helper Methods ---
+
+
+    /**
+     * Handles grading logic in practice mode.
+     * Updates mastery counts, grades the current question, cycles the question index,
+     * and forwards to immediate correction feedback page.
+     */
     private void analyzePracticeMode(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
 
@@ -80,6 +127,16 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         req.getRequestDispatcher("/immediate-correction.jsp").forward(req, resp);
     }
 
+
+    /**
+     * Calculates the grade and detailed grades for a response against the question.
+     * Retrieves correct answers or matches from the database depending on question type.
+     *
+     * @param response       The user's response to grade
+     * @param question       The question to grade against
+     * @param grades         The list of cumulative grades per question (to update)
+     * @param responseGrades The list of detailed response grades per question (to update)
+     */
     private void calculateGrade(Response response, Question question, List<Integer> grades, List<List<Integer>> responseGrades) {
         int grade = 0;
         List<Integer> respGrades;
@@ -102,6 +159,12 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         responseGrades.add(respGrades);
     }
 
+
+    /**
+     * Handles grading logic in quiz-taking mode.
+     * Records the response, calculates the grade, checks time limits and quiz completion,
+     * inserts history record if quiz ended, and forwards to appropriate JSP.
+     */
     private void analyzeTakingMode(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
 

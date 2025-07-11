@@ -1,3 +1,5 @@
+package UtilTests;
+
 import org.ja.utils.PasswordHasher;
 import org.junit.jupiter.api.Test;
 
@@ -5,6 +7,10 @@ import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+/**
+ * Unit tests for the {@link PasswordHasher} class.
+ */
 public class PasswordHasherTest {
 
     @Test

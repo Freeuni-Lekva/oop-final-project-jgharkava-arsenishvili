@@ -1,7 +1,7 @@
 package org.ja.servlet;
 
 import org.ja.dao.UsersDao;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 import org.ja.utils.PasswordHasher;
 

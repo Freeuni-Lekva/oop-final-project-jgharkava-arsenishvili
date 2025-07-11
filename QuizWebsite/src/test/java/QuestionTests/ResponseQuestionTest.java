@@ -1,7 +1,7 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.quiz.question.Question;
+import org.ja.model.data.Answer;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.ResponseQuestion;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
@@ -11,11 +11,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link ResponseQuestion} class.
+ */
 public class ResponseQuestionTest {
 
     @Test
     public void testGradeQuestionCorrect(){
-        Answer answer = new Answer("Tornike/toko/bero");
+        Answer answer = new Answer("Tornike¶toko¶bero");
         ResponseQuestion question = new ResponseQuestion(1, 1, "Who is our team's MVP?",
                 null, Constants.QuestionTypes.RESPONSE_QUESTION, 1, Constants.OrderTypes.ORDERED);
 
@@ -27,7 +30,7 @@ public class ResponseQuestionTest {
 
     @Test
     public void testGradeQuestionIncorrect(){
-        Answer answer = new Answer("Tornike/toko/bero");
+        Answer answer = new Answer("Tornike¶toko¶bero");
         ResponseQuestion question = new ResponseQuestion(1, 1, "Who is our team's MVP?",
                 null, Constants.QuestionTypes.RESPONSE_QUESTION, 1, Constants.OrderTypes.ORDERED);
 

@@ -1,11 +1,16 @@
 package FilterTests;
 
-import org.ja.model.Filters.OrderFilter;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.OrderFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+/**
+ * Unit tests for the {@link OrderFilter} class.
+ */
 public class OrderFilterTest {
     private OrderFilter filterAsc;
     private OrderFilter filterDesc;

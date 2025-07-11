@@ -1,11 +1,11 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="java.util.*" %>
-<%@ page import="org.ja.model.OtherObjects.History" %>
-<%@ page import="org.ja.model.user.User" %>
+<%@ page import="org.ja.model.data.History" %>
+<%@ page import="org.ja.model.data.User" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="org.ja.dao.*" %>
-<%@ page import="org.ja.model.OtherObjects.QuizRating" %>
+<%@ page import="org.ja.model.data.QuizRating" %>
 <%@ page import="org.ja.utils.NumUtils" %>
 <%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

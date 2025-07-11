@@ -1,9 +1,9 @@
 <%@ page import="org.ja.utils.Constants" %>
-<%@ page import="org.ja.model.CategoriesAndTags.Category" %>
+<%@ page import="org.ja.model.data.Category" %>
 <%@ page import="org.ja.dao.CategoriesDao" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.TagsDao" %>
-<%@ page import="org.ja.model.CategoriesAndTags.Tag" %>
+<%@ page import="org.ja.model.data.Tag" %>
 <%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: lizamarsagishvili

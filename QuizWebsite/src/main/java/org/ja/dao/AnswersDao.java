@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
 import org.ja.model.quiz.question.Question;
 
 import java.sql.Connection;

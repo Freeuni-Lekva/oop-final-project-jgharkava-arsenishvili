@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Match;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.CategoriesAndTags.Category;
+import org.ja.model.data.Category;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

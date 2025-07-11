@@ -1,10 +1,10 @@
 package org.ja.servlet;
 
 import org.ja.dao.*;
-import org.ja.model.CategoriesAndTags.Category;
-import org.ja.model.OtherObjects.Announcement;
+import org.ja.model.data.Category;
+import org.ja.model.data.Announcement;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -13,10 +13,39 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Timestamp;
 
+/**
+ * Servlet that handles administrative actions such as posting announcements,
+ * promoting users to administrators, removing users or quizzes,
+ * clearing quiz histories, and managing quiz categories.
+ *
+ * This servlet processes POST requests to the "/administrator" endpoint
+ * and performs different operations based on the "action" parameter in the request.
+ */
 @WebServlet("/administrator")
 public class AdministratorServlet extends HttpServlet {
+
+
+    /**
+     * Handles HTTP POST requests to perform various administrative operations.
+     * The supported actions include:
+     * <ul>
+     *     <li>create - Create a new announcement.</li>
+     *     <li>promote - Promote a user to administrator.</li>
+     *     <li>removeUser - Remove a user by username.</li>
+     *     <li>removeQuiz - Remove a quiz by name.</li>
+     *     <li>clearHistory - Clear the history of a quiz.</li>
+     *     <li>addCategory - Add a new quiz category.</li>
+     * </ul>
+     * For each action, appropriate request parameters are expected. After performing
+     * the operation, the servlet forwards the request back to the administrator JSP
+     * with a status message indicating success or failure.
+     *
+     * @param request  the HttpServletRequest containing request parameters
+     * @param response the HttpServletResponse to write the response
+     * @throws ServletException if an input or output error is detected when the servlet handles the POST request
+     * @throws IOException      if the request for the POST could not be handled
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         AdministratorsDao adminsDao = (AdministratorsDao) getServletContext().getAttribute(Constants.ContextAttributes.ADMINISTRATORS_DAO);

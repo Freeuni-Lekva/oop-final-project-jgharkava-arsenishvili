@@ -1,6 +1,7 @@
 package FilterTests;
 
-import org.ja.model.Filters.CategoryFilter;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.CategoryFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link CategoryFilter} class.
+ */
 public class CategoryFilterTest {
     private CategoryFilter filter;
 

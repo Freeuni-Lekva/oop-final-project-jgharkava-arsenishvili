@@ -1,6 +1,7 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.MultiAnswerQuestion;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
@@ -10,6 +11,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link MultiAnswerQuestion} class.
+ */
 public class MultiAnswerQuestionTest {
 
     @Test
@@ -35,8 +39,8 @@ public class MultiAnswerQuestionTest {
                 null, Constants.QuestionTypes.MULTI_ANSWER_QUESTION, 5, Constants.OrderTypes.ORDERED);
 
         List<Answer> answers = List.of(new Answer("Tokyo"), new Answer("Delhi"),
-                new Answer("Shanghai"), new Answer("Sao Paulo/São Paulo"),
-                new Answer("Mexico city/Mexico"));
+                new Answer("Shanghai"), new Answer("Sao Paulo¶São Paulo"),
+                new Answer("Mexico city¶Mexico"));
         Response response = new Response();
         response.addAnswer("Delhi");
         response.addAnswer("Tokyo");
@@ -53,7 +57,7 @@ public class MultiAnswerQuestionTest {
                 null, Constants.QuestionTypes.MULTI_ANSWER_QUESTION, 5, Constants.OrderTypes.UNORDERED);
 
         List<Answer> answers = List.of(new Answer("Mesopotamian"), new Answer("Egyptian"),
-                new Answer("Indus valley/IVC"), new Answer("Mayan"), new Answer("Greek"));
+                new Answer("Indus valley¶IVC"), new Answer("Mayan"), new Answer("Greek"));
         Response response = new Response();
         response.addAnswer("mayan");
         response.addAnswer("greek");
@@ -70,7 +74,7 @@ public class MultiAnswerQuestionTest {
                 null, Constants.QuestionTypes.MULTI_ANSWER_QUESTION, 5, Constants.OrderTypes.UNORDERED);
 
         List<Answer> answers = List.of(new Answer("Mesopotamian"), new Answer("Egyptian"),
-                new Answer("Indus valley/IVC"), new Answer("Mayan"), new Answer("Greek"));
+                new Answer("Indus valley¶IVC"), new Answer("Mayan"), new Answer("Greek"));
         Response response = new Response();
         response.addAnswer("roman");
         response.addAnswer("greek");

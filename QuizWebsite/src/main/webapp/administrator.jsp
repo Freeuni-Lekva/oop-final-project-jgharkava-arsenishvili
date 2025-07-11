@@ -1,4 +1,4 @@
-<%@ page import="org.ja.model.user.User" %>
+<%@ page import="org.ja.model.data.User" %>
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.dao.AdministratorsDao" %><%--
   Created by IntelliJ IDEA.

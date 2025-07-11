@@ -1,11 +1,11 @@
 package org.ja.servlet;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.Challenge;
-import org.ja.model.OtherObjects.Friendship;
-import org.ja.model.OtherObjects.Message;
+import org.ja.model.data.Challenge;
+import org.ja.model.data.Friendship;
+import org.ja.model.data.Message;
 import org.ja.model.quiz.Quiz;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -14,10 +14,40 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Timestamp;
 
+
+/**
+ * Servlet handling communication-related actions between users such as
+ * managing friendships, sending challenges, and sending messages.
+ *
+ * Listens for POST requests at "/communication" endpoint and processes
+ * various actions based on the "action" request parameter.
+ *
+ * Supported actions include:
+ * <ul>
+ *   <li>add-friend: Send a friend request to another user.</li>
+ *   <li>remove-friend / remove-request / delete: Remove an existing friendship or friend request.</li>
+ *   <li>send-challenge: Send a quiz challenge to a friend.</li>
+ *   <li>accept: Accept a friend request.</li>
+ *   <li>send-message: Send a private message to a friend.</li>
+ *   <li>delete-challenge: Remove a previously sent challenge.</li>
+ * </ul>
+ *
+ * Responses are returned as plain text, usually "OK" for success or error messages/status codes for failures.
+ */
 @WebServlet("/communication")
 public class CommunicationServlet extends HttpServlet {
+
+    /**
+     * Handles HTTP POST requests for various communication actions.
+     * The action to perform is specified by the "action" parameter.
+     * Request parameters vary by action (e.g., friendId, quizName, message, recipient).
+     *
+     * @param request  the HttpServletRequest containing parameters and session info
+     * @param response the HttpServletResponse to send plain text responses
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException if an I/O error occurs while writing the response
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         FriendShipsDao friendShipsDao = (FriendShipsDao) getServletContext().getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);

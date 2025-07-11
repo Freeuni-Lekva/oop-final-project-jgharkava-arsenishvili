@@ -1,6 +1,6 @@
 package FilterTests;
 
-import org.ja.model.Filters.*;
+import org.ja.model.filters.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +9,9 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for the {@link OrFilter} class.
+ */
 public class OrFilterTest {
     private OrFilter orFilter;
     private OrderFilter orderFilter;
