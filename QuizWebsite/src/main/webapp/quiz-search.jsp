@@ -111,10 +111,5 @@
         }
     %>
 </div>
-
-<div class="go-home-wrapper">
-    <a href="user-page.jsp" class="go-home-btn">Go Home</a>
-</div>
-
 </body>
 </html>

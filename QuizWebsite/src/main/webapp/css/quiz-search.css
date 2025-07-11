@@ -250,34 +250,3 @@ input[type="submit"]:active {
     transform: translateX(8px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
-
-.go-home-wrapper {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.go-home-btn {
-    background-color: #dc6b6b; /* Muted red */
-    color: white;
-    text-decoration: none;
-    padding: 16px 50px;
-    border-radius: 10px;
-    font-size: 1.1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 16px rgba(220, 107, 107, 0.25);
-    border: 2px solid transparent;
-    display: inline-block;
-    text-align: center;
-}
-
-.go-home-btn:hover {
-    transform: translateY(-3px);
-    background-color: #e98a8a; /* Slightly lighter on hover */
-    box-shadow: 0 8px 24px rgba(220, 107, 107, 0.35);
-}
-
-
