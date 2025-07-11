@@ -9,6 +9,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Unit tests for the QuizTagsDao class using an in-memory H2 database.
  */
@@ -23,6 +33,7 @@ public class QuizTagsDaoTest extends BaseDaoTest{
         dao = new QuizTagsDao(basicDataSource);
     }
 
+
     @Test
     public void testInsertQuizTag() {
         QuizTag tag = new QuizTag(4L, 6L);
@@ -32,12 +43,14 @@ public class QuizTagsDaoTest extends BaseDaoTest{
         assertTrue(tagIds.contains(6L));
     }
 
+
     @Test
     public void testInsertDuplicateQuizTagThrowsException() {
         QuizTag tag = new QuizTag(4L, 4); // Already exists in test DB setup
 
         assertThrows(RuntimeException.class, () -> dao.insertQuizTag(tag));
     }
+
 
     @Test
     public void testRemoveQuizTag() {
@@ -61,4 +74,69 @@ public class QuizTagsDaoTest extends BaseDaoTest{
         assertTrue(tagIds.contains(4L));
     }
 
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertQuizTag_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Insert failed"));
+
+        QuizTagsDao dao = new QuizTagsDao(ds);
+        QuizTag quizTag = new QuizTag(1L, 2L);
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuizTag(quizTag));
+    }
+
+
+    @Test
+    public void testRemoveQuizTag_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Delete failed"));
+
+        QuizTagsDao dao = new QuizTagsDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.removeQuizTag(1L, 2L));
+    }
+
+
+    @Test
+    public void testGetTagsByQuizId_throwsExceptionOnPrepareStatement() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Prepare failed"));
+
+        QuizTagsDao dao = new QuizTagsDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getTagsByQuizId(1L, 10));
+    }
+
+
+    @Test
+    public void testGetTagsByQuizId_throwsExceptionOnExecuteQuery() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizTagsDao dao = new QuizTagsDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getTagsByQuizId(1L, 10));
+    }
 }

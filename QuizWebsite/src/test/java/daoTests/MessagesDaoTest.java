@@ -10,6 +10,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 public class MessagesDaoTest extends BaseDaoTest{
 
     private MessageDao dao;
@@ -40,6 +50,7 @@ public class MessagesDaoTest extends BaseDaoTest{
         boolean removedAgain = dao.removeMessage(message.getMessageId());
         assertFalse(removedAgain, "Removing again should fail");
     }
+
 
     @Test
     public void testRemoveMessageByUser() {
@@ -77,4 +88,233 @@ public class MessagesDaoTest extends BaseDaoTest{
             previous = m.getMessageSendDate();
         }
     }
+
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertMessage_success() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement psInsert = mock(PreparedStatement.class);
+        PreparedStatement psSelectDate = mock(PreparedStatement.class);
+        ResultSet rsGeneratedKeys = mock(ResultSet.class);
+        ResultSet rsDate = mock(ResultSet.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(psInsert);
+        when(conn.prepareStatement(startsWith("SELECT message_send_date"))).thenReturn(psSelectDate);
+
+        when(psInsert.executeUpdate()).thenReturn(1);
+        when(psInsert.getGeneratedKeys()).thenReturn(rsGeneratedKeys);
+        when(rsGeneratedKeys.next()).thenReturn(true);
+        when(rsGeneratedKeys.getLong(1)).thenReturn(42L);
+
+        when(psSelectDate.executeQuery()).thenReturn(rsDate);
+        when(rsDate.next()).thenReturn(true);
+        when(rsDate.getTimestamp("message_send_date")).thenReturn(new Timestamp(System.currentTimeMillis()));
+
+        MessageDao dao = new MessageDao(ds);
+        Message message = new Message(0, 1L, 2L, "Hello!", null);
+
+        boolean result = dao.insertMessage(message);
+
+        assertTrue(result);
+        assertEquals(42L, message.getMessageId());
+        assertNotNull(message.getMessageSendDate());
+
+        verify(psInsert).setLong(1, 1L);
+        verify(psInsert).setLong(2, 2L);
+        verify(psInsert).setString(3, "Hello!");
+    }
+
+
+    @Test
+    public void testInsertMessage_throwsExceptionOnInsert() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement psInsert = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(psInsert);
+        when(psInsert.executeUpdate()).thenThrow(new SQLException("Insert error"));
+
+        MessageDao dao = new MessageDao(ds);
+        Message message = new Message(0, 1L, 2L, "Hi!", null);
+
+        assertThrows(RuntimeException.class, () -> dao.insertMessage(message));
+    }
+
+
+    @Test
+    public void testInsertMessage_noGeneratedKey() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement psInsert = mock(PreparedStatement.class);
+        ResultSet rsGeneratedKeys = mock(ResultSet.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(psInsert);
+        when(psInsert.executeUpdate()).thenReturn(1);
+        when(psInsert.getGeneratedKeys()).thenReturn(rsGeneratedKeys);
+        when(rsGeneratedKeys.next()).thenReturn(false);
+
+        MessageDao dao = new MessageDao(ds);
+        Message message = new Message(0, 1L, 2L, "Test", null);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> dao.insertMessage(message));
+        assertTrue(ex.getMessage().contains("no ID was returned"));
+    }
+
+
+    @Test
+    public void testRemoveMessage_success() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(1);
+
+        MessageDao dao = new MessageDao(ds);
+
+        boolean deleted = dao.removeMessage(123L);
+
+        assertTrue(deleted);
+        verify(ps).setLong(1, 123L);
+    }
+
+
+    @Test
+    public void testRemoveMessage_notFound() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(0);
+
+        MessageDao dao = new MessageDao(ds);
+
+        boolean deleted = dao.removeMessage(123L);
+
+        assertFalse(deleted);
+    }
+
+
+    @Test
+    public void testRemoveMessage_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Delete error"));
+
+        MessageDao dao = new MessageDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.removeMessage(123L));
+    }
+
+
+    @Test
+    public void testRemoveMessagesByUser_success() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(3);
+
+        MessageDao dao = new MessageDao(ds);
+
+        boolean deleted = dao.removeMessagesByUser(456L);
+
+        assertTrue(deleted);
+        verify(ps).setLong(1, 456L);
+    }
+
+
+    @Test
+    public void testRemoveMessagesByUser_notFound() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(0);
+
+        MessageDao dao = new MessageDao(ds);
+
+        boolean deleted = dao.removeMessagesByUser(456L);
+
+        assertFalse(deleted);
+    }
+
+
+    @Test
+    public void testRemoveMessagesByUser_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Delete error"));
+
+        MessageDao dao = new MessageDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.removeMessagesByUser(456L));
+    }
+
+
+    @Test
+    public void testGetMessagesForUser_success() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+
+        when(ps.executeQuery()).thenReturn(rs);
+
+        // Simulate 2 messages
+        when(rs.next()).thenReturn(true, true, false);
+
+        when(rs.getLong("message_id")).thenReturn(1L, 2L);
+        when(rs.getLong("sender_user_id")).thenReturn(10L, 20L);
+        when(rs.getLong("recipient_user_id")).thenReturn(100L, 200L);
+        when(rs.getString("message_text")).thenReturn("Hello", "World");
+        when(rs.getTimestamp("message_send_date")).thenReturn(new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
+
+        MessageDao dao = new MessageDao(ds);
+
+        List<Message> messages = dao.getMessagesForUser(100L, 5);
+
+        assertEquals(2, messages.size());
+        assertEquals("Hello", messages.get(0).getMessageText());
+        assertEquals("World", messages.get(1).getMessageText());
+
+        verify(ps).setLong(1, 100L);
+        verify(ps).setInt(2, 5);
+    }
+
+
+    @Test
+    public void testGetMessagesForUser_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        MessageDao dao = new MessageDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getMessagesForUser(100L, 5));
+    }
+
 }

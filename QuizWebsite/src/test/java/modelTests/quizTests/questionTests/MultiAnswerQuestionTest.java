@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for the {@link MultiAnswerQuestion} class.
@@ -82,5 +83,23 @@ public class MultiAnswerQuestionTest {
         response.addAnswer("greek");
 
         assertEquals(List.of(0, 1, 1, 0, 0), question.gradeResponse(answers, response));
+    }
+
+
+    @Test
+    public void testConstructorWithTextNumAnswersAndOrderStatus() {
+        String questionText = "List the planets in the solar system.";
+        int numAnswers = 8;
+        String orderStatus = Constants.OrderTypes.UNORDERED;
+
+        MultiAnswerQuestion question = new MultiAnswerQuestion(questionText, numAnswers, orderStatus);
+
+        assertEquals(0L, question.getQuizId());
+        assertEquals(0L, question.getQuestionId());
+        assertEquals(questionText, question.getQuestionText());
+        assertNull(question.getImageUrl());
+        assertEquals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION, question.getQuestionType());
+        assertEquals(numAnswers, question.getNumAnswers());
+        assertEquals(orderStatus, question.getOrderStatus());
     }
 }

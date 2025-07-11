@@ -11,6 +11,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
 /**
  * Unit tests for the HistoryDao class using an in-memory H2 database.
  */
@@ -75,6 +86,7 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertDoesNotThrow(() -> dao.getTopPerformersByQuizIdAndRange(6L, "last_week", Constants.FETCH_LIMIT));
     }
 
+
     @Test
     public void testUserHistoryByQuiz() {
         List<History> userQuiz = dao.getUserHistoryByQuiz(8L, 6L, Constants.FETCH_LIMIT);
@@ -82,6 +94,7 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertFalse(userQuiz.isEmpty());
         assertTrue(userQuiz.stream().allMatch(h -> h.getUserId() == 8L && h.getQuizId() == 6L));
     }
+
 
     @Test
     public void testUserFriendsHistoryByQuiz() {
@@ -96,6 +109,7 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertTrue(friendsQuizNonExisting.isEmpty());
     }
 
+
     @Test
     public void testUserFriendsHistory() {
         List<History> friendsAll = dao.getUserFriendsHistory(7L, Constants.FETCH_LIMIT);
@@ -103,6 +117,7 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertEquals(2, friendsAll.size());
         assertTrue(friendsAll.stream().allMatch(h -> h.getUserId() != 7L));
     }
+
 
     @Test
     public void testStatisticsMethods() {
@@ -113,5 +128,207 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertEquals(5, dao.getMaximumScore(quizId));
         assertEquals(3, dao.getMinimumScore(quizId));
         assertEquals(8.5, dao.getAverageTime(quizId), 0.001);
+    }
+
+
+    @Test
+    public void testInsertHistory_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(any(), anyInt())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Insert error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+        History h = new History(1, 1, 1, 80, 10.5, null);
+
+        assertThrows(RuntimeException.class, () -> dao.insertHistory(h));
+    }
+
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testGetHistoriesByUserId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getHistoriesByUserId(1L, 5));
+    }
+
+
+    @Test
+    public void testGetHistoriesByQuizId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getHistoriesByQuizId(1L, 5));
+    }
+
+
+    @Test
+    public void testGetTopNDistinctHistoriesByQuizId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getTopNDistinctHistoriesByQuizId(1L, 5));
+    }
+
+
+    @Test
+    public void testGetDistinctTopHistoriesByQuizId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getDistinctTopHistoriesByQuizId(1L, 5));
+    }
+
+
+    @Test
+    public void testGetTopPerformersByQuizIdAndRange_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getTopPerformersByQuizIdAndRange(1L, "last_week", 5));
+    }
+
+
+    @Test
+    public void testGetUserHistoryByQuiz_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getUserHistoryByQuiz(1L, 1L, 5));
+    }
+
+
+    @Test
+    public void testGetUserFriendsHistoryByQuiz_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getUserFriendsHistoryByQuiz(1L, 1L, 5));
+    }
+
+
+    @Test
+    public void testGetUserFriendsHistory_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getUserFriendsHistory(1L, 5));
+    }
+
+
+    @Test
+    public void testGetTotalAttempts_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Statistics query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getTotalAttempts(1L));
+    }
+
+
+    @Test
+    public void testGetAverageScore_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Statistics query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getAverageScore(1L));
+    }
+
+
+    @Test
+    public void testGetMaximumScore_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Statistics query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getMaximumScore(1L));
+    }
+
+
+    @Test
+    public void testGetMinimumScore_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Statistics query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getMinimumScore(1L));
+    }
+
+
+    @Test
+    public void testGetAverageTime_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Statistics query error"));
+
+        HistoriesDao dao = new HistoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getAverageTime(1L));
     }
 }

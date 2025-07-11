@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 /**
@@ -82,5 +83,22 @@ public class MultiChoiceMultiAnswersQuestionTest {
         response.addAnswer("brazil");
 
         assertEquals(List.of(1, -1), question.gradeResponse(answers, response));
+    }
+
+
+    @Test
+    public void testConstructor_initializesFieldsCorrectly() {
+        String questionText = "Which of the following are prime numbers?";
+        int numAnswers = 3;
+
+        MultiChoiceMultiAnswersQuestion question = new MultiChoiceMultiAnswersQuestion(questionText, numAnswers);
+
+        assertEquals(0L, question.getQuizId());
+        assertEquals(0L, question.getQuestionId());
+        assertEquals(questionText, question.getQuestionText());
+        assertNull(question.getImageUrl());
+        assertEquals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION, question.getQuestionType());
+        assertEquals(numAnswers, question.getNumAnswers());
+        assertEquals(Constants.OrderTypes.ORDERED, question.getOrderStatus());
     }
 }

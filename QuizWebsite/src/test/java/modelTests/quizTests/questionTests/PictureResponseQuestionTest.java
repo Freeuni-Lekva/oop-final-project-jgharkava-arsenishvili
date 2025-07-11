@@ -39,4 +39,20 @@ public class PictureResponseQuestionTest {
 
         assertEquals(List.of(0), question.gradeResponse(List.of(answer), response));
     }
+
+    @Test
+    public void testConstructorWithImageAndText() {
+        String imageUrl = "http://example.com/image.png";
+        String questionText = "What is shown in this picture?";
+
+        PictureResponseQuestion question = new PictureResponseQuestion(imageUrl, questionText);
+
+        assertEquals(0L, question.getQuizId());
+        assertEquals(0L, question.getQuestionId());
+        assertEquals(questionText, question.getQuestionText());
+        assertEquals(imageUrl, question.getImageUrl());
+        assertEquals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION, question.getQuestionType());
+        assertEquals(1, question.getNumAnswers());
+        assertEquals(Constants.OrderTypes.ORDERED, question.getOrderStatus());
+    }
 }

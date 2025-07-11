@@ -13,6 +13,18 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+
 public class QuestionDaoTest extends BaseDaoTest{
 
     private QuestionDao dao;
@@ -40,6 +52,7 @@ public class QuestionDaoTest extends BaseDaoTest{
         assertFalse(dao.removeQuestion(q.getQuestionId())); // already deleted
     }
 
+
     @Test
     public void testUpdateQuestionText() {
         Question q = new ResponseQuestion(-1L, 4L, "Old Text", null,
@@ -54,6 +67,7 @@ public class QuestionDaoTest extends BaseDaoTest{
         assertTrue(updated.stream()
                 .anyMatch(q2 -> q2.getQuestionId() == q.getQuestionId() && q2.getQuestionText().equals(newText)));
     }
+
 
     @Test
     public void testUpdateQuestionImage() {
@@ -70,6 +84,7 @@ public class QuestionDaoTest extends BaseDaoTest{
                 .anyMatch(q2 -> q2.getQuestionId() == q.getQuestionId() && q2.getImageUrl().equals(imageUrl)));
     }
 
+
     @Test
     public void testQuizScoreUpdateAfterRemoval() {
         Question q = new MultiAnswerQuestion(-1L, 4L, "Quiz score test", null,
@@ -85,6 +100,7 @@ public class QuestionDaoTest extends BaseDaoTest{
         int scoreAfter = getQuizScore(quizId);
         assertEquals(scoreBefore - 3, scoreAfter);
     }
+
 
     @Test
     public void testInsertQuestionUpdatesQuizScore() {
@@ -118,4 +134,92 @@ public class QuestionDaoTest extends BaseDaoTest{
     }
 
 
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertQuestion_throwsExceptionOnInsert() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Insert failed"));
+
+        QuestionDao dao = new QuestionDao(ds);
+        Question q = new Question();
+        q.setQuizId(1L);
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuestion(q));
+    }
+
+
+    @Test
+    public void testInsertQuestion_throwsExceptionOnGetGeneratedKeys() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(ps);
+        when(ps.executeUpdate()).thenReturn(1);
+        when(ps.getGeneratedKeys()).thenReturn(rs);
+        when(rs.next()).thenReturn(false); // no ID returned
+
+        QuestionDao dao = new QuestionDao(ds);
+        Question q = new Question();
+        q.setQuizId(1L);
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuestion(q));
+    }
+
+
+    @Test
+    public void testGetQuizQuestions_throwsExceptionOnQuery() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuestionDao dao = new QuestionDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizQuestions(1L));
+    }
+
+
+    @Test
+    public void testUpdateQuestionText_throwsExceptionOnUpdate() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuestionDao dao = new QuestionDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuestionText(1L, "New text"));
+    }
+
+
+    @Test
+    public void testUpdateQuestionImage_throwsExceptionOnUpdate() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuestionDao dao = new QuestionDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuestionImage(1L, "new-image-url"));
+    }
 }

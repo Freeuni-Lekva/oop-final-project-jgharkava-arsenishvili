@@ -4,10 +4,19 @@ import org.ja.dao.*;
 import org.ja.model.data.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -39,6 +48,7 @@ public class QuizRatingsDaoTest extends BaseDaoTest{
         assertEquals(4.5, avg);
     }
 
+
     @Test
     public void testUpdateExistingRating() {
         QuizRating rating = new QuizRating(5L, 8L, 2, "Not bad");
@@ -52,6 +62,7 @@ public class QuizRatingsDaoTest extends BaseDaoTest{
         assertEquals("Much better now", stored.getReview());
     }
 
+
     @Test
     public void testGetQuizRatingsByQuizIdLimit() {
         dao.insertQuizRating(new QuizRating(4L, 5L, 3, "Nice"));
@@ -63,6 +74,144 @@ public class QuizRatingsDaoTest extends BaseDaoTest{
 
         assertTrue(limited.stream().allMatch(r -> r.getQuizId() == 4L));
     }
+
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertQuizRating_throwsExceptionOnInsert() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Insert failed"));
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+        QuizRating qr = new QuizRating(1L, 1L, 5, "Review");
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuizRating(qr));
+    }
+
+
+    @Test
+    public void testInsertQuizRating_throwsExceptionOnUpdateAfterDuplicate() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+
+        Connection insertConn = mock(Connection.class);
+        PreparedStatement insertPs = mock(PreparedStatement.class);
+
+        Connection updateConn = mock(Connection.class);
+        PreparedStatement updatePs = mock(PreparedStatement.class);
+
+        when(ds.getConnection())
+                .thenReturn(insertConn)  // Insert connection
+                .thenReturn(updateConn); // Update connection
+
+        when(insertConn.prepareStatement(anyString())).thenReturn(insertPs);
+        when(insertPs.executeUpdate()).thenThrow(new SQLException("Duplicate", "23000", 1062));
+
+        when(updateConn.prepareStatement(anyString())).thenReturn(updatePs);
+        when(updatePs.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+        QuizRating qr = new QuizRating(1L, 1L, 5, "Review");
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuizRating(qr));
+    }
+
+
+    @Test
+    public void testGetQuizRatingByUserIdQuizId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizRatingByUserIdQuizId(1L, 1L));
+    }
+
+
+    @Test
+    public void testGetQuizRatingsByQuizId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizRatingsByQuizId(1L, 5));
+    }
+
+
+    @Test
+    public void testUpdateQuizRating_throwsExceptionOnSelect() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection selectConn = mock(Connection.class);
+        PreparedStatement selectPs = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(selectConn);
+        when(selectConn.prepareStatement(startsWith("SELECT AVG"))).thenReturn(selectPs);
+        when(selectPs.executeQuery()).thenThrow(new SQLException("Select AVG failed"));
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+
+        // Trigger updateQuizRating indirectly by inserting
+        Connection insertConn = mock(Connection.class);
+        PreparedStatement insertPs = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(insertConn).thenReturn(selectConn);
+
+        when(insertConn.prepareStatement(startsWith("INSERT"))).thenReturn(insertPs);
+        when(insertPs.executeUpdate()).thenReturn(1);
+
+        QuizRating qr = new QuizRating(1L, 1L, 5, "Review");
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuizRating(qr));
+    }
+
+
+    @Test
+    public void testUpdateQuizRating_throwsExceptionOnUpdate() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        PreparedStatement selectPs = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+        PreparedStatement updatePs = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+
+        when(conn.prepareStatement(startsWith("SELECT AVG"))).thenReturn(selectPs);
+        when(selectPs.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(true);
+        when(rs.getDouble("avgRating")).thenReturn(4.5);
+
+        when(conn.prepareStatement(startsWith("UPDATE quizzes SET"))).thenReturn(updatePs);
+        when(updatePs.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        // Setup insert to succeed so updateQuizRating is called
+        PreparedStatement insertPs = mock(PreparedStatement.class);
+        when(conn.prepareStatement(startsWith("INSERT"))).thenReturn(insertPs);
+        when(insertPs.executeUpdate()).thenReturn(1);
+
+        QuizRatingsDao dao = new QuizRatingsDao(ds);
+        QuizRating qr = new QuizRating(1L, 1L, 5, "Review");
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuizRating(qr));
+    }
+
 
 
     // --- Helper Methods ---

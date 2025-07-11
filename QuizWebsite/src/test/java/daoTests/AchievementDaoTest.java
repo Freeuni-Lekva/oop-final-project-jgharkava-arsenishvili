@@ -9,12 +9,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * Unit tests for the AchievementsDao class using an in-memory H2 database.
@@ -30,6 +26,7 @@ public class AchievementDaoTest extends BaseDaoTest{
         dao = new AchievementsDao(basicDataSource);
     }
 
+
     @Test
     public void testGetExistingAchievementById() {
         Achievement a = dao.getAchievement(1L);
@@ -39,10 +36,12 @@ public class AchievementDaoTest extends BaseDaoTest{
         assertNull(a.getAchievementPhoto());
     }
 
+
     @Test
     public void testGetNonExistentAchievement() {
         assertNull(dao.getAchievement(1225)); // ID not present
     }
+
 
     @Test
     public void testInsertAchievement() {
@@ -61,6 +60,7 @@ public class AchievementDaoTest extends BaseDaoTest{
         assertNull(fetched.getAchievementPhoto());
     }
 
+
     @Test
     public void testInsertAchievementWithInvalidDataThrows() {
         Achievement invalid = new Achievement(0L, null, "desc", null);
@@ -69,30 +69,103 @@ public class AchievementDaoTest extends BaseDaoTest{
         assertTrue(ex.getMessage().contains("Error inserting achievement"));
     }
 
-//    @Test
-//    public void testInsertAchievementZeroRowsAffected() throws Exception {
-//        // Mock the DataSource and Connection to control executeUpdate return value
-//        DataSource mockDataSource = mock(DataSource.class);
-//        Connection mockConnection = mock(Connection.class);
-//        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
-//
-//        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-//        when(mockConnection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS)))
-//                .thenReturn(mockPreparedStatement);
-//
-//        // Mock executeUpdate to return 0 (no rows affected)
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-//
-//        // Create DAO with mocked DataSource
-//        AchievementsDao mockedDao = new AchievementsDao(mockDataSource);
-//
-//        Achievement testAchievement = new Achievement(0L, "Test Achievement", "Test Description", null);
-//
-//        // This should return false due to 0 rows affected
-//        boolean result = mockedDao.insertAchievement(testAchievement);
-//
-//        assertFalse(result);
-//        assertEquals(0L, testAchievement.getAchievementId()); // ID should remain unchanged
-//    }
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertAchievementZeroRowsAffected() throws Exception {
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS)))
+                .thenReturn(mockPreparedStatement);
+
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+
+        BasicDataSource mockBasicDataSource = mock(BasicDataSource.class);
+        when(mockBasicDataSource.getConnection()).thenReturn(mockConnection);
+
+        AchievementsDao mockedDao = new AchievementsDao(mockBasicDataSource);
+
+        Achievement testAchievement = new Achievement(0L, "Test Achievement", "Test Description", null);
+
+        boolean result = mockedDao.insertAchievement(testAchievement);
+
+        assertFalse(result);
+        assertEquals(0L, testAchievement.getAchievementId());
+    }
+
+
+    @Test
+    public void testInsertAchievement_sqlExceptionThrown() throws Exception {
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS)))
+                .thenThrow(new SQLException("DB failure"));
+
+        BasicDataSource mockBasicDataSource = mock(BasicDataSource.class);
+        when(mockBasicDataSource.getConnection()).thenReturn(mockConnection);
+
+        AchievementsDao dao = new AchievementsDao(mockBasicDataSource);
+
+        Achievement achievement = new Achievement(0L, "CrashTest", "SQL error test", null);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class,
+                () -> dao.insertAchievement(achievement));
+
+        assertTrue(thrown.getMessage().contains("Error inserting achievement"));
+    }
+
+
+    @Test
+    public void testInsertAchievement_noGeneratedKey_throwsRuntimeException() throws Exception {
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS))).thenReturn(mockStatement);
+        when(mockStatement.executeUpdate()).thenReturn(1);
+        when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // no ID returned
+
+        BasicDataSource mockBasicDataSource = mock(BasicDataSource.class);
+        when(mockBasicDataSource.getConnection()).thenReturn(mockConnection);
+
+        AchievementsDao dao = new AchievementsDao(mockBasicDataSource);
+
+        Achievement achievement = new Achievement(0L, "MissingID", "Should throw", null);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class,
+                () -> dao.insertAchievement(achievement));
+
+        assertEquals("Insert succeeded but no ID was returned.", thrown.getMessage());
+    }
+
+
+    @Test
+    public void testGetAchievement_sqlExceptionThrown() throws Exception {
+        DataSource mockDataSource = mock(DataSource.class);
+        Connection mockConnection = mock(Connection.class);
+
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("DB problem"));
+
+        BasicDataSource mockBasicDataSource = mock(BasicDataSource.class);
+        when(mockBasicDataSource.getConnection()).thenReturn(mockConnection);
+
+        AchievementsDao dao = new AchievementsDao(mockBasicDataSource);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class,
+                () -> dao.getAchievement(99));
+
+        assertTrue(thrown.getMessage().contains("Error retrieving achievement"));
+    }
 
 }

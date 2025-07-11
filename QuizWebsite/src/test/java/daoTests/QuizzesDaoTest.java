@@ -12,6 +12,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
 /**
  * Unit tests for the QuizzesDao class using an in-memory H2 database.
  */
@@ -24,6 +35,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
 
         dao = new QuizzesDao(basicDataSource);
     }
+
 
     @Test
     public void testGetQuizById() {
@@ -40,6 +52,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertNull(quizNonExisting);
     }
 
+
     @Test
     public void testGetQuizByName() {
         Quiz quiz = dao.getQuizByName("Basic Algebra");
@@ -47,12 +60,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals(4, quiz.getId());
     }
 
+
     @Test
     public void testGetQuizzesByCreatorId() {
         List<Quiz> quizzes = dao.getQuizzesByCreatorId(5, Constants.FETCH_LIMIT); // Mariam
         assertEquals(1, quizzes.size());
         assertEquals("Oscar Winners", quizzes.get(0).getName());
     }
+
 
     @Test
     public void testGetQuizzesSortedByCreationDate() {
@@ -66,12 +81,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
         }
     }
 
+
     @Test
     public void testGetFriendsQuizzesSortedByCreationDate() {
         List<Quiz> quizzes = dao.getFriendsQuizzesSortedByCreationDate(6, Constants.FETCH_LIMIT); // Gio is friends with 5 (Mariam)
         assertFalse(quizzes.isEmpty());
         assertTrue(quizzes.stream().anyMatch(q -> q.getCreatorId() == 5));
     }
+
 
     @Test
     public void testInsertQuiz() {
@@ -90,6 +107,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals("Test Insert", fetched.getName());
     }
 
+
     @Test
     public void testUpdateQuizTitle() {
         long quizId = 4;
@@ -104,12 +122,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertFalse(updatedNonExistent);
     }
 
+
     @Test
     public void testUpdateQuizDescription() {
         boolean result = dao.updateQuizDescription(4, "New description");
         assertTrue(result);
         assertEquals("New description", dao.getQuizById(4).getDescription());
     }
+
 
     @Test
     public void testUpdateQuizTimeLimit() {
@@ -118,12 +138,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals(15, dao.getQuizById(4).getTimeInMinutes());
     }
 
+
     @Test
     public void testUpdateQuizCategory() {
         boolean result = dao.updateQuizCategory(4, 8); // 'Art'
         assertTrue(result);
         assertEquals(8, dao.getQuizById(4).getCategoryId());
     }
+
 
     @Test
     public void testRemoveQuizById() {
@@ -134,6 +156,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
         Quiz quiz = dao.getQuizById(quizId);
         assertNull(quiz);
     }
+
 
     @Test
     public void testFilterQuizzes() {
@@ -161,6 +184,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals("Basic Algebra", quizzes.get(0).getName());
     }
 
+
     @Test
     public void testGetQuizzesSortedByParticipantCount() {
         List<Quiz> quizzes = dao.getQuizzesSortedByParticipantCount(Constants.FETCH_LIMIT);
@@ -170,12 +194,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
         }
     }
 
+
     @Test
     public void testUpdateQuizQuestionOrderStatus() {
         boolean result = dao.updateQuizQuestionOrderStatus(4, Constants.QuizQuestionOrderTypes.QUESTIONS_ORDERED);
         assertTrue(result);
         assertEquals(Constants.QuizQuestionOrderTypes.QUESTIONS_ORDERED, dao.getQuizById(4).getQuestionOrder());
     }
+
 
     @Test
     public void testUpdateQuizQuestionPlacementStatus() {
@@ -184,6 +210,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals(Constants.QuizQuestionPlacementTypes.ONE_PAGE, dao.getQuizById(4).getQuestionPlacement());
     }
 
+
     @Test
     public void testUpdateQuizQuestionCorrectionStatus() {
         boolean result = dao.updateQuizQuestionCorrectionStatus(4, Constants.QuizQuestionCorrectionTypes.FINAL_CORRECTION);
@@ -191,5 +218,280 @@ public class QuizzesDaoTest extends BaseDaoTest{
         assertEquals(Constants.QuizQuestionCorrectionTypes.FINAL_CORRECTION, dao.getQuizById(4).getQuestionCorrection());
     }
 
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertQuiz_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Insert failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+        Quiz quiz = mock(Quiz.class);
+        when(quiz.getName()).thenReturn("name");
+        when(quiz.getDescription()).thenReturn("desc");
+        when(quiz.getScore()).thenReturn(0);
+        when(quiz.getAvgRating()).thenReturn(0.0);
+        when(quiz.getParticipantCount()).thenReturn(0L);
+        when(quiz.getTimeInMinutes()).thenReturn(0);
+        when(quiz.getCategoryId()).thenReturn(0L);
+        when(quiz.getCreatorId()).thenReturn(0L);
+        when(quiz.getQuestionOrder()).thenReturn("");
+        when(quiz.getQuestionPlacement()).thenReturn("");
+        when(quiz.getQuestionCorrection()).thenReturn("");
+
+        assertThrows(RuntimeException.class, () -> dao.insertQuiz(quiz));
+    }
+
+
+    @Test
+    public void testUpdateQuizTitle_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizTitle(1L, "new title"));
+    }
+
+
+    @Test
+    public void testUpdateQuizDescription_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizDescription(1L, "new desc"));
+    }
+
+
+    @Test
+    public void testUpdateQuizTimeLimit_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizTimeLimit(1L, 15));
+    }
+
+
+    @Test
+    public void testUpdateQuizCategory_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizCategory(1L, 2L));
+    }
+
+
+    @Test
+    public void testUpdateQuizQuestionOrderStatus_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizQuestionOrderStatus(1L, "order"));
+    }
+
+
+    @Test
+    public void testUpdateQuizQuestionPlacementStatus_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizQuestionPlacementStatus(1L, "placement"));
+    }
+
+
+    @Test
+    public void testUpdateQuizQuestionCorrectionStatus_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Update failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateQuizQuestionCorrectionStatus(1L, "correction"));
+    }
+
+
+    @Test
+    public void testRemoveQuizById_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Delete failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.removeQuizById(1L));
+    }
+
+
+    @Test
+    public void testFilterQuizzes_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        Filter filter = mock(Filter.class);
+        when(filter.buildWhereClause()).thenReturn("1=1");
+        when(filter.buildOrderByClause()).thenReturn("quiz_id");
+        when(filter.getParameters()).thenReturn(java.util.Collections.emptyList());
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.filterQuizzes(filter, 10));
+    }
+
+
+    @Test
+    public void testGetQuizzesSortedByCreationDate_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizzesSortedByCreationDate(5));
+    }
+
+
+    @Test
+    public void testGetFriendsQuizzesSortedByCreationDate_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getFriendsQuizzesSortedByCreationDate(1L, 5));
+    }
+
+
+    @Test
+    public void testGetQuizzesSortedByParticipantCount_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizzesSortedByParticipantCount(5));
+    }
+
+
+    @Test
+    public void testGetQuizById_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizById(1L));
+    }
+
+
+    @Test
+    public void testGetQuizByName_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizByName("name"));
+    }
+
+
+    @Test
+    public void testGetQuizzesByCreatorId_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("Query failed"));
+
+        QuizzesDao dao = new QuizzesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuizzesByCreatorId(1L, 10));
+    }
 }
 

@@ -7,6 +7,15 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 
 /**
  * Unit tests for the MatchesDao class using an in-memory H2 database.
@@ -21,6 +30,7 @@ public class MatchesDaoTest extends BaseDaoTest{
         dao = new MatchesDao(basicDataSource);
     }
 
+
     @Test
     public void testInsertMatch() {
         Match newMatch = new Match(-1, 7L, "New Inventor", "New Invention");
@@ -33,6 +43,7 @@ public class MatchesDaoTest extends BaseDaoTest{
                 m.getLeftMatch().equals("New Inventor") &&
                         m.getRightMatch().equals("New Invention")));
     }
+
 
     @Test
     public void testRemoveMatch() {
@@ -62,6 +73,7 @@ public class MatchesDaoTest extends BaseDaoTest{
         }
     }
 
+
     @Test
     public void testUpdateLeftMatch() {
         List<Match> matches = dao.getQuestionMatches(7L);
@@ -78,6 +90,7 @@ public class MatchesDaoTest extends BaseDaoTest{
         assertEquals("Updated Left", updatedMatch.getLeftMatch());
     }
 
+
     @Test
     public void testUpdateRightMatch() {
         List<Match> matches = dao.getQuestionMatches(7L);
@@ -93,6 +106,7 @@ public class MatchesDaoTest extends BaseDaoTest{
 
         assertEquals("Updated Right", updatedMatch.getRightMatch());
     }
+
 
     @Test
     public void testInsertMatchUpdatesCounts() {
@@ -111,6 +125,7 @@ public class MatchesDaoTest extends BaseDaoTest{
         assertEquals(oldQuizScore + 1, getQuizScore(quizId));
     }
 
+
     @Test
     public void testRemoveMatchUpdatesCounts() {
         long questionId = 7L;
@@ -128,4 +143,79 @@ public class MatchesDaoTest extends BaseDaoTest{
         assertEquals(oldQuizScore - 1, getQuizScore(quizId));
     }
 
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertMatch_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), anyInt())).thenThrow(new SQLException("Insert error"));
+
+        MatchesDao dao = new MatchesDao(ds);
+        Match m = new Match(0, 1L, "left", "right");
+
+        assertThrows(RuntimeException.class, () -> dao.insertMatch(m));
+    }
+
+
+    @Test
+    public void testRemoveMatch_throwsExceptionOnDelete() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("Delete error"));
+
+        MatchesDao dao = new MatchesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.removeMatch(1L));
+    }
+
+
+    @Test
+    public void testGetQuestionMatches_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
+
+        MatchesDao dao = new MatchesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getQuestionMatches(1L));
+    }
+
+
+    @Test
+    public void testUpdateLeftMatch_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Update error"));
+
+        MatchesDao dao = new MatchesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateLeftMatch(1L, "newLeft"));
+    }
+
+
+    @Test
+    public void testUpdateRightMatch_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenThrow(new SQLException("Update error"));
+
+        MatchesDao dao = new MatchesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.updateRightMatch(1L, "newRight"));
+    }
 }

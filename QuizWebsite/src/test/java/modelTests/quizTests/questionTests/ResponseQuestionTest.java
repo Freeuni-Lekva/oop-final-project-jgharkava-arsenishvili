@@ -38,4 +38,17 @@ public class ResponseQuestionTest {
 
         assertEquals(List.of(0), question.gradeResponse(List.of(answer), response));
     }
+
+    @Test
+    public void testConstructorWithTextOnly() {
+        String text = "What is your name?";
+        ResponseQuestion question = new ResponseQuestion(text);
+
+        assertEquals(0L, question.getQuizId());
+        assertEquals(0L, question.getQuestionId());
+        assertEquals(text, question.getQuestionText());
+        assertEquals(Constants.QuestionTypes.RESPONSE_QUESTION, question.getQuestionType());
+        assertEquals(1, question.getNumAnswers());
+        assertEquals(Constants.OrderTypes.ORDERED, question.getOrderStatus());
+    }
 }

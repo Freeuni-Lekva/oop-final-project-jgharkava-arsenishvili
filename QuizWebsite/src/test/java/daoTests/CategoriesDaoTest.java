@@ -9,6 +9,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
 /**
  * Unit tests for the CategoriesDao class using an in-memory H2 database.
  */
@@ -21,6 +32,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
 
         dao = new CategoriesDao(basicDataSource);
     }
+
 
     @Test
     public void testGetCategoryById() {
@@ -35,6 +47,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
         assertNull(dao.getCategoryById(9999L));
     }
 
+
     @Test
     public void testGetCategoryByName() {
 
@@ -46,6 +59,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
         // Non-existing
         assertNull(dao.getCategoryByName("Dance"));
     }
+
 
     @Test
     public void testInsertCategory() {
@@ -59,6 +73,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
         assertNotNull(fetched);
         assertEquals("Science", fetched.getCategoryName());
     }
+
 
     @Test
     public void testGetAllCategories() {
@@ -82,5 +97,74 @@ public class CategoriesDaoTest extends BaseDaoTest{
         boolean foundArt = categories.stream()
                 .anyMatch(c -> c.getCategoryName().equalsIgnoreCase("Art"));
         assertTrue(foundArt);
+    }
+
+
+    // --- Mockito Tests ---
+
+
+    @Test
+    public void testInsertCategory_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString(), eq(PreparedStatement.RETURN_GENERATED_KEYS))).thenReturn(ps);
+        when(ps.executeUpdate()).thenThrow(new SQLException("insert failed"));
+
+        CategoriesDao dao = new CategoriesDao(ds);
+        Category category = new Category(0L, "");
+        category.setCategoryName("Test");
+
+        assertThrows(RuntimeException.class, () -> dao.insertCategory(category));
+    }
+
+
+    @Test
+    public void testGetCategoryById_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("query failed"));
+
+        CategoriesDao dao = new CategoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getCategoryById(1));
+    }
+
+
+    @Test
+    public void testGetCategoryByName_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("query by name failed"));
+
+        CategoriesDao dao = new CategoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getCategoryByName("Test"));
+    }
+
+
+    @Test
+    public void testGetAllCategories_throwsException() throws Exception {
+        BasicDataSource ds = mock(BasicDataSource.class);
+        Connection conn = mock(Connection.class);
+        PreparedStatement ps = mock(PreparedStatement.class);
+
+        when(ds.getConnection()).thenReturn(conn);
+        when(conn.prepareStatement(anyString())).thenReturn(ps);
+        when(ps.executeQuery()).thenThrow(new SQLException("get all failed"));
+
+        CategoriesDao dao = new CategoriesDao(ds);
+
+        assertThrows(RuntimeException.class, () -> dao.getAllCategories(5));
     }
 }

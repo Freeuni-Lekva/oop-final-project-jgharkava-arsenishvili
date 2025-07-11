@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for the {@link MatchingQuestion} class.
@@ -76,6 +77,23 @@ public class MatchingQuestionTest {
         response.addMatch(new Match("France", "Paris"));
 
         assertEquals(List.of(0, 0, 0, 0, 1), question.gradeResponse(matches, response));
+    }
+
+
+    @Test
+    public void testConstructorWithTextAndNumAnswers() {
+        String questionText = "Match the countries with their capitals";
+        int numAnswers = 4;
+
+        MatchingQuestion question = new MatchingQuestion(questionText, numAnswers);
+
+        assertEquals(0L, question.getQuizId());
+        assertEquals(0L, question.getQuestionId());
+        assertEquals(questionText, question.getQuestionText());
+        assertNull(question.getImageUrl());
+        assertEquals(Constants.QuestionTypes.MATCHING_QUESTION, question.getQuestionType());
+        assertEquals(numAnswers, question.getNumAnswers());
+        assertEquals(Constants.OrderTypes.ORDERED, question.getOrderStatus());
     }
 
 }
