@@ -27,6 +27,9 @@ function sortTable(){
 
 function toggleSortDirection(){
     const btn = document.getElementById("sortDirectionBtn");
+
+    if (btn === null) return;
+
     btn.textContent = ascending ? "Sort Descending" : "Sort Ascending";
 
     ascending = !ascending;
@@ -38,6 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
     filterByRange();
 
     const btn = document.getElementById("sortDirectionBtn");
+
+    if (btn === null) return;
+
     btn.textContent = ascending ? "Sort Descending" : "Sort Ascending";
 
     ascending = !ascending;

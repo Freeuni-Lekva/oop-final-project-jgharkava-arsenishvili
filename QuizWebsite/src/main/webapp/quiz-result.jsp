@@ -93,7 +93,7 @@
     </div>
 
     <% if (question.getImageUrl() != null) { %>
-    <img src="<%= question.getImageUrl() %>" alt="Question Image" width="300" height="200"><br><br>
+    <img src="<%= question.getImageUrl() %>" alt="Question Image" class="responsive-img"><br><br>
     <% } %>
 
     <% if(Constants.QuestionTypes.MATCHING_QUESTION.equals(type)) {

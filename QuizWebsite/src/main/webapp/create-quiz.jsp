@@ -112,6 +112,10 @@
             </button>
 
         </form>
+
+        <form id = "discard-form" action = "discard-quiz" method = "post" onsubmit = "return confirmDiscard();">
+            <button type = "submit" id = "discardChangesButton">Discard All Changes</button>
+        </form>
     </div>
 </body>
 
