@@ -21,7 +21,6 @@
     List<Tag> tags = tagsDao.getAllTags();
 %>
 
-
 <html>
 <head>
     <title>Create Quiz</title>

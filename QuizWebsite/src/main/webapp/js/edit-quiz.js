@@ -165,9 +165,8 @@ document.addEventListener("DOMContentLoaded", function () {
     placementSelect.addEventListener('change', function () {
         const newStatus = this.value;
 
-        if(newStatus === "one-page" && correctionSelect.value === "immediate-correction") {
+        if(newStatus === "one-page") {
             correctionSelect.value = "final-correction";
-            correctionSelect.dispatchEvent(new Event("change"));
         }
 
         fetch('edit-quiz', {
@@ -190,9 +189,8 @@ document.addEventListener("DOMContentLoaded", function () {
     correctionSelect.addEventListener('change', function () {
         const newStatus = this.value;
 
-        if(newStatus === "immediate-correction" && placementSelect.value === "one-page") {
+        if(newStatus === "immediate-correction") {
             placementSelect.value = "multiple-page";
-            placementSelect.dispatchEvent(new Event("change"));
         }
 
         fetch('edit-quiz', {
