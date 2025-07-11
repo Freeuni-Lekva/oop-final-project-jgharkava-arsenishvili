@@ -390,6 +390,14 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
             setTimeout(() => answerField.setCustomValidity(""), 2000);
         }
+
+        if(answerField.value.trim().length >= 100) {
+            e.preventDefault();
+            answerField.setCustomValidity("This field is too long.");
+            answerField.reportValidity();
+
+            setTimeout(() => answerField.setCustomValidity(""), 2000);
+        }
     })
 
     if(selectedType === "picture-response") {
@@ -402,6 +410,16 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             imageUrl.reportValidity();
 
             setTimeout(() => imageUrl.setCustomValidity(""), 2000);
+        }
+
+        if(imageUrl.value.trim().length >= 2040) {
+            e.preventDefault();
+
+            imageUrl.setCustomValidity("This field is too long.");
+            imageUrl.reportValidity();
+
+            setTimeout(() => imageUrl.setCustomValidity(""), 2000);
+
         }
     }
     else if(selectedType === "fill-in-the-blank") {
@@ -424,6 +442,15 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
             setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
         }
+
+        if(rawQuestionInput.value.trim().length >= 1000) {
+            e.preventDefault();
+
+            rawQuestionInput.setCustomValidity("This field is too long.");
+            rawQuestionInput.reportValidity();
+
+            setTimeout(() => rawQuestionInput.setCustomValidity(""), 2000);
+        }
     }
     else {
         const questionText = container.querySelector(`[name="questionText"]`);
@@ -432,6 +459,15 @@ document.getElementById("create-question-form").addEventListener("submit", funct
             e.preventDefault();
 
             questionText.setCustomValidity("Please fill out this field.");
+            questionText.reportValidity();
+
+            setTimeout(() => questionText.setCustomValidity(""), 2000);
+        }
+
+        if(questionText.value.trim().length >= 1000) {
+            e.preventDefault();
+
+            questionText.setCustomValidity("This field is too long.");
             questionText.reportValidity();
 
             setTimeout(() => questionText.setCustomValidity(""), 2000);
@@ -460,6 +496,15 @@ document.getElementById("create-question-form").addEventListener("submit", funct
 
                 setTimeout(() => textarea.setCustomValidity(""), 2000);
             }
+
+            if(textarea.value.trim().length >= 100) {
+                e.preventDefault();
+
+                textarea.setCustomValidity("This field is too long.");
+                textarea.reportValidity();
+
+                setTimeout(() => textarea.setCustomValidity(""), 2000);
+            }
         });
     }
 
@@ -480,6 +525,15 @@ document.getElementById("create-question-form").addEventListener("submit", funct
                 e.preventDefault();
 
                 option.setCustomValidity("This field cannot include 'not selected'.");
+                option.reportValidity();
+
+                setTimeout(() => option.setCustomValidity(""), 2000);
+            }
+
+            if(option.value.trim().length >= 100) {
+                e.preventDefault();
+
+                option.setCustomValidity("This field is too long.");
                 option.reportValidity();
 
                 setTimeout(() => option.setCustomValidity(""), 2000);

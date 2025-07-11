@@ -18,9 +18,9 @@ import java.sql.SQLException;
 public class SignUpServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String photo = request.getParameter("photo");
+        String username = request.getParameter("username").trim();
+        String password = request.getParameter("password").trim();
+        String photo = request.getParameter("photo").trim();
 
         UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         User check = dao.getUserByUsername(username);

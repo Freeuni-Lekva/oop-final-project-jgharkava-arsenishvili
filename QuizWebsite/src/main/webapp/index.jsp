@@ -1,6 +1,6 @@
 <%@ page import="org.ja.utils.Constants" %><%
     if(session.getAttribute(Constants.SessionAttributes.USER) != null) {
-        response.sendRedirect("user-page.jsp");
+        response.sendRedirect("/user-page.jsp");
         return;
     }
 
