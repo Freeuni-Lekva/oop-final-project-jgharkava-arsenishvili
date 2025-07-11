@@ -318,6 +318,15 @@ body {
     margin: 0 auto 10px auto;
 }
 
+.responsive-img {
+    max-width: 300px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+}
+
+
 .back-btn:hover {
     background: #e0e0e0;
 }

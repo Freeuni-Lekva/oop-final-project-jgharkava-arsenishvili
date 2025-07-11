@@ -40,39 +40,43 @@
     <!-- Categories section -->
     <div class="categories-section">
         <h3>Select categories:</h3>
-        <div class="checkbox-group">
-            <%
-                for(Category category : categories) {%>
-            <div class="checkbox-item">
-                <input type="checkbox" id="category<%=category.getCategoryId()%>" name="<%=Constants.FilterFields.CATEGORY%>" value="<%=category.getCategoryName()%>">
-                <label for="category<%=category.getCategoryId()%>"><%=category.getCategoryName()%></label>
+        <div class="scrollable-container">
+            <div class="checkbox-group">
+                <%
+                    for(Category category : categories) {%>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="category<%=category.getCategoryId()%>" name="<%=Constants.FilterFields.CATEGORY%>" value="<%=category.getCategoryName()%>">
+                    <label for="category<%=category.getCategoryId()%>"><%=category.getCategoryName()%></label>
+                </div>
+                <%
+                    }
+                %>
             </div>
-            <%
-                }
-            %>
         </div>
     </div>
 
     <!-- Tags section -->
     <div class="tags-section">
         <h3>Select tags:</h3>
-        <div class="checkbox-group">
-            <%
-                for(Tag tag : tags) {%>
-            <div class="checkbox-item">
-                <input type="checkbox" id="tag<%=tag.getTagId()%>" name="<%=Constants.FilterFields.TAG%>" value="<%=tag.getTagName()%>">
-                <label for="tag<%=tag.getTagId()%>"><%=tag.getTagName()%></label>
+        <div class="scrollable-container">
+            <div class="checkbox-group">
+                <%
+                    for(Tag tag : tags) {%>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="tag<%=tag.getTagId()%>" name="<%=Constants.FilterFields.TAG%>" value="<%=tag.getTagName()%>">
+                    <label for="tag<%=tag.getTagId()%>"><%=tag.getTagName()%></label>
+                </div>
+                <%
+                    }
+                %>
             </div>
-            <%
-                }
-            %>
         </div>
     </div>
 
     <!-- Order section -->
     <div class="order-section">
         <label for="order-select">Sort by:</label>
-        <select id="order-select" name="<%=Constants.FilterFields.ORDER%>">
+        <select id="order-select" name="<%=Constants.FilterFields.ORDER%>" >
             <option value="<%=Constants.FilterFields.ORDER_PLACEHOLDER%>">Select sorting option</option>
             <option value="average_rating">Rating</option>
             <option value="creation_date">Creation Date</option>

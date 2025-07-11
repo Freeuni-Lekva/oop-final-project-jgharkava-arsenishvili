@@ -45,7 +45,7 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, average_ra
 
 (4, 'Literature Quiz', 'Test your knowledge on classic and modern literature!', 6, 3,
  4, '2024-07-10 15:30:00', 7, 4,4, 'ordered',
- 'multiple-page', 'immediate-correction');;
+ 'multiple-page', 'immediate-correction');
 
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values
@@ -59,7 +59,7 @@ insert into questions(quiz_id, question, image_url, question_type, num_answers, 
 (3, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered'),
 (4, 'Who wrote Pride and Prejudice?', null, 'question-response', 1, 'ordered'),
 (4, 'Which of the following are works by William Shakespeare?', null, 'multi-choice-multi-answers', 3, 'ordered'),
-(4, '“It was the best of times, it was the worst of times...” is the opening line of _ by Charles Dickens.', null, 'fill-in-the-blank', 1, 'ordered'),
+(4, '''It was the best of times, it was the worst of times...'' is the opening line of _ by Charles Dickens.', null, 'fill-in-the-blank', 1, 'ordered'),
 (4,'This image depicts the legendary author of two ancient Greek epics. Who is he?',
  'https://upload.wikimedia.org/wikipedia/commons/1/1c/Homer_British_Museum.jpg',
  'picture-response', 1, 'ordered');

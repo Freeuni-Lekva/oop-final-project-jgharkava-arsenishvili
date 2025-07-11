@@ -68,7 +68,7 @@
     <%--    current tags--%>
     <div>
         <h3>Remove Tags for this quiz:</h3>
-        <div id="quizTags">
+        <div id="quizTags" class="tags-container">
             <% for (Long tagId : quizTags) { %>
             <span class="tag" data-id="<%=tagId%>">
                 <%=tagsDao.getTagById(tagId).getTagName()%>
@@ -81,7 +81,7 @@
     <%--    available tags--%>
     <div>
         <h3>Add Tags for this quiz:</h3>
-        <div id="availableTags">
+        <div id="availableTags" class="tags-container">
             <% for (Tag tag: allTags){
                 Long tagId = tag.getTagId();
                 if (!quizTags.contains(tagId)){
