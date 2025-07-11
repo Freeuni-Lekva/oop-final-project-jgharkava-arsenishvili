@@ -9,6 +9,9 @@ function sendChallenge(button, friendId) {
     });
 
     button.disabled = true;
+
+    button.classList.add("sent");
+    button.textContent = "Challenge sent";
 }
 
 let selectedRating = 0;

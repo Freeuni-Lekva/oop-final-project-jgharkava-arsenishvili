@@ -91,6 +91,16 @@ body {
     text-align: center;
 }
 
+
+.creation-date{
+    color: #666;
+    font-size: 1em;
+    margin-bottom: 15px;
+    font-weight: normal;
+    text-align: center;
+}
+
+
 /* Quiz description */
 .quiz-description {
     font-size: 1em;
@@ -239,14 +249,13 @@ h3 {
     background-color: #e3f2fd;
 }
 
-/* Scrollable panes */
 .scrollable-pane {
-    max-height: 200px;
+    max-height: 350px;
     overflow-y: auto;
     border: 2px solid #ddd;
     border-radius: 8px;
     padding: 15px;
-    margin: 15px 0;
+    margin: 20px 0;
     background: #ffffff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -338,10 +347,12 @@ form button[type="submit"]:disabled {
 #allPerformersContainer {
     margin-top: 20px;
     display: none;
+    max-height: 300px;
 }
 
 #topPerformersContainer {
     margin-top: 20px;
+    max-height: 300px;
 }
 
 #rangeContainer {

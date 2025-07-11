@@ -3,6 +3,7 @@
 <%@ page import="org.ja.dao.*" %>
 <%@ page import="org.ja.model.OtherObjects.*" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     UsersDao usersDao = (UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO);
@@ -34,6 +35,7 @@
     <div class="user-info">
         <h2><%=visitedUser.getUsername()%></h2>
         <img src="<%=visitedUser.getPhoto()%>" alt="Profile Picture" width="100" height="100" onerror="this.src='<%=Constants.IMAGE_URL_NOT_FOUND%>'">
+        <h4>User since: <%=visitedUser.getRegistrationDate().toLocalDateTime().format(TimeUtils.DATE_FORMATTER)%></h4>
     </div>
 
     <!-- feedback message -->
@@ -82,10 +84,11 @@
         <form action="history-page.jsp" method="get">
             <input type="hidden" name="<%= Constants.RequestParameters.USER_ID %>" value="<%= visitedUser.getId() %>">
             <button type="submit">See <%=visitedUser.getUsername()%>'s Quiz History</button>
-
         </form>
 
-        <button type="button" onclick="toggleAchievements()">View <%= visitedUser.getUsername() %>'s Achievements</button>
+        <form onsubmit="event.preventDefault(); toggleAchievements();">
+            <button type="submit">View <%= visitedUser.getUsername() %>'s Achievements</button>
+        </form>
     </div>
 
     <div id="achievements-section" style="display: none; margin-top: 20px;">
