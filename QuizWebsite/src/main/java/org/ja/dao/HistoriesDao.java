@@ -80,21 +80,23 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves all history records for a specific user, sorted by completion date descending.
+     * Retrieves recent history records for a specific user, sorted by completion date descending.
      *
      * @param userId the user ID to query by
-     * @return list of History objects, empty if none found
+     * @param limit the maximum number of records to retrieve
+     * @return a list of History objects; empty if none found
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getHistoriesByUserId(long userId){
+    public List<History> getHistoriesByUserId(long userId, int limit){
         List<History> histories = new ArrayList<>();
 
-        String sql = "SELECT * FROM history WHERE user_id = ? ORDER BY completion_date DESC";
+        String sql = "SELECT * FROM history WHERE user_id = ? ORDER BY completion_date DESC LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, userId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
@@ -107,24 +109,25 @@ public class HistoriesDao {
         return histories;
     }
 
-    /// TODO: should add limit here
 
     /**
-     * Retrieves all history records for a specific quiz, sorted by completion date descending.
+     * Retrieves recent history records for a specific quiz, sorted by completion date descending.
      *
      * @param quizId the quiz ID to query by
-     * @return list of History objects, empty if none found
+     * @param limit the maximum number of records to retrieve
+     * @return a list of History objects; empty if none found
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getHistoriesByQuizId(long quizId){
+    public List<History> getHistoriesByQuizId(long quizId, int limit){
         List<History> histories = new ArrayList<>();
 
-        String sql = "SELECT DISTINCT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC";
+        String sql = "SELECT DISTINCT * FROM history WHERE quiz_id = ? ORDER BY completion_date DESC LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, quizId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while(rs.next())
@@ -139,12 +142,12 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves top distinct user performances for a quiz limited by count.
-     * Each user appears only once with their best performance.
+     * Retrieves top distinct user performances for a quiz, limited by the specified count.
+     * Each user appears only once with their best score.
      *
      * @param quizId the quiz ID to query by
-     * @param limit max number of records to return
-     * @return list of top History objects distinct by user
+     * @param limit the maximum number of top performances to retrieve
+     * @return a list of History objects representing the best attempt per user
      * @throws RuntimeException if a database error occurs
      */
     public List<History> getTopNDistinctHistoriesByQuizId(long quizId, int limit) {
@@ -188,13 +191,14 @@ public class HistoriesDao {
 
     /**
      * Retrieves all distinct top user performances for a quiz.
-     * Each user appears only once with their best performance.
+     * Each user appears only once with their best score, limited by the specified count.
      *
      * @param quizId the quiz ID to query by
-     * @return list of top History objects distinct by user
+     * @param limit the maximum number of top performances to retrieve
+     * @return a list of History objects representing the best attempt per user
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getDistinctTopHistoriesByQuizId(long quizId) {
+    public List<History> getDistinctTopHistoriesByQuizId(long quizId, int limit) {
         List<History> histories = new ArrayList<>();
 
         String sql = """
@@ -210,12 +214,14 @@ public class HistoriesDao {
         ) ranked
         WHERE rn = 1
         ORDER BY score DESC, completion_time ASC, completion_date DESC
+        LIMIT ?
     """;
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setLong(1, quizId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -232,16 +238,17 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves top performers for a quiz filtered by a time range.
+     * Retrieves top quiz performances within a specified time range, limited by the given count.
      *
      * @param quizId the quiz ID to query by
-     * @param range one of "last_week", "last_month", "last_year", or default "last_day"
-     * @return list of History objects matching criteria
+     * @param range the time range filter ("last_day", "last_week", "last_month", or "last_year")
+     * @param limit the maximum number of records to retrieve
+     * @return a list of top History objects within the specified range
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getTopPerformersByQuizIdAndRange(long quizId, String range) {
+    public List<History> getTopPerformersByQuizIdAndRange(long quizId, String range, int limit) {
         List<History> histories = new ArrayList<>();
-        String sql = "SELECT * FROM history WHERE quiz_id = ? AND completion_date >= ? ORDER BY score DESC, completion_time ASC, completion_date DESC";
+        String sql = "SELECT * FROM history WHERE quiz_id = ? AND completion_date >= ? ORDER BY score DESC, completion_time ASC, completion_date DESC LIMIT ?";
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime cutoff = switch (range) {
@@ -256,6 +263,7 @@ public class HistoriesDao {
 
             ps.setLong(1, quizId);
             ps.setTimestamp(2, Timestamp.valueOf(cutoff));
+            ps.setInt(3, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -271,23 +279,25 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves a user's full history for a specific quiz.
+     * Retrieves a user's history for a specific quiz, limited by the specified count.
      *
      * @param userId the user ID
      * @param quizId the quiz ID
-     * @return list of History objects for the user and quiz
+     * @param limit the maximum number of records to retrieve
+     * @return a list of History objects for the user and quiz; empty if none found
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getUserHistoryByQuiz(long userId, long quizId){
+    public List<History> getUserHistoryByQuiz(long userId, long quizId, int limit){
         List<History> historyList = new ArrayList<>();
 
-        String sql = "SELECT * FROM history WHERE user_id = ? AND quiz_id = ?";
+        String sql = "SELECT * FROM history WHERE user_id = ? AND quiz_id = ? LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, userId);
             ps.setLong(2, quizId);
+            ps.setInt(3, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
@@ -302,14 +312,15 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves a user's friends' history for a specific quiz.
+     * Retrieves history records of a user's friends for a specific quiz, sorted by completion date descending.
      *
      * @param userId the user ID
      * @param quizId the quiz ID
-     * @return list of History objects of friends' attempts on the quiz
+     * @param limit the maximum number of records to retrieve
+     * @return a list of History objects of friends' attempts on the quiz
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getUserFriendsHistoryByQuiz(long userId, long quizId){
+    public List<History> getUserFriendsHistoryByQuiz(long userId, long quizId, int limit){
         List<History> historyList = new ArrayList<>();
 
         String sql = "SELECT h.* " +
@@ -324,7 +335,7 @@ public class HistoriesDao {
                 "    WHERE (first_user_id = ? OR second_user_id = ?) " +
                 "      AND friendship_status = 'friends' " +
                 ") f ON h.user_id = f.friend_id " +
-                "WHERE h.quiz_id = ? ORDER BY h.completion_date DESC;";
+                "WHERE h.quiz_id = ? ORDER BY h.completion_date DESC LIMIT ?;";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
@@ -333,6 +344,7 @@ public class HistoriesDao {
             ps.setLong(2, userId);
             ps.setLong(3, userId);
             ps.setLong(4, quizId);
+            ps.setInt(5, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
@@ -347,13 +359,14 @@ public class HistoriesDao {
 
 
     /**
-     * Retrieves a user's friends' history.
+     * Retrieves recent history records of a user's friends across all quizzes, sorted by completion date descending.
      *
      * @param userId the user ID
-     * @return list of History objects of friends' attempts across quizzes ordered by completion date descending
+     * @param limit the maximum number of records to retrieve
+     * @return a list of History objects of friends' quiz attempts
      * @throws RuntimeException if a database error occurs
      */
-    public List<History> getUserFriendsHistory(long userId){
+    public List<History> getUserFriendsHistory(long userId, int limit){
         List<History> historyList = new ArrayList<>();
 
         String sql = "SELECT h.* " +
@@ -368,7 +381,7 @@ public class HistoriesDao {
                 "    WHERE (first_user_id = ? OR second_user_id = ?) " +
                 "      AND friendship_status = 'friends' " +
                 ") f ON h.user_id = f.friend_id " +
-                "ORDER BY h.completion_date DESC";
+                "ORDER BY h.completion_date DESC LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)){
@@ -376,6 +389,7 @@ public class HistoriesDao {
             ps.setLong(1, userId);
             ps.setLong(2, userId);
             ps.setLong(3, userId);
+            ps.setInt(4, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())

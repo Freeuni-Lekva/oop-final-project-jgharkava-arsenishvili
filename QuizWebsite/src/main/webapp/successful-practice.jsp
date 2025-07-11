@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.ja.utils.Constants" %><%--
   Created by IntelliJ IDEA.
   User: tober
   Date: 7/7/2025
@@ -6,6 +6,14 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+    if(session.getAttribute(Constants.SessionAttributes.USER) != null) {
+        response.sendRedirect("/user-page.jsp");
+        return;
+    }
+%>
+
 <html>
 <head>
     <title>Practice Mode Completed</title>

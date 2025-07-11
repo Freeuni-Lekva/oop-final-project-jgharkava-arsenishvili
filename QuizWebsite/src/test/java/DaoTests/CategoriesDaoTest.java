@@ -2,6 +2,7 @@ package DaoTests;
 
 import org.ja.dao.CategoriesDao;
 import org.ja.model.data.Category;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -61,7 +62,7 @@ public class CategoriesDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetAllCategories() {
-        List<Category> categories = dao.getAllCategories();
+        List<Category> categories = dao.getAllCategories(Constants.FETCH_LIMIT);
 
         assertNotNull(categories);
         assertTrue(categories.size() >= 4);

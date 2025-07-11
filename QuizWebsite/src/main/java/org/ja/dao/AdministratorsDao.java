@@ -44,6 +44,7 @@ public class AdministratorsDao {
         }
     }
 
+
     /**
      * Returns the number of unique quizzes that have been taken (appear in history).
      *
@@ -83,6 +84,7 @@ public class AdministratorsDao {
             throw new RuntimeException("Error removing user from database", e);
         }
     }
+
 
     /**
      * Retrieves the total number of users in the system.

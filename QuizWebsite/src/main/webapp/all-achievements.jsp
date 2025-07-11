@@ -25,7 +25,7 @@
 <body>
 <div class="center-wrapper">
   <%
-    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(userId);
+    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(userId, Constants.FETCH_LIMIT);
     if(achievements != null && !achievements.isEmpty()){
       int num = achievements.size();
   %>

@@ -1,6 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
+import org.ja.utils.Constants;
 import org.ja.model.data.Friendship;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,7 +74,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetFriends() {
-        List<Friendship> friendsOf7 = dao.getFriends(7); // Only (7, 8) friends exist
+        List<Friendship> friendsOf7 = dao.getFriends(7, Constants.FETCH_LIMIT); // Only (7, 8) friends exist
 
         assertEquals(1, friendsOf7.size());
         assertEquals("friends", friendsOf7.get(0).getFriendshipStatus());
@@ -81,7 +82,7 @@ public class FriendshipsDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetFriendRequests() {
-        List<Friendship> requestsFor8 = dao.getFriendRequests(8);
+        List<Friendship> requestsFor8 = dao.getFriendRequests(8, Constants.FETCH_LIMIT);
         assertTrue(requestsFor8.stream().anyMatch(f -> f.getFriendshipStatus().equals("pending")));
     }
 }

@@ -19,7 +19,7 @@
     FriendShipsDao friendsDao = (FriendShipsDao)application.getAttribute(Constants.ContextAttributes.FRIENDSHIPS_DAO);
     UserAchievementsDao userAchievementsDao = (UserAchievementsDao)application.getAttribute(Constants.ContextAttributes.USER_ACHIEVEMENTS_DAO);
     AchievementsDao achievementDao = (AchievementsDao)application.getAttribute(Constants.ContextAttributes.ACHIEVEMENTS_DAO);
-    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(visitedUser.getId());
+    List<UserAchievement> achievements = userAchievementsDao.getUserAchievements(visitedUser.getId(), Constants.FETCH_LIMIT);
 %>
 <!DOCTYPE html>
 <html>

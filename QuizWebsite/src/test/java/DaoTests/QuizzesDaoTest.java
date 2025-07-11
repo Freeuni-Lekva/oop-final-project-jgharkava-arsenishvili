@@ -49,14 +49,14 @@ public class QuizzesDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetQuizzesByCreatorId() {
-        List<Quiz> quizzes = dao.getQuizzesByCreatorId(5); // Mariam
+        List<Quiz> quizzes = dao.getQuizzesByCreatorId(5, Constants.FETCH_LIMIT); // Mariam
         assertEquals(1, quizzes.size());
         assertEquals("Oscar Winners", quizzes.get(0).getName());
     }
 
     @Test
     public void testGetQuizzesSortedByCreationDate() {
-        List<Quiz> quizzes = dao.getQuizzesSortedByCreationDate();
+        List<Quiz> quizzes = dao.getQuizzesSortedByCreationDate(Constants.FETCH_LIMIT);
         assertFalse(quizzes.isEmpty());
 
         // non-increasing
@@ -68,7 +68,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetFriendsQuizzesSortedByCreationDate() {
-        List<Quiz> quizzes = dao.getFriendsQuizzesSortedByCreationDate(6); // Gio is friends with 5 (Mariam)
+        List<Quiz> quizzes = dao.getFriendsQuizzesSortedByCreationDate(6, Constants.FETCH_LIMIT); // Gio is friends with 5 (Mariam)
         assertFalse(quizzes.isEmpty());
         assertTrue(quizzes.stream().anyMatch(q -> q.getCreatorId() == 5));
     }
@@ -154,7 +154,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
             }
         };
 
-        List<Quiz> quizzes = dao.filterQuizzes(dummyFilter);
+        List<Quiz> quizzes = dao.filterQuizzes(dummyFilter, Constants.FETCH_LIMIT);
 
         assertEquals( 2, quizzes.size());
         assertEquals("Oscar Winners", quizzes.get(1).getName());
@@ -163,7 +163,7 @@ public class QuizzesDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetQuizzesSortedByParticipantCount() {
-        List<Quiz> quizzes = dao.getQuizzesSortedByParticipantCount();
+        List<Quiz> quizzes = dao.getQuizzesSortedByParticipantCount(Constants.FETCH_LIMIT);
         assertFalse(quizzes.isEmpty());
         for (int i = 0; i < quizzes.size() - 1; i++) {
             assertTrue(quizzes.get(i).getParticipantCount() >= quizzes.get(i + 1).getParticipantCount());

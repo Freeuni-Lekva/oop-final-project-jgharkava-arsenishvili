@@ -43,7 +43,7 @@ public class QuizSearchServlet extends HttpServlet {
         Filter filter = FilterBuilder.build(req);
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
 
-        List<Quiz> quizzes = quizzesDao.filterQuizzes(filter);
+        List<Quiz> quizzes = quizzesDao.filterQuizzes(filter, Constants.FETCH_LIMIT);
 
         req.setAttribute("quizzes", quizzes);
         req.getRequestDispatcher("/quiz-search.jsp").forward(req, resp);

@@ -1,6 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
+import org.ja.utils.Constants;
 import org.ja.model.data.UserAchievement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ public class UserAchievementDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetUserAchievements(){
-        List<UserAchievement> achievements = dao.getUserAchievements(6L);
+        List<UserAchievement> achievements = dao.getUserAchievements(6L, Constants.FETCH_LIMIT);
         assertNotNull(achievements);
         assertEquals(2, achievements.size());
 
@@ -35,7 +36,7 @@ public class UserAchievementDaoTest extends BaseDaoTest{
 
     @Test
     void testGetUserAchievementsNoAchievements() {
-        List<UserAchievement> achievements = dao.getUserAchievements(1225);
+        List<UserAchievement> achievements = dao.getUserAchievements(1225, Constants.FETCH_LIMIT);
         assertNotNull(achievements);
         assertTrue(achievements.isEmpty());
     }

@@ -26,7 +26,7 @@
 <body>
 <div class="center-wrapper">
   <%
-    List<Challenge> challenges = challengeDao.challengesAsReceiver(userId);
+    List<Challenge> challenges = challengeDao.challengesAsReceiver(userId, Constants.FETCH_LIMIT);
     if(challenges != null && !challenges.isEmpty()){
       int num = challenges.size();
   %>

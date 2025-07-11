@@ -20,7 +20,7 @@
     User user = ((UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO)).getUserById(userId);
     User sessionUser = (User)session.getAttribute(Constants.SessionAttributes.USER);
     HistoriesDao hd=(HistoriesDao) application.getAttribute(Constants.ContextAttributes.HISTORIES_DAO);
-    List<History> arr=hd.getHistoriesByUserId(user.getId());
+    List<History> arr=hd.getHistoriesByUserId(user.getId(), Constants.FETCH_LIMIT);
     QuizzesDao quizDao = (QuizzesDao)application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO);
 %>
 <html>
@@ -89,9 +89,18 @@
     </div>
     <% } %><br>
 
-    <form action="user-page.jsp" method="get" >
-        <button type="submit" class="back-btn">Go Home</button>
-    </form>
+    <%
+        if(sessionUser.getId() == user.getId()){%>
+            <form action="user-page.jsp" method="get" >
+                <button type="submit" class="back-btn">Go Home</button>
+            </form>
+      <%}else{%>
+            <form action="visit-user.jsp" method="get">
+                <input type="hidden" name="<%=Constants.RequestParameters.USER_ID%>" value="<%= userId %>">
+                <button type="submit" class="back-btn">Go Back</button>
+            </form>
+     <%}
+    %>
 </div>
 </body>
 </html>

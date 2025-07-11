@@ -1,4 +1,9 @@
-<%
+<%@ page import="org.ja.utils.Constants" %><%
+    if(session.getAttribute(Constants.SessionAttributes.USER) != null) {
+        response.sendRedirect("/user-page.jsp");
+        return;
+    }
+
     String err = (String) request.getAttribute("error");
     if(err != null){ %>
     <div id="login-error" class="error-message"><%= err %></div>
@@ -20,11 +25,11 @@
     <form action="login" method="post">
         <label>
             Username:
-            <input type="text" name="username" required/>
+            <input type="text" name="username" autocomplete="off" required/>
         </label>
          <label>
              Password:
-             <input type="password" name="password" required/>
+             <input type="password" name="password" autocomplete="off" required/>
          </label>
         <input type="submit" value="Login" />
     </form>

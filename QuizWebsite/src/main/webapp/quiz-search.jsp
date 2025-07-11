@@ -18,8 +18,8 @@
     CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
 
-    List<Category> categories = categoriesDao.getAllCategories();
-    List<Tag> tags = tagsDao.getAllTags();
+    List<Category> categories = categoriesDao.getAllCategories(Constants.FETCH_LIMIT);
+    List<Tag> tags = tagsDao.getAllTags(Constants.FETCH_LIMIT);
 %>
 
 <html>
@@ -95,7 +95,7 @@
     <h2>Quizzes:</h2>
     <%
         if(request.getAttribute("quizzes") == null) {
-            List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate();
+            List<Quiz> quizzes = ((QuizzesDao) application.getAttribute(Constants.ContextAttributes.QUIZZES_DAO)).getQuizzesSortedByCreationDate(Constants.FETCH_LIMIT);
 
             for(Quiz quiz : quizzes) {%>
     <a class="hotlink" href="quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>"><%=quiz.getName()%></a>

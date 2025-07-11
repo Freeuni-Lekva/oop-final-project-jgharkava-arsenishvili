@@ -5,11 +5,11 @@ use ja_project_db;
 -- and status: one may be an administrator or a basic user.
 create table users(
     user_id bigint primary key auto_increment,
-    password_hashed varchar(256) not null,
+    password_hashed varchar(2048) not null,
     salt varchar(256) not null,
     username varchar(64) unique not null collate utf8mb4_bin, -- ensures case-sensitivity
     registration_date timestamp default current_timestamp,
-    user_photo varchar(256),
+    user_photo varchar(2048),
     user_status enum('administrator','user') not null default 'user'
 );
 

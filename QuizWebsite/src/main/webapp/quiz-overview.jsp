@@ -28,9 +28,9 @@
     int quizScore = quiz.getScore();
     String creatorName = usersDao.getUserById(quiz.getCreatorId()).getUsername();
     String categoryName = categoriesDao.getCategoryById(quiz.getCategoryId()).getCategoryName();
-    List<Long> quizTagIds = quizTagsDao.getTagsByQuizId(quizId);
+    List<Long> quizTagIds = quizTagsDao.getTagsByQuizId(quizId, Constants.FETCH_LIMIT);
     double averageRating = quiz.getAvgRating();
-    List<QuizRating> quizRatings = quizRatingsDao.getQuizRatingsByQuizIdLimit(quizId, 3);
+    List<QuizRating> quizRatings = quizRatingsDao.getQuizRatingsByQuizId(quizId, Constants.FETCH_LIMIT);
     long participantCount = quiz.getParticipantCount();
 
     List<String> quizTags = new ArrayList<String>();
@@ -47,10 +47,10 @@
 
     boolean isCreator = user.getId() == quiz.getCreatorId();
 
-    List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId);
+    List<History> histories = historiesDao.getUserHistoryByQuiz(user.getId(), quizId, Constants.FETCH_LIMIT);
     List<History> topPerformers = historiesDao.getTopNDistinctHistoriesByQuizId(quizId, 3);
-    List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId);
-    List<History> recentPerformers = historiesDao.getHistoriesByQuizId(quizId);
+    List<History> allPerformers = historiesDao.getDistinctTopHistoriesByQuizId(quizId, Constants.FETCH_LIMIT);
+    List<History> recentPerformers = historiesDao.getHistoriesByQuizId(quizId, Constants.FETCH_LIMIT);
 
     long totalAttempts = historiesDao.getTotalAttempts(quizId);
     double averageScore = historiesDao.getAverageScore(quizId);
@@ -59,10 +59,10 @@
     double averageTime = historiesDao.getAverageTime(quizId);
 
     Map<String, List<History>> topByRange = new HashMap<String, List<History>>();
-    topByRange.put("last_day", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_day"));
-    topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week"));
-    topByRange.put("last_month", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_month"));
-    topByRange.put("last_year", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_year"));
+    topByRange.put("last_day", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_day", Constants.FETCH_LIMIT));
+    topByRange.put("last_week", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_week", Constants.FETCH_LIMIT));
+    topByRange.put("last_month", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_month", Constants.FETCH_LIMIT));
+    topByRange.put("last_year", historiesDao.getTopPerformersByQuizIdAndRange(quizId, "last_year", Constants.FETCH_LIMIT));
 %>
 
 <html>

@@ -84,18 +84,20 @@ public class QuizTagsDao {
      * Retrieves a list of tag IDs associated with a given quiz ID.
      *
      * @param quizId the ID of the quiz
+     * @param limit the maximum number of tags to return
      * @return a list of tag IDs for the specified quiz
      * @throws RuntimeException if a SQL exception occurs during retrieval
      */
-    public List<Long> getTagsByQuizId(long quizId) {
+    public List<Long> getTagsByQuizId(long quizId, int limit) {
         List<Long> tagIds = new ArrayList<>();
 
-        String sql = "select * from quiz_tag where quiz_id = ?";
+        String sql = "select * from quiz_tag where quiz_id = ? LIMIT ?";
 
         try (Connection c = dataSource.getConnection()){
             PreparedStatement ps = c.prepareStatement(sql);
 
             ps.setLong(1, quizId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())

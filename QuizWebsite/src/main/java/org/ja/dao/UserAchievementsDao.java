@@ -28,18 +28,21 @@ public class UserAchievementsDao {
      * Retrieves all achievements earned by a specific user.
      *
      * @param userId the ID of the user whose achievements are being retrieved
+     * @param limit limit the maximum number of user's achievements to return
      * @return a list of {@link UserAchievement} objects associated with the user
      * @throws RuntimeException if a SQL error occurs
      */
-    public List<UserAchievement> getUserAchievements(long userId) {
+    public List<UserAchievement> getUserAchievements(long userId, int limit) {
         List<UserAchievement> achievements = new ArrayList<>();
 
-        String sql = "SELECT * FROM user_achievement WHERE user_id = ?";
+        String sql = "SELECT * FROM user_achievement WHERE user_id = ? LIMIT ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, userId);
+            ps.setInt(2, limit);
+
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())
                     achievements.add(retrieveUserAchievement(rs));

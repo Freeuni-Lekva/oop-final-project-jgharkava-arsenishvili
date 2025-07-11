@@ -134,20 +134,25 @@ public class TagsDao {
 
     /**
      * Retrieves all tags in the database.
+     *
+     * @param limit the maximum number of tags to return
      * @return a list of all tags
      */
-    public List<Tag> getAllTags(){
+    public List<Tag> getAllTags(int limit){
         List<Tag> tags = new ArrayList<>();
 
-        String sql = "SELECT * FROM TAGS";
+        String sql = "SELECT * FROM TAGS LIMIT ?";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement(sql)){
 
-            while (rs.next()) {
-                tags.add(retrieveTag(rs));
-            }
+            ps.setInt(1, limit);
+
+             try (ResultSet rs = ps.executeQuery()){
+                 while (rs.next()) {
+                     tags.add(retrieveTag(rs));
+                 }
+             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying all tags", e);

@@ -21,9 +21,9 @@
 
     long quizId = Long.parseLong(request.getParameter(Constants.RequestParameters.QUIZ_ID));
     Quiz quiz = quizzesDao.getQuizById(quizId);
-    List<Category> allCategories = categoriesDao.getAllCategories();
-    List<Tag> allTags = tagsDao.getAllTags();
-    List<Long> quizTags = quizTagsDao.getTagsByQuizId(quizId);
+    List<Category> allCategories = categoriesDao.getAllCategories(Constants.FETCH_LIMIT);
+    List<Tag> allTags = tagsDao.getAllTags(Constants.FETCH_LIMIT);
+    List<Long> quizTags = quizTagsDao.getTagsByQuizId(quizId, Constants.FETCH_LIMIT);
     String questionOrder = quiz.getQuestionOrder();
     String questionPlacement = quiz.getQuestionPlacement();
     String questionCorrection = quiz.getQuestionCorrection();

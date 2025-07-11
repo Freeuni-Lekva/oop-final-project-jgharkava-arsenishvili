@@ -36,7 +36,7 @@ public class UserPageServlet extends HttpServlet {
      * @throws IOException      if an I/O error occurs during request processing
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String newPhoto = req.getParameter("newPhoto");
+        String newPhoto = req.getParameter("newPhoto").trim();
         UsersDao dao = (UsersDao)getServletContext().getAttribute(Constants.ContextAttributes.USERS_DAO);
         User curUser = (User) req.getSession().getAttribute(Constants.SessionAttributes.USER);
         if(newPhoto != null){

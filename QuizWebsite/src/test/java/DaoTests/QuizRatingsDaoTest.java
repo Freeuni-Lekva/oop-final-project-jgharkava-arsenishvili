@@ -58,7 +58,7 @@ public class QuizRatingsDaoTest extends BaseDaoTest{
         dao.insertQuizRating(new QuizRating(4L, 6L, 4, "Cool"));
         dao.insertQuizRating(new QuizRating(4L, 7L, 5, "Perfect"));
 
-        List<QuizRating> limited = dao.getQuizRatingsByQuizIdLimit(4L, 2);
+        List<QuizRating> limited = dao.getQuizRatingsByQuizId(4L, 2);
         assertEquals(2, limited.size());
 
         assertTrue(limited.stream().allMatch(r -> r.getQuizId() == 4L));

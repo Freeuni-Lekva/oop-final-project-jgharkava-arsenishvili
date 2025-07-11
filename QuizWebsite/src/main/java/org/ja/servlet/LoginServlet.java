@@ -46,7 +46,7 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/index.jsp").forward(request, resp);
             }else{
                 request.getSession().setAttribute(Constants.SessionAttributes.USER, user);
-                request.getRequestDispatcher("/user-page.jsp").forward(request, resp);
+                resp.sendRedirect("user-page.jsp");
             }
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

@@ -44,6 +44,18 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
+    if (quizTitle.length >= 60) {
+        e.preventDefault();
+
+        quizTitleInput.setCustomValidity("Quiz title is too long.");
+        quizTitleInput.reportValidity();
+
+        setTimeout(() => quizTitleInput.setCustomValidity(""), 2000);
+
+        return;
+
+    }
+
     if(quizDescription === "") {
         e.preventDefault();
 
@@ -55,13 +67,46 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    if (!isPositiveInteger(duration)) {
+    if(quizDescription.length >= 1000) {
+        e.preventDefault();
+
+        quizDescriptionInput.setCustomValidity("Quiz description is too long.");
+        quizDescriptionInput.reportValidity();
+
+        setTimeout(() => quizDescriptionInput.setCustomValidity(""), 2000);
+
+        return;
+    }
+
+    if (!isPositiveInteger(duration) || duration.startsWith("0")) {
         e.preventDefault();
 
         durationInput.setCustomValidity("Time must be a positive integer");
         durationInput.reportValidity();
 
         setTimeout(() => durationInput.setCustomValidity(""), 2000);
+
+        return;
+    }
+
+    if(duration.length >= 3) {
+        e.preventDefault();
+
+        durationInput.setCustomValidity("Quiz time limit is too big.");
+        durationInput.reportValidity();
+
+        setTimeout(() => durationInput.setCustomValidity(""), 2000);
+
+        return;
+    }
+
+    if(document.getElementById("tag_other").checked && otherTag.length >= 25) {
+        e.preventDefault();
+
+        otherTagInput.setCustomValidity("Tag name is too long.");
+        otherTagInput.reportValidity();
+
+        setTimeout(() => otherTagInput.setCustomValidity(""), 2000);
 
         return;
     }

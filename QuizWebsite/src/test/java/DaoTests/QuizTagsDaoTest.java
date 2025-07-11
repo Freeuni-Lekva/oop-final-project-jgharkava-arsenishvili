@@ -1,6 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
+import org.ja.utils.Constants;
 import org.ja.model.data.QuizTag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ public class QuizTagsDaoTest extends BaseDaoTest{
         QuizTag tag = new QuizTag(4L, 6L);
         assertTrue(dao.insertQuizTag(tag));
 
-        List<Long> tagIds = dao.getTagsByQuizId(4L);
+        List<Long> tagIds = dao.getTagsByQuizId(4L, Constants.FETCH_LIMIT);
         assertTrue(tagIds.contains(6L));
     }
 
@@ -45,7 +46,7 @@ public class QuizTagsDaoTest extends BaseDaoTest{
 
         assertTrue(dao.removeQuizTag(4L, 6L));
 
-        List<Long> tagIds = dao.getTagsByQuizId(4L);
+        List<Long> tagIds = dao.getTagsByQuizId(4L, Constants.FETCH_LIMIT);
         assertFalse(tagIds.contains(6L));
         assertFalse(dao.removeQuizTag(1225L, 1225)); // Not present
     }
@@ -53,7 +54,7 @@ public class QuizTagsDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetTagsByQuizId() {
-        List<Long> tagIds = dao.getTagsByQuizId(6L);
+        List<Long> tagIds = dao.getTagsByQuizId(6L, Constants.FETCH_LIMIT);
         assertNotNull(tagIds);
         assertEquals(2, tagIds.size()); // Based on sample dataset
         assertTrue(tagIds.contains(6L));

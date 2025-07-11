@@ -1,6 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
+import org.ja.utils.Constants;
 import org.ja.model.data.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +33,14 @@ public class HistoryDaoTest extends BaseDaoTest{
         assertTrue(history.getHistoryId() > 0);
         assertNotNull(history.getCompletionDate());
 
-        List<History> userHistories = dao.getHistoriesByUserId(5L);
+        List<History> userHistories = dao.getHistoriesByUserId(5L, Constants.FETCH_LIMIT);
         assertFalse(userHistories.isEmpty());
         assertTrue(userHistories.stream().anyMatch(h -> h.getHistoryId() == history.getHistoryId()));
     }
 
     @Test
     public void testGetHistoriesByQuizId() {
-        List<History> histories = dao.getHistoriesByQuizId(6L);
+        List<History> histories = dao.getHistoriesByQuizId(6L, Constants.FETCH_LIMIT);
         assertFalse(histories.isEmpty());
 
         // Check whether descending by date
@@ -60,7 +61,7 @@ public class HistoryDaoTest extends BaseDaoTest{
 
     @Test
     public void testDistinctTopHistoriesAll() {
-        List<History> distinctAll = dao.getDistinctTopHistoriesByQuizId(6L);
+        List<History> distinctAll = dao.getDistinctTopHistoriesByQuizId(6L, Constants.FETCH_LIMIT);
 
         assertFalse(distinctAll.isEmpty());
         assertEquals(distinctAll.stream().map(History::getUserId).distinct().count(), distinctAll.size());
@@ -68,15 +69,15 @@ public class HistoryDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetTopPerformersByRange() {
-        List<History> lastDay = dao.getTopPerformersByQuizIdAndRange(6L, "last_day");
+        List<History> lastDay = dao.getTopPerformersByQuizIdAndRange(6L, "last_day", Constants.FETCH_LIMIT);
         assertTrue(lastDay.stream().allMatch(h -> h.getCompletionDate().after(Timestamp.valueOf(LocalDateTime.now().minusDays(1)))));
 
-        assertDoesNotThrow(() -> dao.getTopPerformersByQuizIdAndRange(6L, "last_week"));
+        assertDoesNotThrow(() -> dao.getTopPerformersByQuizIdAndRange(6L, "last_week", Constants.FETCH_LIMIT));
     }
 
     @Test
     public void testUserHistoryByQuiz() {
-        List<History> userQuiz = dao.getUserHistoryByQuiz(8L, 6L);
+        List<History> userQuiz = dao.getUserHistoryByQuiz(8L, 6L, Constants.FETCH_LIMIT);
 
         assertFalse(userQuiz.isEmpty());
         assertTrue(userQuiz.stream().allMatch(h -> h.getUserId() == 8L && h.getQuizId() == 6L));
@@ -85,19 +86,19 @@ public class HistoryDaoTest extends BaseDaoTest{
     @Test
     public void testUserFriendsHistoryByQuiz() {
         // Existing
-        List<History> friendsQuizExisting = dao.getUserFriendsHistoryByQuiz(7L, 6L);
+        List<History> friendsQuizExisting = dao.getUserFriendsHistoryByQuiz(7L, 6L, Constants.FETCH_LIMIT);
 
         assertFalse(friendsQuizExisting.isEmpty());
         assertTrue(friendsQuizExisting.stream().allMatch(h -> h.getQuizId() == 6L && h.getUserId() != 7L));
 
         // Non-Existing
-        List<History> friendsQuizNonExisting = dao.getUserFriendsHistoryByQuiz(7L, 4L);
+        List<History> friendsQuizNonExisting = dao.getUserFriendsHistoryByQuiz(7L, 4L, Constants.FETCH_LIMIT);
         assertTrue(friendsQuizNonExisting.isEmpty());
     }
 
     @Test
     public void testUserFriendsHistory() {
-        List<History> friendsAll = dao.getUserFriendsHistory(7L);
+        List<History> friendsAll = dao.getUserFriendsHistory(7L, Constants.FETCH_LIMIT);
 
         assertEquals(2, friendsAll.size());
         assertTrue(friendsAll.stream().allMatch(h -> h.getUserId() != 7L));
