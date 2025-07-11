@@ -59,7 +59,8 @@ insert into questions(quiz_id, question, image_url, question_type, num_answers, 
 (3, 'Match the elements to their atomic number', null, 'matching', 4, 'ordered'),
 (4, 'Who wrote Pride and Prejudice?', null, 'question-response', 1, 'ordered'),
 (4, 'Which of the following are works by William Shakespeare?', null, 'multi-choice-multi-answers', 3, 'ordered'),
-(4, '“It was the best of times, it was the worst of times...” is the opening line of _ by Charles Dickens.', null, 'fill-in-the-blank', 1, 'ordered'),
+-- here
+(4, '''It was the best of times, it was the worst of times...'' is the opening line of _ by Charles Dickens.', null, 'fill-in-the-blank', 1, 'ordered'),
 (4, 'This image symbolizes a key theme from a famous dystopian novel. What is the title of the novel?',
  'https://media.istockphoto.com/id/981630990/vector/vintage-big-brother-watching-you-spying-eyes-surveillance-and-privacy-concept-vector.jpg?s=612x612&w=0&k=20&c=1DZlhgivizXJkWumOpfufNTBC_WcJJZ7illHZv5TB-c',
  'picture-response', 1, 'ordered');
