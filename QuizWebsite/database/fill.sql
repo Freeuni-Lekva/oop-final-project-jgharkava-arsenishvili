@@ -45,7 +45,7 @@ insert into quizzes(quiz_id, quiz_name, quiz_description, quiz_score, average_ra
 
 (4, 'Literature Quiz', 'Test your knowledge on classic and modern literature!', 6, 3,
  4, '2024-07-10 15:30:00', 7, 4,4, 'ordered',
- 'multiple-page', 'immediate-correction');;
+ 'multiple-page', 'immediate-correction');
 
 
 insert into questions(quiz_id, question, image_url, question_type, num_answers, order_status) values

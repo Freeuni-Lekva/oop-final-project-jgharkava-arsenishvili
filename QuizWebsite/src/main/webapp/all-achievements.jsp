@@ -37,8 +37,10 @@
   %>
   <div class="achievement-item" id="achievement-<%=a.getAchievementId()%>">
     <strong><%=achievementsDao.getAchievement(a.getAchievementId()).getAchievementName()%></strong>
-    <img src="<%=achievementsDao.getAchievement(a.getAchievementId()).getAchievementPhoto()%>" alt="Achievement Badge">
-    <p><%=achievementsDao.getAchievement(a.getAchievementId()).getAchievementDescription()%></p>
+    <div class="achievement-content">
+      <img src="<%=achievementsDao.getAchievement(a.getAchievementId()).getAchievementPhoto()%>" alt="Achievement Badge">
+      <div class="achievement-description"><%=achievementsDao.getAchievement(a.getAchievementId()).getAchievementDescription()%></div>
+    </div>
   </div>
   <%
     }
