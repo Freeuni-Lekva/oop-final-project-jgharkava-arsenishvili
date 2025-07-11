@@ -238,7 +238,9 @@ button[value="delete"]:hover, button[value="remove-friend"]:hover, button[value=
 
 .back-btn {
     background: #e3f2fd;
-    margin-top: 30px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
     border: 1px solid #ccc;
     padding: 12px 24px;
     border-radius: 4px;
