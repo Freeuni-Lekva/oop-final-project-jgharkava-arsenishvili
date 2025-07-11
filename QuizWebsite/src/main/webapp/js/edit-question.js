@@ -442,12 +442,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".matching-question-block").forEach(questionBlock => {
         // dropdown logic
-        questionBlock.querySelectorAll(".left-group").forEach(group => {
-            const rightSelect = group.querySelector("select.right-select");
-            if (!rightSelect) return;
 
-            rightSelect.addEventListener("change", () => {
-                const newRightText = rightSelect.value;
+        // Function to bind dropdown change event
+        function bindDropdownChangeEvent(select) {
+            select.addEventListener("change", () => {
+                const newRightText = select.value;
+                const group = select.closest(".left-group");
                 const matchId = group.dataset.matchId;
 
                 if (!matchId || matchId === "") {
@@ -457,7 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 console.log(matchId);
-
 
                 fetch("edit-question", {
                     method: "POST",
@@ -481,8 +480,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         alert("Error updating right match.");
                     });
             });
-        });
+        }
 
+
+
+        // Bind dropdown logic to existing elements
+        questionBlock.querySelectorAll(".left-group").forEach(group => {
+            const rightSelect = group.querySelector("select.right-select");
+            if (rightSelect) {
+                bindDropdownChangeEvent(rightSelect);
+            }
+        });
         const leftOptionsContainer = questionBlock.querySelector(".left-options");
 
         // if initially only one, disable delete
@@ -722,6 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 leftOptionsContainer.appendChild(group);
 
                 bindSaveToggle(group);
+                bindDropdownChangeEvent(select);
                 updateDeleteButtonStateLeftMatches(leftOptionsContainer);
             });
         }
