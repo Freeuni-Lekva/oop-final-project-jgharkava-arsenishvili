@@ -2,6 +2,7 @@ package DaoTests;
 
 import org.ja.dao.*;
 import org.ja.model.OtherObjects.*;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -29,7 +30,7 @@ public class AnnouncementsDaoTest extends BaseDaoTest{
         assertTrue(newAnnouncement.getAnnouncementId() > 0);
         assertNotNull(newAnnouncement.getCreationDate());
 
-        Announcement fetched = dao.getAllAnnouncements().stream()
+        Announcement fetched = dao.getAllAnnouncements(Constants.FETCH_LIMIT).stream()
                 .filter(a -> a.getAnnouncementText().equals("Reminder: Submit feedback!"))
                 .findFirst()
                 .orElse(null);
@@ -41,7 +42,7 @@ public class AnnouncementsDaoTest extends BaseDaoTest{
 
     @Test
     public void testGetAllAnnouncements() {
-        List<Announcement> announcements = dao.getAllAnnouncements();
+        List<Announcement> announcements = dao.getAllAnnouncements(Constants.FETCH_LIMIT);
 
         assertEquals(2, announcements.size());
         assertTrue(announcements.stream().anyMatch(a ->

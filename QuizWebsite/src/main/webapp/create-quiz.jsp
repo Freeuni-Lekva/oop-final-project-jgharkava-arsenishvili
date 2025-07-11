@@ -15,10 +15,10 @@
 
 <%
     CategoriesDao categoriesDao = (CategoriesDao) application.getAttribute(Constants.ContextAttributes.CATEGORIES_DAO);
-    List<Category> categories = categoriesDao.getAllCategories();
+    List<Category> categories = categoriesDao.getAllCategories(Constants.FETCH_LIMIT);
 
     TagsDao tagsDao = (TagsDao) application.getAttribute(Constants.ContextAttributes.TAGS_DAO);
-    List<Tag> tags = tagsDao.getAllTags();
+    List<Tag> tags = tagsDao.getAllTags(Constants.FETCH_LIMIT);
 %>
 
 <html>

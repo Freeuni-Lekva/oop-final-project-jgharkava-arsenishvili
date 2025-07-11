@@ -256,20 +256,22 @@ public class QuizzesDao {
     }
 
 
+
     /**
      * Retrieves quizzes from the database based on the given filter.
      *
      * @param filter the filter criteria for retrieving quizzes
+     * @param limit the maximum number of quizzes to return
      * @return a list of quizzes matching the filter
      */
-    public List<Quiz> filterQuizzes(Filter filter) {
+    public List<Quiz> filterQuizzes(Filter filter, int limit) {
         String sql = "SELECT DISTINCT quizzes.quiz_id, quiz_name, quiz_description, average_rating, " +
                 "participant_count, creation_date, time_limit_in_minutes, quizzes.category_id, " +
                 "creator_id, question_order_status, question_placement_status, question_correction_status, quiz_score " +
                 "FROM quizzes left join categories on categories.category_id = quizzes.category_id " +
                 "left join quiz_tag on quizzes.quiz_id = quiz_tag.quiz_id " +
                 "left join tags on tags.tag_id = quiz_tag.tag_id " +
-                "WHERE " + filter.buildWhereClause() + " ORDER BY " + filter.buildOrderByClause();
+                "WHERE " + filter.buildWhereClause() + " ORDER BY " + filter.buildOrderByClause() + " LIMIT " + limit;
 
         List<Quiz> quizzes = new ArrayList<>();
 
@@ -298,18 +300,22 @@ public class QuizzesDao {
     /**
      * Retrieves all quizzes from the database sorted by creation date (most recent first).
      *
+     * @param limit the maximum number of quizzes to return
      * @return a list of quizzes sorted by creation date
      */
-    public List<Quiz> getQuizzesSortedByCreationDate() {
-        String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC";
+    public List<Quiz> getQuizzesSortedByCreationDate(int limit) {
+        String sql = "SELECT * FROM quizzes ORDER BY creation_date DESC LIMIT ?";
         List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            while (rs.next())
-                quizzes.add(retrieveQuiz(rs));
+            stmt.setInt(1, limit);
+
+            try (ResultSet rs = stmt.executeQuery()){
+                while (rs.next())
+                    quizzes.add(retrieveQuiz(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quizzes by creation date", e);
@@ -323,9 +329,10 @@ public class QuizzesDao {
      * Retrieves quizzes created by a user's friends, sorted by creation date.
      *
      * @param userId the ID of the user whose friends' quizzes to retrieve
+     * @param limit the maximum number of quizzes to return
      * @return a list of quizzes created by friends
      */
-    public List<Quiz> getFriendsQuizzesSortedByCreationDate(long userId) {
+    public List<Quiz> getFriendsQuizzesSortedByCreationDate(long userId, int limit) {
         String sql = "SELECT q.*" +
                 "        FROM quizzes q" +
                 "        JOIN (" +
@@ -338,7 +345,7 @@ public class QuizzesDao {
                 "            WHERE (first_user_id = ? OR second_user_id = ?)" +
                 "              AND friendship_status = 'friends'" +
                 "        ) f ON q.creator_id = f.friend_id" +
-                "        ORDER BY q.creation_date DESC";
+                "        ORDER BY q.creation_date DESC LIMIT ?";
         List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -346,6 +353,7 @@ public class QuizzesDao {
             stmt.setLong(1, userId);
             stmt.setLong(2, userId);
             stmt.setLong(3, userId);
+            stmt.setInt(4, limit);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
@@ -364,18 +372,22 @@ public class QuizzesDao {
     /**
      * Retrieves quizzes from the database sorted by participant count in descending order.
      *
+     * @param limit the maximum number of quizzes to return
      * @return a list of popular quizzes
      */
-    public List<Quiz> getQuizzesSortedByParticipantCount() {
-        String sql = "SELECT * FROM quizzes ORDER BY participant_count DESC";
+    public List<Quiz> getQuizzesSortedByParticipantCount(int limit) {
+        String sql = "SELECT * FROM quizzes ORDER BY participant_count DESC LIMIT ?";
         List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            while (rs.next())
-                quizzes.add(retrieveQuiz(rs));
+            stmt.setInt(1, limit);
+
+            try (ResultSet rs = stmt.executeQuery()){
+                while (rs.next())
+                    quizzes.add(retrieveQuiz(rs));
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error querying quizzes by participant quiz database", e);
@@ -439,15 +451,17 @@ public class QuizzesDao {
      * Retrieves all quizzes created by a specific user.
      *
      * @param id the creator's user ID
+     * @param limit the maximum number of quizzes to return
      * @return a list of quizzes created by the user
      */
-    public List<Quiz> getQuizzesByCreatorId(long id) {
-        String sql = "SELECT * FROM quizzes WHERE creator_id = ? ORDER BY creation_date desc";
+    public List<Quiz> getQuizzesByCreatorId(long id, int limit) {
+        String sql = "SELECT * FROM quizzes WHERE creator_id = ? ORDER BY creation_date DESC LIMIT ?";
         List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setLong(1, id);
+            stmt.setInt(2, limit);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

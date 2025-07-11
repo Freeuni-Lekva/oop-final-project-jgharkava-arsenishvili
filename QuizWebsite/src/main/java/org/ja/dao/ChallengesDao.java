@@ -93,15 +93,16 @@ public class ChallengesDao {
      * @return a list of Challenge objects received by the specified user (empty if none)
      * @throws RuntimeException if a database error occurs
      */
-    public List<Challenge> challengesAsReceiver(long receiverId){
+    public List<Challenge> challengesAsReceiver(long receiverId, int limit){
         ArrayList<Challenge> challenges = new ArrayList<>();
 
-        String sql = "SELECT * FROM challenges WHERE recipient_user_id = ?";
+        String sql = "SELECT * FROM challenges WHERE recipient_user_id = ? LIMIT ?";
 
         try (Connection c = dataSource.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
 
             ps.setLong(1, receiverId);
+            ps.setInt(2, limit);
 
             try (ResultSet rs = ps.executeQuery()){
                 while (rs.next())

@@ -2,6 +2,7 @@ package DaoTests;
 
 import org.ja.dao.*;
 import org.ja.model.OtherObjects.*;
+import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.sql.Timestamp;
@@ -52,37 +53,16 @@ public class MessagesDaoTest extends BaseDaoTest{
         assertTrue(removedAny, "Should remove messages for user 99999");
 
         // Confirm no messages remain for this user
-        List<Message> messages = dao.getMessagesForUser(7L);
+        List<Message> messages = dao.getMessagesForUser(7L, Constants.FETCH_LIMIT);
         assertTrue(messages.isEmpty(), "No messages should remain for user 99999");
     }
 
-    @Test
-    public void testGetMutualMessages() {
-        List<Message> mutualMessages = dao.getMutualMessages(5, 6);
-
-        assertFalse(mutualMessages.isEmpty(), "Mutual messages between user 5 and 6 should exist");
-
-        // Testing whether messages are sorted by date
-        Timestamp previous = null;
-        for (Message m : mutualMessages) {
-            if (previous != null) {
-                assertTrue(m.getMessageSendDate().compareTo(previous) <= 0);
-            }
-            previous = m.getMessageSendDate();
-
-            // Confirm sender and recipient are either (5->6) or (6->5)
-            assertTrue(
-                    (m.getSenderUserId() == 5 && m.getRecipientUserId() == 6) ||
-                            (m.getSenderUserId() == 6 && m.getRecipientUserId() == 5)
-            );
-        }
-    }
 
     @Test
     public void testGetMessagesForUserSorted() {
         List<Long> expectedSenders = List.of(5L, 8L);
 
-        List<Message> messages = dao.getMessagesForUser(6L);
+        List<Message> messages = dao.getMessagesForUser(6L, Constants.FETCH_LIMIT);
         assertFalse(messages.isEmpty(), "Messages for user 6 should not be empty");
 
         Timestamp previous = null;

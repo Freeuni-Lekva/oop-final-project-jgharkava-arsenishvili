@@ -28,7 +28,7 @@
 
     User user = (User) session.getAttribute(Constants.SessionAttributes.USER);
 
-    List<Friendship> friends = friendShipsDao.getFriends(user.getId());
+    List<Friendship> friends = friendShipsDao.getFriends(user.getId(), Constants.FETCH_LIMIT);
 
     Quiz quiz = (Quiz) session.getAttribute(Constants.SessionAttributes.QUIZ);
     List<Integer> grades = (List<Integer>) session.getAttribute("grades");
@@ -244,7 +244,7 @@
 <%-- User's past performance on this quiz--%>
 
 <%
-    List<History> usersPastPerformance = historyDao.getUserHistoryByQuiz(user.getId(), quiz.getId());
+    List<History> usersPastPerformance = historyDao.getUserHistoryByQuiz(user.getId(), quiz.getId(), Constants.FETCH_LIMIT);
 %>
 
 <div class="scrollable-history-table-title">
@@ -289,7 +289,7 @@
 <%-- Friends' history on this quiz--%>
 
 <%
-    List<History> friendsHistory = historyDao.getUserFriendsHistoryByQuiz(user.getId(), quiz.getId());
+    List<History> friendsHistory = historyDao.getUserFriendsHistoryByQuiz(user.getId(), quiz.getId(), Constants.FETCH_LIMIT);
 %>
 
 <div class="scrollable-history-table-title">
