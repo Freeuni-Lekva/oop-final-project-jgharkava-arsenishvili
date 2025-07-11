@@ -2,7 +2,6 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.dao.HistoriesDao" %>
 <%@ page import="org.ja.model.data.History" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.QuizzesDao" %>
 <%@ page import="org.ja.dao.UsersDao" %>
 <%@ page import="java.util.List" %>

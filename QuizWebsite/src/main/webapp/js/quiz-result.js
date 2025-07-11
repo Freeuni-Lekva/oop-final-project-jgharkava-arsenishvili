@@ -1,3 +1,7 @@
+window.onload = function () {
+    highlightStars(selectedRating);
+};
+
 function sendChallenge(button, friendId) {
     fetch("challenge-friend", {
         method: "POST",
@@ -14,7 +18,7 @@ function sendChallenge(button, friendId) {
     button.textContent = "Challenge sent";
 }
 
-let selectedRating = 0;
+//let selectedRating = 0;
 
 document.querySelectorAll("#rating-stars span").forEach(star => {
     star.addEventListener("mouseover", function () {

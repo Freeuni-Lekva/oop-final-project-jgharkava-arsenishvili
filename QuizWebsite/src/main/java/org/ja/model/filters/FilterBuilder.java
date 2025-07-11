@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FilterBuilder {
     private static final String[] PARAMETER_NAMES = {
-            Constants.FilterFields.USERNAME,
             Constants.FilterFields.QUIZ_NAME,
             Constants.FilterFields.CATEGORY,
             Constants.FilterFields.TAG,
@@ -50,12 +49,6 @@ public class FilterBuilder {
             if (values == null || values.length == 0) continue;
 
             switch (parameterName) {
-                case Constants.FilterFields.USERNAME -> {
-                    for (String value : values) {
-                        if (value.trim().isEmpty()) continue;
-                        andFilter.addFilter(new UserNameFilter(value.trim()));
-                    }
-                }
                 case Constants.FilterFields.QUIZ_NAME -> {
                     for (String value : values) {
                         if (value.trim().isEmpty()) continue;
