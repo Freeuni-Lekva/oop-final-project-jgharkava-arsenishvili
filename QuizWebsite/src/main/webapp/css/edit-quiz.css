@@ -9,8 +9,9 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #739cc8 0%, #5a7ba3 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 30px;
     color: #333;
+    line-height: 1.6; /* Added for better text spacing */
 }
 
 /* Main container */
@@ -20,7 +21,7 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 40px;
+    padding: 50px; /* Increased from 40px */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
@@ -29,16 +30,16 @@ h2 {
     text-align: center;
     color: #2c3e50;
     font-size: 2.5rem;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Form sections */
 .form-section {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    padding: 25px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 35px;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -50,7 +51,8 @@ label {
     display: block;
     font-weight: 600;
     color: #2c3e50;
-    margin-bottom: 8px;
+    margin-bottom: 15px; /* Increased from 8px */
+    margin-top: 20px; /* Added top margin */
     font-size: 1.1rem;
 }
 
@@ -59,14 +61,15 @@ h3[contenteditable="true"] {
     background: white;
     border: 2px solid #e1e8ed;
     border-radius: 10px;
-    padding: 15px;
+    padding: 20px;
     font-size: 1.2rem;
     font-weight: 500;
     color: #2c3e50;
     transition: all 0.3s ease;
     cursor: text;
-    min-height: 50px;
+    min-height: 60px;
     outline: none;
+    margin-bottom: 20px;
 }
 
 h3[contenteditable="true"]:hover {
@@ -83,7 +86,7 @@ h3[contenteditable="true"]:focus {
 /* Select dropdowns */
 select {
     width: 100%;
-    padding: 15px;
+    padding: 18px;
     border: 2px solid #e1e8ed;
     border-radius: 10px;
     font-size: 1rem;
@@ -93,6 +96,11 @@ select {
     appearance: none;
     background: white right 15px center;
     background-size: 16px;
+    margin-bottom: 20px;
+    /* Custom dropdown arrow */
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%235a7ba3' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
 }
 
 select:hover {
@@ -108,28 +116,34 @@ select:focus {
 
 /* Tag containers */
 .tags-container {
-    margin-top: 30px;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
     margin-bottom: 30px;
+    background-color: #f9f9f9;
 }
 
 .tags-container h3 {
     color: #2c3e50;
     font-size: 1.3rem;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 #quizTags, #availableTags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    min-height: 60px;
-    padding: 20px;
+    gap: 15px;
+    min-height: 80px;
+    padding: 25px;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 12px;
     border: 2px dashed #e1e8ed;
     transition: all 0.3s ease;
+    margin-bottom: 25px;
 }
 
 #quizTags:hover, #availableTags:hover {
@@ -143,13 +157,14 @@ select:focus {
     align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 8px 15px;
+    padding: 10px 18px;
     border-radius: 25px;
     font-size: 0.9rem;
     font-weight: 500;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     cursor: pointer;
+    margin: 5px;
 }
 
 .tag:hover {
@@ -159,12 +174,12 @@ select:focus {
 
 /* Tag buttons */
 .removeTagBtn, .addTagBtn {
-    margin-left: 8px;
+    margin-left: 10px;
     background: rgba(255, 255, 255, 0.3);
     border: none;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -197,24 +212,23 @@ select:focus {
     border-left: 4px solid #3498db;
 }
 
-/* Form buttons */
 form {
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 button[type="submit"] {
     background: linear-gradient(135deg, #739cc8 0%, #5a7ba3 100%);
     color: white;
     border: none;
-    padding: 15px 30px;
+    padding: 18px 35px;
     font-size: 1.1rem;
     font-weight: 600;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-right: 15px;
-    margin-bottom: 10px;
+    margin-right: 20px;
+    margin-bottom: 15px;
 }
 
 button[type="submit"]:hover {
@@ -237,5 +251,42 @@ button[type="submit"]:active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* Additional spacing helpers */
+.section-divider {
+    height: 30px; /* Add this class between major sections */
+}
 
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 20px;
+    margin-top: 30px;
+}
 
+h1:first-child, h2:first-child, h3:first-child {
+    margin-top: 0;
+}
+
+p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Input field spacing */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+    border-color: #2980b9;
+    box-shadow: 0 4px 16px rgba(41, 128, 185, 0.2);
+    outline: none;
+}
