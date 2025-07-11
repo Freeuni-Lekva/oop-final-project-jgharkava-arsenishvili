@@ -88,6 +88,8 @@
     <div class="search-button">
         <input type="submit" value="Search">
     </div>
+
+    <button type="button" class="back-btn" onclick="goHome()">Go Home</button>
 </form>
 
 <!-- Quiz results -->
@@ -111,5 +113,12 @@
         }
     %>
 </div>
+
 </body>
 </html>
+
+<script>
+    function goHome() {
+        window.location.href = 'user-page.jsp?';
+    }
+</script>
