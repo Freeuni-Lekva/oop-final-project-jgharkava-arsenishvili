@@ -102,10 +102,9 @@
 
     }
 
-    /// MULTI CHOICE QUESTION
-    else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
-        List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
-        Collections.shuffle(answers);%>
+        /// MULTI CHOICE QUESTION
+        else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
+            List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
 
         <h3><%=question.getQuestionText()%></h3><%
 
@@ -115,10 +114,9 @@
         }
     }
 
-    /// MULTI_CHOICE_MULTI_ANSWER_QUESTION
-    else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
-        List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
-        Collections.shuffle(answers);%>
+        /// MULTI_CHOICE_MULTI_ANSWER_QUESTION
+        else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
+            List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());%>
 
         <h3><%=question.getQuestionText()%></h3><%
 
