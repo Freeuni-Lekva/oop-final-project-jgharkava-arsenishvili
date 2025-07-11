@@ -1,8 +1,8 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Match;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.MatchingQuestion;
-import org.ja.model.quiz.question.MultiAnswerQuestion;
 import org.ja.model.quiz.response.Response;
 import org.ja.utils.Constants;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link MatchingQuestion} class.
+ */
 public class MatchingQuestionTest {
 
     @Test

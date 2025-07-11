@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

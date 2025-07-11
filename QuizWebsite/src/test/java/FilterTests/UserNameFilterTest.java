@@ -1,6 +1,7 @@
 package FilterTests;
 
-import org.ja.model.Filters.UserNameFilter;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.UserNameFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link UserNameFilter} class.
+ */
 public class UserNameFilterTest {
     private UserNameFilter filter;
 

@@ -1,6 +1,7 @@
 package FilterTests;
 
-import org.ja.model.Filters.QuizNameFilter;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.QuizNameFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link QuizNameFilter} class.
+ */
 public class QuizNameFilterTest {
     private QuizNameFilter filter;
 

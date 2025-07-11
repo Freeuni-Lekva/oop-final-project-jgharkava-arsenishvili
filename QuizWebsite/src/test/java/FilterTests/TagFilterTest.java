@@ -1,6 +1,7 @@
 package FilterTests;
 
-import org.ja.model.Filters.TagFilter;
+import org.ja.model.filters.AndFilter;
+import org.ja.model.filters.TagFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * Unit tests for the {@link TagFilter} class.
+ */
 public class TagFilterTest {
     private TagFilter filter;
 

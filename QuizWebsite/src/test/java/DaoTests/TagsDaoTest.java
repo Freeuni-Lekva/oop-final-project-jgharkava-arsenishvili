@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.TagsDao;
-import org.ja.model.CategoriesAndTags.Tag;
+import org.ja.model.data.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

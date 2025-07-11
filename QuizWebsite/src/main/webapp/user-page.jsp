@@ -1,10 +1,10 @@
-<%@ page import="org.ja.model.user.User" %>
+<%@ page import="org.ja.model.data.User" %>
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
 <%@ page import="org.ja.dao.*" %>
-<%@ page import="org.ja.model.OtherObjects.*" %>
+<%@ page import="org.ja.model.data.*" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>

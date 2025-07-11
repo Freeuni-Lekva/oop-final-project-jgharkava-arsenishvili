@@ -1,11 +1,15 @@
 package ResponseTests;
 
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Match;
+import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.response.Response;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Unit tests for the {@link Response} class.
+ */
 public class ResponseTest {
 
     @Test

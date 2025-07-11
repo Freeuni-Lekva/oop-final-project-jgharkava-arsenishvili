@@ -9,10 +9,25 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.sql.SQLException;
 
+/**
+ * Application context listener that initializes and destroys shared resources for the web application.
+ *
+ * <p>On application startup, it sets up a shared {@link BasicDataSource} and initializes all DAO instances,
+ * storing them in the servlet context under the keys defined in {@link org.ja.utils.Constants.ContextAttributes}.</p>
+ *
+ * <p>On application shutdown, it properly closes the {@link BasicDataSource} to release database connections.</p>
+ */
 @WebListener
 public class ContextListener implements ServletContextListener {
     private BasicDataSource ds;
 
+
+    /**
+     * Initializes the application context by setting up the database connection pool and
+     * registering all DAO instances as servlet context attributes.
+     *
+     * @param sce the ServletContextEvent containing the ServletContext to be initialized
+     */
     public void contextInitialized(ServletContextEvent sce) {
         ds = new BasicDataSource();
         ds.setUrl("jdbc:mysql://localhost:3306/ja_project_db");
@@ -38,6 +53,12 @@ public class ContextListener implements ServletContextListener {
         sce.getServletContext().setAttribute(Constants.ContextAttributes.QUESTIONS_DAO, new QuestionDao(ds));
     }
 
+
+    /**
+     * Cleans up the application context by closing the database connection pool.
+     *
+     * @param sce the ServletContextEvent containing the ServletContext to be destroyed
+     */
     public void contextDestroyed(ServletContextEvent sce) {
         try {
             ds.close();

@@ -6,12 +6,12 @@
 <%@ page import="org.ja.model.quiz.question.Question" %>
 <%@ page import="org.ja.model.quiz.question.PictureResponseQuestion" %>
 <%@ page import="org.ja.dao.AnswersDao" %>
-<%@ page import="org.ja.model.OtherObjects.Answer" %>
+<%@ page import="org.ja.model.data.Answer" %>
 <%@ page import="java.lang.reflect.Array" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
-<%@ page import="org.ja.model.OtherObjects.Match" %><%--
+<%@ page import="org.ja.model.data.Match" %><%--
   Created by IntelliJ IDEA.
   User: lizamarsagishvili
   Date: 04.07.25

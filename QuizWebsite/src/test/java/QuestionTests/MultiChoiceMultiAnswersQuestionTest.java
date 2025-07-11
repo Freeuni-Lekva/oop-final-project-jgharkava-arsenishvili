@@ -1,6 +1,6 @@
 package QuestionTests;
 
-import org.ja.model.OtherObjects.Answer;
+import org.ja.model.data.Answer;
 import org.ja.model.quiz.question.FillInTheBlankQuestion;
 import org.ja.model.quiz.question.MultiChoiceMultiAnswersQuestion;
 import org.ja.model.quiz.response.Response;
@@ -11,6 +11,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
+/**
+ * Unit tests for the {@link MultiChoiceMultiAnswersQuestion} class.
+ */
 public class MultiChoiceMultiAnswersQuestionTest {
 
     @Test
@@ -21,7 +25,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
                 3, Constants.OrderTypes.ORDERED);
 
         List<Answer> answers =  List.of(new Answer("Nigeria"),
-                new Answer("Egypt"), new Answer("South Africa/RSA"));
+                new Answer("Egypt"), new Answer("South Africa¶RSA"));
         Response response = new Response();
         response.addAnswer("egypt");
         response.addAnswer("nigeria");
@@ -38,7 +42,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
                 3, Constants.OrderTypes.ORDERED);
 
         List<Answer> answers =  List.of(new Answer("Nigeria"),
-                new Answer("Egypt"), new Answer("South Africa/RSA"));
+                new Answer("Egypt"), new Answer("South Africa¶RSA"));
         Response response = new Response();
         response.addAnswer("egypt");
         response.addAnswer("nigeria");
@@ -56,7 +60,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
                 3, Constants.OrderTypes.ORDERED);
 
         List<Answer> answers =  List.of(new Answer("Nigeria"),
-                new Answer("Egypt"), new Answer("South Africa/RSA"));
+                new Answer("Egypt"), new Answer("South Africa¶RSA"));
         Response response = new Response();
         response.addAnswer("egypt");
         response.addAnswer("nigeria");
@@ -73,7 +77,7 @@ public class MultiChoiceMultiAnswersQuestionTest {
                 3, Constants.OrderTypes.ORDERED);
 
         List<Answer> answers =  List.of(new Answer("Nigeria"),
-                new Answer("Egypt"), new Answer("South Africa/RSA"));
+                new Answer("Egypt"), new Answer("South Africa¶RSA"));
         Response response = new Response();
         response.addAnswer("egypt");
         response.addAnswer("brazil");

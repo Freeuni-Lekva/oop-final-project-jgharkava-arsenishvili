@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.Filters.Filter;
+import org.ja.model.filters.Filter;
 import org.ja.model.quiz.Quiz;
 
 import java.sql.Connection;

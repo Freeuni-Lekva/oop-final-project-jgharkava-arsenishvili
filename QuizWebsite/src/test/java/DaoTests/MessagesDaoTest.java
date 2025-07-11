@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.*;
+import org.ja.model.data.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.sql.Timestamp;

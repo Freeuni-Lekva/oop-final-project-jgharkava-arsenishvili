@@ -1,6 +1,6 @@
 <%@ page import="org.ja.utils.Constants" %>
 <%@ page import="org.ja.dao.ChallengesDao" %>
-<%@ page import="org.ja.model.OtherObjects.Challenge" %>
+<%@ page import="org.ja.model.data.Challenge" %>
 <%@ page import="org.ja.dao.QuizzesDao" %>
 <%@ page import="org.ja.dao.UsersDao" %>
 <%@ page import="java.util.List" %><%--

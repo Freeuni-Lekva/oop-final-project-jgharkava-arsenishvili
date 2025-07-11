@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.OtherObjects.UserAchievement;
+import org.ja.model.data.UserAchievement;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

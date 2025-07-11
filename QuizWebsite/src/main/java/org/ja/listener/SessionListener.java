@@ -1,32 +1,41 @@
 package org.ja.listener;
 
 import org.ja.dao.MessageDao;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.Match;
-import org.ja.model.quiz.question.Question;
-import org.ja.model.user.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+
+/**
+ * Session listener that initializes and cleans up session-specific resources.
+ */
 @WebListener
 public class SessionListener implements HttpSessionListener {;
+
+    /**
+     * Called when a new HTTP session is created.
+     * Initializes a list to track message IDs that should be deleted when the session ends.
+     *
+     * @param se the HttpSessionEvent containing the newly created session
+     */
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        System.out.println("session initialized");
-
         List<Long> messagesToDelete = new ArrayList<>();
         se.getSession().setAttribute(Constants.SessionAttributes.MESSAGES_TO_DELETE, messagesToDelete);
     }
 
+
+    /**
+     * Called when an HTTP session is destroyed.
+     * Retrieves and deletes any messages that were marked for deletion during the session.
+     *
+     * @param se the HttpSessionEvent containing the session being destroyed
+     */
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         HttpSession session = se.getSession();

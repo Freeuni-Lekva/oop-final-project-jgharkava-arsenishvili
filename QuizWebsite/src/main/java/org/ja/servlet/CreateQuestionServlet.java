@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Answer;
+import org.ja.model.data.Match;
 import org.ja.model.quiz.question.*;
 import org.ja.utils.Constants;
 
@@ -14,6 +14,31 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+
+/**
+ * Servlet responsible for handling creation of various question types
+ * during quiz creation workflow.
+ *
+ * <p>Supports GET requests by redirecting to the question creation JSP page,
+ * and POST requests to process submitted question data and store it in
+ * the user's session.</p>
+ *
+ * <p>The servlet supports multiple question types:
+ * <ul>
+ *   <li>Response Question</li>
+ *   <li>Picture Response Question</li>
+ *   <li>Fill in the Blank Question</li>
+ *   <li>Multiple Choice Question</li>
+ *   <li>Multi-Choice Multi-Answer Question</li>
+ *   <li>Multi-Answer Question</li>
+ *   <li>Matching Question</li>
+ * </ul>
+ *
+ * <p>Question data and their associated answers or matches are stored
+ * in session attributes {@code QUESTIONS} and {@code MATCHES} respectively,
+ * keyed by the created Question objects.</p>
+ */
 @WebServlet("/create-question")
 public class CreateQuestionServlet extends HttpServlet {
     private String questionText;
@@ -25,11 +50,30 @@ public class CreateQuestionServlet extends HttpServlet {
     private Map<Question, List<Match>> questionMatchMap;
     private HttpServletRequest request;
 
+
+    /**
+     * Redirects GET requests to the question creation page.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws IOException if sending the redirect fails
+     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendRedirect("create-question.jsp");
     }
 
+
+    /**
+     * Handles POST requests to create a question of a specific type.
+     * Parses parameters from the request, constructs the appropriate Question
+     * subtype, prepares associated Answer or Match objects, and stores
+     * them in the session.
+     *
+     * @param request  the HttpServletRequest containing question form data
+     * @param response the HttpServletResponse to send redirects or errors
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         this.request = request;
@@ -73,6 +117,14 @@ public class CreateQuestionServlet extends HttpServlet {
         response.sendRedirect("create-question.jsp");
     }
 
+
+    // --- Helper Methods ---
+
+
+    /**
+     * Handles creation of a ResponseQuestion.
+     * Collects and joins answers with '¶' delimiter.
+     */
     private void handleResponseQuestion() {
         question = new ResponseQuestion(questionText);
 
@@ -83,6 +135,11 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
 
+
+    /**
+     * Handles creation of a PictureResponseQuestion.
+     * Collects and joins answers with '¶' delimiter.
+     */
     private void handlePictureQuestion() {
         question = new PictureResponseQuestion(imageUrl, questionText);
 
@@ -93,6 +150,12 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
 
+
+
+    /**
+     * Handles creation of a FillInTheBlankQuestion.
+     * Adjusts blanks and joins answers with '¶' delimiter.
+     */
     private void handleFillInTheBlankQuestion() {
         question = new FillInTheBlankQuestion(questionText.replace("_____", "_"));
 
@@ -103,6 +166,12 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, List.of(new Answer(joinedAnswers)));
     }
 
+
+
+    /**
+     * Handles creation of a MultipleChoiceQuestion.
+     * Collects answers along with boolean flags for correctness.
+     */
     private void handleMultipleChoiceQuestion() {
         question = new MultipleChoiceQuestion(questionText);
         isCorrectValues = request.getParameterValues("isCorrect");
@@ -118,6 +187,12 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, answerList);
     }
 
+
+
+    /**
+     * Handles creation of a MultiChoiceMultiAnswersQuestion.
+     * Counts how many correct answers exist and creates question accordingly.
+     */
     private void handleMultiChoiceMultiAnswerQuestion() {
         isCorrectValues = request.getParameterValues("isCorrect");
 
@@ -137,6 +212,12 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, answerList);
     }
 
+
+
+    /**
+     * Handles creation of a MultiAnswerQuestion.
+     * Respects order if specified and collects grouped answers/options.
+     */
     private void handleMultiAnswerQuestion(){
         String isOrdered = request.getParameter("isOrdered");
 
@@ -169,6 +250,11 @@ public class CreateQuestionServlet extends HttpServlet {
         questionAnswerMap.put(question, answerList);
     }
 
+
+    /**
+     * Handles creation of a MatchingQuestion.
+     * Collects pairs of matches from left and right sides with mapping.
+     */
     private void handleMatchingQuestion(){
         Map<String, String[]> paramNames = request.getParameterMap();
 

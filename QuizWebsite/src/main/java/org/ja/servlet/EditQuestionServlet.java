@@ -3,12 +3,10 @@ package org.ja.servlet;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import netscape.javascript.JSObject;
 import org.ja.dao.AnswersDao;
 import org.ja.dao.MatchesDao;
 import org.ja.dao.QuestionDao;
-import org.ja.dao.QuizzesDao;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Match;
 import org.ja.utils.Constants;
 
 import javax.servlet.ServletException;
@@ -19,8 +17,33 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+
+/**
+ * Servlet to handle editing quiz questions and their related data via AJAX JSON requests.
+ *
+ * <p>The GET method forwards to the question editing JSP page, passing quizId as a parameter.</p>
+ *
+ * <p>The POST method accepts JSON input specifying various actions such as:
+ * updating question text or image,
+ * deleting questions,
+ * updating or removing answer options,
+ * setting correct choices,
+ * manipulating match pairs, etc.
+ *
+ * After processing the requested action, the servlet responds with JSON indicating success or failure.</p>
+ */
 @WebServlet("/edit-question")
 public class EditQuestionServlet extends HttpServlet {
+
+
+    /**
+     * Handles GET requests by forwarding to the question editing page.
+     *
+     * @param request  HttpServletRequest containing the quiz ID parameter.
+     * @param response HttpServletResponse used to forward the request.
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long quizId = Long.valueOf(request.getParameter(Constants.RequestParameters.QUIZ_ID));
@@ -29,6 +52,15 @@ public class EditQuestionServlet extends HttpServlet {
         request.getRequestDispatcher("/edit-question.jsp").forward(request, response);
     }
 
+
+    /**
+     * Handles POST requests with JSON payloads specifying actions to edit questions,
+     * answers, and matches.
+     *
+     * @param request  HttpServletRequest containing JSON data specifying the edit action.
+     * @param response HttpServletResponse used to send back JSON success/failure status.
+     * @throws IOException if an input or output error occurs during request processing.
+     */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuestionDao questionDao = (QuestionDao) getServletContext().getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);

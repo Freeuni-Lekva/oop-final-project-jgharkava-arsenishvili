@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.*;
-import org.ja.model.OtherObjects.QuizTag;
+import org.ja.model.data.QuizTag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;

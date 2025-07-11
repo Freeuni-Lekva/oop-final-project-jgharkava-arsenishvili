@@ -16,8 +16,38 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * Servlet that initiates a quiz session in practice mode.
+ * <p>
+ * It fetches the quiz and its questions from the database, optionally randomizes the question order,
+ * initializes the user's mastery map (tracking attempts left per question),
+ * and sets up initial session attributes required for practicing the quiz.
+ * Finally, it forwards the user to the first question page.
+ * </p>
+ */
 @WebServlet("/practice-quiz")
 public class StartPracticeServlet extends HttpServlet {
+
+    /**
+     * Handles POST requests to start practicing a quiz.
+     * <p>
+     * Steps performed:
+     * <ul>
+     *   <li>Retrieves the quiz by ID from the database.</li>
+     *   <li>Retrieves all questions for the quiz.</li>
+     *   <li>Randomizes question order if the quiz is set to "randomized".</li>
+     *   <li>Initializes a mastery map assigning 3 attempts per question.</li>
+     *   <li>Sets up session attributes for grades, responses, quiz, questions, mastery map,
+     *       quiz mode (practice), and the current question index.</li>
+     *   <li>Forwards to the first question display page (single-question-page.jsp).</li>
+     * </ul>
+     *
+     * @param req  the HttpServletRequest containing the quiz ID parameter
+     * @param resp the HttpServletResponse used to forward to the quiz question page
+     * @throws ServletException if a servlet error occurs during forwarding
+     * @throws IOException      if an I/O error occurs during forwarding
+     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         QuizzesDao quizzesDao = (QuizzesDao) getServletContext().getAttribute(Constants.ContextAttributes.QUIZZES_DAO);

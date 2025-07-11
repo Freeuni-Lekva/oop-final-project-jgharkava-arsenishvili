@@ -1,7 +1,7 @@
 package DaoTests;
 
 import org.ja.dao.QuizzesDao;
-import org.ja.model.Filters.Filter;
+import org.ja.model.filters.Filter;
 import org.ja.model.quiz.Quiz;
 import org.ja.utils.Constants;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,7 @@
 package org.ja.dao;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.ja.model.OtherObjects.Challenge;
+import org.ja.model.data.Challenge;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

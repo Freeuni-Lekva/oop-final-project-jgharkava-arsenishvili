@@ -1,11 +1,11 @@
 package org.ja.servlet;
 
-import org.ja.model.CategoriesAndTags.Tag;
-import org.ja.model.OtherObjects.Answer;
-import org.ja.model.OtherObjects.Match;
+import org.ja.model.data.Tag;
+import org.ja.model.data.Answer;
+import org.ja.model.data.Match;
 import org.ja.model.quiz.Quiz;
 import org.ja.model.quiz.question.Question;
-import org.ja.model.user.User;
+import org.ja.model.data.User;
 import org.ja.utils.Constants;
 
 import javax.servlet.annotation.WebServlet;
@@ -18,9 +18,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Servlet that handles creation of a new quiz.
+ *
+ * <p>Processes quiz data submitted by a user from a form,
+ * initializes the Quiz object, handles quiz tags and categories,
+ * and sets up session attributes for subsequent question creation.</p>
+ *
+ * <p>After processing, redirects the user to the question creation page.</p>
+ */
 @WebServlet("/create-quiz")
 public class CreateQuizServlet extends HttpServlet {
 
+
+    /**
+     * Handles POST request to create a new quiz.
+     *
+     * <p>Extracts quiz information such as title, description, category, tags,
+     * time limit, and quiz behavior settings from the request parameters.
+     * Creates a Quiz object and stores it in the session.</p>
+     *
+     * <p>If any new tag is specified, stores it in the session for later creation.</p>
+     *
+     * <p>Initializes session attributes to manage questions and matches
+     * related to the quiz creation process.</p>
+     *
+     * @param request  the HttpServletRequest containing form data for quiz creation
+     * @param response the HttpServletResponse used to redirect the client
+     * @throws IOException if an input or output error occurs during redirection
+     */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User user = (User) request.getSession().getAttribute(Constants.SessionAttributes.USER);
