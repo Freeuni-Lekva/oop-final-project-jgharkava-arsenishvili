@@ -99,7 +99,7 @@
                 for(int j = 0; j < answers.size(); j++) {
                     Answer answer = answers.get(j);%>
 
-                    <input type="radio" name="response_<%=i+1%>_1" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><%
+                    <input type="radio" name="response_<%=i+1%>_1" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><br><%
                 }
             }
 

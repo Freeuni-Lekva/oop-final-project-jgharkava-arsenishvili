@@ -75,110 +75,108 @@
 <%
     }
 %>
+<div class="question-container">
+    <form id="question-form" action="grade-single-question" method="post">
+        <%
+            ///  RESPONSE QUESTION
+            if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION)) {%>
+        <h3><%=question.getQuestionText()%></h3>
+        <input type="text" name="response_1_1"><br><br><%
 
-<form id="question-form" action="grade-single-question" method="post">
-    <%
-        ///  RESPONSE QUESTION
-        if (type.equals(Constants.QuestionTypes.RESPONSE_QUESTION)) {%>
-            <h3><%=question.getQuestionText()%></h3>
-            <input type="text" name="response_1_1"><br><br><%
+    }
 
+    /// FILL_IN_THE_BLACK QUESTION
+    else if (type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
+        <h3><%=question.getQuestionText().replace("_", "_____")%></h3>
+        <input type="text" name="response_1_1"><br><br><%
+    }
+
+    /// PICTURE_RESPONSE_QUESTION
+    else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
+        if (!(question.getQuestionText() == null)  && !question.getQuestionText().trim().isEmpty()) {%>
+        <h3><%=question.getQuestionText()%></h3><%
+        }%>
+
+        <img src="<%=question.getImageUrl()%>" width="300" height="200"><br>
+        <input type="text" name="response_1_1"><br><br><%
+
+    }
+
+    /// MULTI CHOICE QUESTION
+    else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
+        List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
+        Collections.shuffle(answers);%>
+
+        <h3><%=question.getQuestionText()%></h3><%
+
+        for(int j = 0; j < answers.size(); j++) {
+            Answer answer = answers.get(j);%>
+        <input type="radio" name="response_1_1" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><br><%
+        }
+    }
+
+    /// MULTI_CHOICE_MULTI_ANSWER_QUESTION
+    else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
+        List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
+        Collections.shuffle(answers);%>
+
+        <h3><%=question.getQuestionText()%></h3><%
+
+        for (int j = 0; j < answers.size(); j++) {
+            Answer answer = answers.get(j);%>
+
+        <input type="checkbox" name="response_1_<%=j+1%>" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><br><%
+        }
+    }
+
+    /// MULTI_ANSWER_QUESTION
+    else if (type.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) {%>
+        <h3><%=question.getQuestionText()%></h3><%
+
+        for (int j = 0; j < question.getNumAnswers(); j++) {%>
+        <input type="text" name="response_1_<%=j+1%>"><br><%
         }
 
-        /// FILL_IN_THE_BLACK QUESTION
-        else if (type.equals(Constants.QuestionTypes.FILL_IN_THE_BLANK_QUESTION)) {%>
-            <h3><%=question.getQuestionText().replace("_", "_____")%></h3>
-            <input type="text" name="response_1_1"><br><br><%
+    }
+
+    /// MATCHING QUESTION
+    else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
+        List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
+        ArrayList<String> leftMatches = new ArrayList<String>();
+
+        for (Match match : matches) {
+            leftMatches.add(match.getLeftMatch());
         }
 
-        /// PICTURE_RESPONSE_QUESTION
-        else if (type.equals(Constants.QuestionTypes.PICTURE_RESPONSE_QUESTION)) {
-            if (!(question.getQuestionText() == null)  && !question.getQuestionText().trim().isEmpty()) {%>
-                <h3><%=question.getQuestionText()%></h3><%
+        ArrayList<String> rightMatches = new ArrayList<String>();
+
+        for (Match match : matches) {
+            String right = match.getRightMatch();
+            if (!rightMatches.contains(right)) {
+                rightMatches.add(right);
+            }
+        }%>
+
+        <h3><%=question.getQuestionText()%></h3><%
+
+        for (String left : leftMatches) {%>
+        <label><%=left%></label>
+        <select name="response_1_<%=left%>">
+            <option value="not selected">select</option> <%
+            for (String right : rightMatches) {%>
+            <option value="<%=right%>"><%=right%></option><%
             }%>
-
-            <img src="<%=question.getImageUrl()%>" width="300" height="200"><br>
-            <input type="text" name="response_1_1"><br><br><%
-
-        }
-
-        /// MULTI CHOICE QUESTION
-        else if (type.equals(Constants.QuestionTypes.MULTIPLE_CHOICE_QUESTION)) {
-            List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
-            Collections.shuffle(answers);%>
-
-            <h3><%=question.getQuestionText()%></h3><%
-
-            for(int j = 0; j < answers.size(); j++) {
-                Answer answer = answers.get(j);%>
-
-                <input type="radio" name="response_1_1" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><%
-            }
-
-        }
-
-        /// MULTI_CHOICE_MULTI_ANSWER_QUESTION
-        else if (type.equals(Constants.QuestionTypes.MULTI_CHOICE_MULTI_ANSWER_QUESTION)) {
-            List<Answer> answers = answersDao.getQuestionAnswers(question.getQuestionId());
-            Collections.shuffle(answers);%>
-
-            <h3><%=question.getQuestionText()%></h3><%
-
-            for (int j = 0; j < answers.size(); j++) {
-                Answer answer = answers.get(j);%>
-
-                <input type="checkbox" name="response_1_<%=j+1%>" value="<%=answer.getAnswerText()%>"><%=answer.getAnswerText()%><br><%
-            }
-        }
-
-        /// MULTI_ANSWER_QUESTION
-        else if (type.equals(Constants.QuestionTypes.MULTI_ANSWER_QUESTION)) {%>
-            <h3><%=question.getQuestionText()%></h3><%
-
-            for (int j = 0; j < question.getNumAnswers(); j++) {%>
-                <input type="text" name="response_1_<%=j+1%>"><br><%
-            }
-
-        }
-
-        /// MATCHING QUESTION
-        else if (type.equals(Constants.QuestionTypes.MATCHING_QUESTION)) {
-            List<Match> matches = matchesDao.getQuestionMatches(question.getQuestionId());
-            ArrayList<String> leftMatches = new ArrayList<String>();
-
-            for (Match match : matches) {
-                leftMatches.add(match.getLeftMatch());
-            }
-
-            ArrayList<String> rightMatches = new ArrayList<String>();
-
-            for (Match match : matches) {
-                String right = match.getRightMatch();
-                if (!rightMatches.contains(right)) {
-                    rightMatches.add(right);
-                }
-            }%>
-
-            <h3><%=question.getQuestionText()%></h3><%
-
-            for (String left : leftMatches) {%>
-                <label><%=left%></label>
-                <select name="response_1_<%=left%>">
-                    <option value="not selected">select</option> <%
-                for (String right : rightMatches) {%>
-                    <option value="<%=right%>"><%=right%></option><%
-                }%>
-                </select><br><%
+        </select><br><%
             }
         }
     %>
+        <input type="submit" value="Submit Answer" class="next-button">
+        <form action="quiz-overview.jsp" method="get">
+            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
+            <button type="submit" class="exit-button">Exit Quiz</button>
+        </form>
+    </form>
+</div>
 
-    <input type="submit" value="Submit Question">
-
-</form>
-<form action="quiz-overview.jsp" method="get">
-    <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-    <button type="submit">Exit Quiz</button>
-</form>
 </body>
 </html>
