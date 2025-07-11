@@ -60,8 +60,8 @@ insert into questions(quiz_id, question, image_url, question_type, num_answers, 
 (4, 'Who wrote Pride and Prejudice?', null, 'question-response', 1, 'ordered'),
 (4, 'Which of the following are works by William Shakespeare?', null, 'multi-choice-multi-answers', 3, 'ordered'),
 (4, '“It was the best of times, it was the worst of times...” is the opening line of _ by Charles Dickens.', null, 'fill-in-the-blank', 1, 'ordered'),
-(4, 'This image symbolizes a key theme from a famous dystopian novel. What is the title of the novel?',
- 'https://media.istockphoto.com/id/981630990/vector/vintage-big-brother-watching-you-spying-eyes-surveillance-and-privacy-concept-vector.jpg?s=612x612&w=0&k=20&c=1DZlhgivizXJkWumOpfufNTBC_WcJJZ7illHZv5TB-c',
+(4,'This image depicts the legendary author of two ancient Greek epics. Who is he?',
+ 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Homer_British_Museum.jpg',
  'picture-response', 1, 'ordered');
 
 
@@ -82,13 +82,13 @@ insert into answers(question_id, answer_text, answer_order, answer_validity) val
 (7, 'Hydrogen¶H', 1, true),
 (7, 'Helium¶He', 2, true),
 (7, 'Lithium¶Li', 3, true),
-(9, 'Jane Austin¶Austin', 1, true),
+(9, 'Jane Austen¶Austen', 1, true),
 (10, 'Hamlet', 1, true),
 (10, 'Othello', 2, true),
-(10, 'The Canterbury Tales', 3, true),
+(10, 'The Canterbury Tales', 3, false),
 (10, 'Macbeth', 4, true),
-(11, 'Dickens¶Charles Dickens', 1, true),
-(12, '1984¶Nineteen Eighty-Four', 1, true);
+(11, 'A Tale of Two Cities', 1, true),
+(12, 'Homer', 1, true);
 
 
 insert into matches(question_id, left_match, right_match) values
