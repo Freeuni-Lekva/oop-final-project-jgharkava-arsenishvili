@@ -8,6 +8,15 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.ja.utils.TimeUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+  if(session.getAttribute(Constants.SessionAttributes.USER) == null) {
+    response.sendRedirect("index.jsp");
+    return;
+  }
+%>
+
+
 <%
   AnnouncementsDao announcementsDao = (AnnouncementsDao)application.getAttribute(Constants.ContextAttributes.ANNOUNCEMENTS_DAO);
   UsersDao usersDao = (UsersDao)application.getAttribute(Constants.ContextAttributes.USERS_DAO);

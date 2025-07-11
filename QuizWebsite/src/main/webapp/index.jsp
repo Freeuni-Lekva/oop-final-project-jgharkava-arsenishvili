@@ -1,4 +1,9 @@
-<%
+<%@ page import="org.ja.utils.Constants" %><%
+    if(session.getAttribute(Constants.SessionAttributes.USER) != null) {
+        response.sendRedirect("user-page.jsp");
+        return;
+    }
+
     String err = (String) request.getAttribute("error");
     if(err != null){ %>
     <div id="login-error" class="error-message"><%= err %></div>

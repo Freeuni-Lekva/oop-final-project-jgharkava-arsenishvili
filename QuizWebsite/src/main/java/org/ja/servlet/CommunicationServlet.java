@@ -66,6 +66,17 @@ public class CommunicationServlet extends HttpServlet {
             response.setContentType("text/plain");
             response.getWriter().write("OK");
         } else if("send-message".equals(action)) {
+            if(friendId != 0) {
+                String message = request.getParameter("message");
+                User recipient = usersDao.getUserById(friendId);
+
+                Message m = new Message(curUser.getId(), recipient.getId(), message);
+                messageDao.insertMessage(m);
+                response.setContentType("text/plain");
+                response.getWriter().write("OK");
+                return;
+            }
+
             String friendName = request.getParameter("recipient");
             String message = request.getParameter("message");
             User recipient = usersDao.getUserByUsername(friendName);

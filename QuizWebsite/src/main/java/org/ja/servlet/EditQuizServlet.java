@@ -64,10 +64,14 @@ public class EditQuizServlet extends HttpServlet {
                 break;
             case "placementStatus":
                 String newPlacementStatus = request.getParameter("questionPlacementStatus");
+                if(Constants.QuizQuestionPlacementTypes.ONE_PAGE.equals(newPlacementStatus))
+                    quizzesDao.updateQuizQuestionCorrectionStatus(quizId, Constants.QuizQuestionCorrectionTypes.FINAL_CORRECTION);
                 quizzesDao.updateQuizQuestionPlacementStatus(quizId, newPlacementStatus);
                 break;
             case "correctionStatus":
                 String newCorrectionStatus = request.getParameter("questionCorrectionStatus");
+                if(Constants.QuizQuestionCorrectionTypes.IMMEDIATE_CORRECTION.equals(newCorrectionStatus))
+                    quizzesDao.updateQuizQuestionPlacementStatus(quizId, Constants.QuizQuestionPlacementTypes.MULTIPLE_PAGE);
                 quizzesDao.updateQuizQuestionCorrectionStatus(quizId, newCorrectionStatus);
                 break;
             default:
