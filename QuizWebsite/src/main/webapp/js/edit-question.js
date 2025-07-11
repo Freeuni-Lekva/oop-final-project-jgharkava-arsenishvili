@@ -1331,9 +1331,24 @@ function updateDeleteButtonStateMultipleChoices(choicesContainer){
 function updateDeleteButtonStateChoices(choicesContainer) {
     const choiceBlocks = choicesContainer.querySelectorAll(".choice-block");
     const deleteButtons = choicesContainer.querySelectorAll(".delete-choice-btn");
-    const shouldDisable = choiceBlocks.length <= 1;
 
-    deleteButtons.forEach(btn => btn.disabled = shouldDisable);
+    // If only one choice or fewer, disable all delete buttons
+    if (choiceBlocks.length <= 1) {
+        deleteButtons.forEach(btn => btn.disabled = true);
+    } else {
+        // Multiple choices: enable all delete buttons first, then disable marked ones
+        deleteButtons.forEach(btn => btn.disabled = false);
+
+        // Find and disable delete button for any choice marked as true
+        choiceBlocks.forEach(block => {
+            const markBtn = block.querySelector(".mark-as-true-btn");
+            const deleteBtn = block.querySelector(".delete-choice-btn");
+
+            if (markBtn.textContent.trim() === "Marked as true") {
+                deleteBtn.disabled = true;
+            }
+        });
+    }
 
     // if only one choice left, mark it as true and send info to server
     if (choiceBlocks.length === 1){
