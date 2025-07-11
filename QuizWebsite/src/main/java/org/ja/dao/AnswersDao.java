@@ -397,7 +397,7 @@ public class AnswersDao extends BaseDao{
      * @param answerId the ID of the question
      * @return the corresponding Answer object, or null if not found
      */
-    private Answer getAnswerById(long answerId){
+    public Answer getAnswerById(long answerId){
         String sql = "SELECT * FROM answers WHERE answer_id = ?";
 
         try (Connection connection = dataSource.getConnection();

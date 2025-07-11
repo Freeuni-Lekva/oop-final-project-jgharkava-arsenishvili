@@ -16,8 +16,6 @@ import java.util.List;
  * Data Access Object for managing quiz histories, participant stats, and related achievements.
  */
 public class HistoriesDao {
-    private static final Log log = LogFactory.getLog(HistoriesDao.class);
-
     private final BasicDataSource dataSource;
 
 

@@ -42,6 +42,13 @@ public class Question {
     }
 
     /**
+     * Constructs an empty Question
+     */
+    public Question() {
+
+    }
+
+    /**
      * Grades a user response against a list of correct answers.
      *
      * This base implementation only supports grading the first answer for correctness.

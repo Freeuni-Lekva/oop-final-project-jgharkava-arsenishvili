@@ -6,7 +6,7 @@ package org.ja.model.data;
  */
 public class Category {
 
-    private final String categoryName;
+    private String categoryName;
     private long categoryId;
 
     /**
@@ -31,12 +31,22 @@ public class Category {
     }
 
     /**
-     * Returns the name of the category.
+     * Gets the name of the category.
      *
      * @return the category name
      */
     public String getCategoryName() {
         return categoryName;
+    }
+
+
+    /**
+     * Sets the name of the category.
+     *
+     * @param categoryName the name to set
+     */
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     /**

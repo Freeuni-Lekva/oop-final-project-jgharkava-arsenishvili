@@ -38,6 +38,12 @@ public class User {
         this.status = status;
     }
 
+    /**
+     * Constructs am empty User.
+     *
+     */
+    public User(){}
+
     /** Returns the unique user ID. */
     public long getId() {
         return id;

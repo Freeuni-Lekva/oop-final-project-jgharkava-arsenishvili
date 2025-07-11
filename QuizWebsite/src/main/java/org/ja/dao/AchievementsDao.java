@@ -42,7 +42,7 @@ public class AchievementsDao {
             ps.setString(3, achievement.getAchievementPhoto());
 
             int rowsAffected = ps.executeUpdate();
-            if (rowsAffected == 0) return false; // No row inserted}
+            if (rowsAffected == 0) return false; // No row inserted
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()){
