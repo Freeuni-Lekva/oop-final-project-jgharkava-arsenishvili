@@ -29,11 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
             })
                 .then(res => res.json())
                 .then(json => {
-                    if (json.success) {
-                        alert("Main answer saved.");
-                    } else {
+                    if (!json.success)
                         alert("Failed to save main answer.");
-                    }
+
                 })
                 .catch(err => {
                     alert("Error while saving main answer.");
@@ -95,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(json => {
                     if (json.success) {
                         block.dataset.optionText = newText;
-                        alert("Saved!");
                     } else {
                         alert("Failed to save.");
                     }
@@ -171,10 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(info)
-            }).then(res => res.json())
-                .then(json => {
-                    alert("Question Text Saved!")
-                })
+            })
                 .catch(err => {
                     console.error("Error saving question", err);
                     alert("Error saving question");
@@ -235,11 +229,9 @@ document.addEventListener("DOMContentLoaded", () => {
             })
                 .then(res => res.json())
                 .then(json => {
-                    if (json.success) {
-                        alert("Question text saved!");
-                    } else {
+                    if (!json.success)
                         alert("Failed to save question text.");
-                    }
+
                 });
         }
     });
@@ -469,11 +461,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                     .then(res => res.json())
                     .then(json => {
-                        if (json.success) {
-                            console.log("Right match updated successfully.");
-                        } else {
+                        if (!json.success)
                             alert("Failed to update right match.");
-                        }
                     })
                     .catch(err => {
                         console.error(err);
@@ -543,7 +532,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(res => res.json())
                     .then(json => {
                         if (json.success) {
-                            alert(isNew ? "Left option created successfully." : "Left option updated successfully.");
                             if (isNew) {
                                 group.dataset.matchId = json.matchId; // Save new matchId on group
                             }
@@ -579,8 +567,6 @@ document.addEventListener("DOMContentLoaded", () => {
                       .then(json => {
                           if (!json.success) {
                               alert("Failed to delete left option from database.");
-                          } else {
-                              alert("Deleted left option from database");
                           }
                       }).catch(() => alert("Error deleting left option from database."));
                 }
@@ -666,8 +652,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 Promise.all(updates).then(results => {
                     if (results.every(r => r.success)) {
-                        alert("Right option updated and linked matches updated successfully.");
-
                         updateDropdowns(originalValue, newRightText);
                         originalValue = newRightText;
                     } else {
@@ -907,7 +891,6 @@ function setupOptionBlockListeners(block) {
             .then(json => {
                 if (json.success) {
                     block.dataset.optionText = newText;
-                    alert("Option saved.");
                 } else {
                     alert("Failed to save.");
                 }
@@ -1001,11 +984,9 @@ function setupMultipleChoiceContainer(container){
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(response => {
-                if (response.ok){
-                    alert("Updated choice text");
-                } else {
+                if (!response.ok)
                     alert("Error updating choice text");
-                }
+
             }).catch(err => {
                 console.error("Error updating choice", err);
             })
@@ -1114,11 +1095,9 @@ function setupChoiceContainer(container){
                     })
                 }).then(res => res.json())
                     .then(json => {
-                        if (json.success) {
-                            alert("Choice marked as true");
-                        } else {
+                        if (!json.success)
                             alert("error marking choice as true");
-                        }
+
                     });
             }
         } else if (event.target.classList.contains("save-choice-btn")){
@@ -1137,11 +1116,9 @@ function setupChoiceContainer(container){
                 })
             }).then(res => res.json())
                 .then(json => {
-                    if (json.success) {
-                        alert("Choice text updated successfully.");
-                    } else {
+                    if (!json.success)
                         alert("Failed to update choice text.");
-                    }
+
                 }).catch(err => {
                 alert("Error saving choice text.");
                 console.error(err);
@@ -1223,7 +1200,6 @@ function createOptionBlock(answerId = null, optionText = "") {
             .then(json => {
                 if (json.success) {
                     block.dataset.optionText = newText;
-                    alert("Saved!");
                 } else {
                     alert("Failed to save.");
                 }

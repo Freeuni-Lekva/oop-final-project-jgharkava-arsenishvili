@@ -3,7 +3,6 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.ja.dao.AnswersDao" %>
 <%@ page import="org.ja.model.data.Answer" %>
-<%@ page import="java.util.Collections" %>
 <%@ page import="org.ja.model.data.Match" %>
 <%@ page import="org.ja.dao.MatchesDao" %>
 <%@ page import="org.ja.model.quiz.Quiz" %>
@@ -169,12 +168,16 @@
         }
     %>
         <input type="submit" value="Submit Answer" class="next-button">
-        <form action="quiz-overview.jsp" method="get">
-            <input type="hidden" name="<%=Constants.RequestParameters.QUIZ_ID%>" value="<%=quiz.getId()%>">
-            <button type="submit" class="exit-button">Exit Quiz</button>
-        </form>
+
+        <button type="button" class="exit-button" onclick="exitQuiz()">Exit Quiz</button>
     </form>
 </div>
+
+<script>
+    function exitQuiz() {
+        window.location.href = 'quiz-overview.jsp?<%=Constants.RequestParameters.QUIZ_ID%>=<%=quiz.getId()%>';
+    }
+</script>
 
 </body>
 </html>

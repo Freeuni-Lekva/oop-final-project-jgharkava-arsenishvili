@@ -250,3 +250,20 @@ input[type="submit"]:active {
     transform: translateX(8px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
+
+.back-btn {
+    background: #8bb6ed;
+    color: white;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: 1px solid #ccc;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.back-btn:hover {
+    background: #739cc8;
+}

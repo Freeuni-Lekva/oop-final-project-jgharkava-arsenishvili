@@ -176,7 +176,7 @@ public class Answer {
      */
     public boolean containsAnswer(String answer) {
         return Arrays.stream(answerText.split("¶"))
-                .anyMatch(part -> part.trim().equalsIgnoreCase(answer.trim()));
+                .anyMatch(part -> (!part.trim().isEmpty() && part.equalsIgnoreCase(answer.trim())));
     }
 
     /**

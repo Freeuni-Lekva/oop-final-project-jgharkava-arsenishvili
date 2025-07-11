@@ -26,7 +26,6 @@ public class FillInTheBlankQuestionTest {
         response.addAnswer("0");
 
         assertEquals(List.of(1), question.gradeResponse(List.of(answer), response));
-
     }
 
     @Test

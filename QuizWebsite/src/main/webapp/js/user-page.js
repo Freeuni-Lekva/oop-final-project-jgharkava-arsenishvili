@@ -68,23 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
     autoFadeOut("login-error");   // Login
 });
 
-function updateChallengeCount() {
-    const countSpan = document.getElementById("challenge-count");
-    const pane = document.querySelector(".scrollable-pane");
-    const remaining = document.querySelectorAll(".challenge-item").length;
-
-    if (countSpan) countSpan.textContent = remaining;
-
-    if (remaining === 0) {
-        const wrapper = document.getElementById("challenge-count-wrapper");
-        if (wrapper) {
-            wrapper.innerHTML = '<p class="text-small">No new challenges.</p>';
-        }
-        if (pane) pane.remove();
-    }
-}
-
-
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".accept-button, .delete-button").forEach(button => {
         button.addEventListener("click", (e) => {
@@ -136,9 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("messageModal");
@@ -222,59 +202,6 @@ function sendMessage() {
         status.style.color = "red";
     });
 }
-
-
-//for going back to the page
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Load initial data
-    refreshUserData();
-
-    // Handle back button cache
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            refreshUserData();
-        }
-    });
-
-    // Handle tab focus
-    window.addEventListener('focus', function() {
-        refreshUserData();
-    });
-
-    function refreshUserData() {
-        const userId = getUserIdFromURL(); // You'll need to implement this
-
-        fetch(`/api/users/${userId}`)
-            .then(response => response.json())
-            .then(data => updateUserInterface(data))
-            .catch(error => console.error('Error:', error));
-    }
-
-    function updateUserInterface(userData) {
-        // Update all the elements that might have changed
-        const elements = {
-            'user-name': userData.name,
-            'user-status': userData.status,
-            'user-email': userData.email,
-            'last-login': userData.lastLogin
-        };
-
-        Object.keys(elements).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = elements[id];
-            }
-        });
-    }
-
-    function getUserIdFromURL() {
-        // Extract user ID from URL like /users/123
-        const path = window.location.pathname;
-        const matches = path.match(/\/users\/(\d+)/);
-        return matches ? matches[1] : null;
-    }
-});
 
 document.getElementById("new-photo-form").addEventListener("submit", function(e) {
     const photo = document.getElementById("newPhoto");

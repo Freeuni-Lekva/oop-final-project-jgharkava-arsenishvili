@@ -188,9 +188,6 @@ public class GradeSingleQuestionServlet extends HttpServlet {
         long startTime = (long) session.getAttribute("start-time");
         long currTime = System.currentTimeMillis();
 
-        /// manage time limit
-        // TODO better conditioning
-
         boolean isTimedOut = quiz.getTimeInMinutes() * 60L <= (currTime - startTime) / 1000;
         boolean isLastQuestion = index + 1 == questions.size();
         boolean isImmediateCorrection = quiz.getQuestionCorrection().equals("immediate-correction");

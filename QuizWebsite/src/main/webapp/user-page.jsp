@@ -11,7 +11,7 @@
 
 <%
   if(session.getAttribute(Constants.SessionAttributes.USER) == null) {
-    response.sendRedirect("index.jsp");
+    response.sendRedirect("/index.jsp");
     return;
   }
 %>

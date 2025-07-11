@@ -26,7 +26,6 @@ const durationInput = document.getElementById("quizDuration");
 const otherTagInput = document.getElementById("otherTagInput");
 const quizDescriptionInput = document.getElementById("quizDescription");
 
-/*TODO change this*/
 form.addEventListener("submit", async function (e) {
     const quizTitle = quizTitleInput.value.trim();
     const duration = durationInput.value.trim();

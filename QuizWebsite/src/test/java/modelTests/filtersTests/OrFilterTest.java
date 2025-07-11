@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,14 +17,24 @@ public class OrFilterTest {
     private OrFilter orFilter;
     private OrderFilter orderFilter;
     private QuizNameFilter quizNameFilter;
-    private UserNameFilter userNameFilter;
+    private Filter userNameFilter;
 
     @BeforeEach
     public void setUp() {
         orFilter = new OrFilter();
         orderFilter = new OrderFilter("price", OrderFilter.DECREASING);
         quizNameFilter = new QuizNameFilter("MathQuiz");
-        userNameFilter = new UserNameFilter("Liza");
+        userNameFilter = new Filter() {
+            @Override
+            public String buildWhereClause() {
+                return "username like ?";
+            }
+
+            @Override
+            public List<Object> getParameters() {
+                return List.of("Liza%");
+            }
+        };
     }
 
     @Test
