@@ -442,7 +442,7 @@ public class QuizzesDao {
      * @return a list of quizzes created by the user
      */
     public List<Quiz> getQuizzesByCreatorId(long id) {
-        String sql = "SELECT * FROM quizzes WHERE creator_id = ?";
+        String sql = "SELECT * FROM quizzes WHERE creator_id = ? ORDER BY creation_date desc";
         List<Quiz> quizzes = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();

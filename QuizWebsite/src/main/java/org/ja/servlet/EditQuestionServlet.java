@@ -21,7 +21,7 @@ import java.io.IOException;
 
 @WebServlet("/edit-question")
 public class EditQuestionServlet extends HttpServlet {
-
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long quizId = Long.valueOf(request.getParameter(Constants.RequestParameters.QUIZ_ID));
 
@@ -29,6 +29,7 @@ public class EditQuestionServlet extends HttpServlet {
         request.getRequestDispatcher("/edit-question.jsp").forward(request, response);
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         QuestionDao questionDao = (QuestionDao) getServletContext().getAttribute(Constants.ContextAttributes.QUESTIONS_DAO);
         AnswersDao answersDao = (AnswersDao) getServletContext().getAttribute(Constants.ContextAttributes.ANSWERS_DAO);
