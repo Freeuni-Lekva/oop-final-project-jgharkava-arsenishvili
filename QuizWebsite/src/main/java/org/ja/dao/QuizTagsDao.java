@@ -32,7 +32,7 @@ public class QuizTagsDao {
 
     /**
      * Inserts a new quiz-tag mapping into the {@code quiz_tag} table.
-     * <p>
+     *
      * If the (quiz_id, tag_id) combination already exists (i.e., primary key conflict),
      * a {@code RuntimeException} is thrown.
      *

@@ -143,6 +143,7 @@ public class FriendShipsDao {
      * Retrieves all accepted friends of a user.
      *
      * @param userId the user ID
+     * @param limit maximum number of queries to return
      * @return a list of friendships (with status 'friends')
      */
     public List<Friendship> getFriends(long userId, int limit) {
@@ -176,6 +177,7 @@ public class FriendShipsDao {
      * Retrieves all pending friend requests where the given user is the recipient.
      *
      * @param userId the recipient user ID
+     * @param limit maximum number of queries to return
      * @return list of pending friendships
      */
     public List<Friendship> getFriendRequests(long userId, int limit) {

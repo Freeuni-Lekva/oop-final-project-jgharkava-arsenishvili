@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object (DAO) class for managing quiz-related operations in the database.
+ * Data Access Object for managing quiz-related operations in the database.
  */
 public class QuizzesDao {
     private final BasicDataSource dataSource;

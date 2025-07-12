@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO class for performing operations on the 'tags' table.
+ * Data Access Object for performing operations on the 'tags' table.
  */
 public class TagsDao {
     private final BasicDataSource dataSource;
