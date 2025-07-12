@@ -53,7 +53,7 @@ public class StartQuizServlet extends HttpServlet {
      *   <li>Forwards to either the single-question page or the all-questions page
      *       depending on the quiz's question placement setting.</li>
      * </ul>
-     * </p>
+     *
      *
      * @param req  the HttpServletRequest containing the quiz ID parameter
      * @param resp the HttpServletResponse used to forward to the quiz page

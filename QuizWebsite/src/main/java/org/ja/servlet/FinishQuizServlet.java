@@ -28,13 +28,13 @@ import java.io.IOException;
  * <p>
  * Expected session attributes:
  * <ul>
- *   <li>QUESTIONS: Map<Question, List<Answer>> — all created questions and their answers</li>
- *   <li>MATCHES: Map<Question, List<Match>> — all matching questions and their pairs</li>
+ *   <li>QUESTIONS: Map&lt;Question, List&lt;Answer&gt;&gt; — all created questions and their answers</li>
+ *   <li>MATCHES: Map&lt;Question, List&lt;Match&gt;&gt; — all matching questions and their pairs</li>
  *   <li>QUIZ: Quiz — the quiz object being created</li>
- *   <li>TAGS_TO_ADD: List<Long> — IDs of tags associated with the quiz</li>
+ *   <li>TAGS_TO_ADD: List&lt;Long&gt; — IDs of tags associated with the quiz</li>
  *   <li>TAG_TO_CREATE: Tag — a new tag to create and associate with the quiz</li>
  * </ul>
- * </p>
+ *
  */
 @WebServlet("/finish-quiz")
 public class FinishQuizServlet extends HttpServlet {
@@ -51,7 +51,7 @@ public class FinishQuizServlet extends HttpServlet {
      *   <li>Resets the related session attributes</li>
      *   <li>Forwards to the quiz overview page showing the newly created quiz</li>
      * </ul>
-     * </p>
+     *
      *
      * @param request  the HttpServletRequest containing session and request parameters
      * @param response the HttpServletResponse to forward or redirect the client

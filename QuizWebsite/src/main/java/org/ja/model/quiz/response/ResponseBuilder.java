@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Utility class for constructing a list of Response objects from HTTP request parameters.
- * The parameters are expected to follow a naming pattern like "response_<questionIndex>_<suffix>".
+ * The parameters are expected to follow a naming pattern like "response_{questionIndex}_{suffix}".
  */
 public class ResponseBuilder {
 

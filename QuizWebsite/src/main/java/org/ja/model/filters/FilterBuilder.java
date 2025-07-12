@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  *   <li>TAG - combined with OR logic</li>
  *   <li>ORDER - combined with OR logic, ignoring placeholder values</li>
  * </ul>
- * </p>
+ *
  */
 public class FilterBuilder {
     private static final String[] PARAMETER_NAMES = {

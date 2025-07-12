@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object (DAO) for managing quiz ratings.
+ * Data Access Object for managing quiz ratings.
  * Handles inserting, updating, and retrieving quiz ratings,
  * and updates the average rating of a quiz after any modification.
  */

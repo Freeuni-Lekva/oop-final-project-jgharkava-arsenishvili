@@ -88,7 +88,7 @@ public abstract class BaseDao {
 
     /**
      * Retrieves the question ID associated with a given answer ID.
-     * If no such answer exists, it throws a {@link RuntimeException}.</p>
+     * If no such answer exists, it throws a {@link RuntimeException}.
      *
      * @param answerId the ID of the answer whose question ID is to be retrieved
      * @return the ID of the question to which the answer belongs
@@ -117,7 +117,7 @@ public abstract class BaseDao {
 
     /**
      * Retrieves the quiz ID associated with a given question ID.
-     * If no such question exists, it throws a {@link RuntimeException}.</p>
+     * If no such question exists, it throws a {@link RuntimeException}.
      *
      * @param questionId the ID of the question whose quiz ID is to be retrieved
      * @return the ID of the quiz to which the question belongs

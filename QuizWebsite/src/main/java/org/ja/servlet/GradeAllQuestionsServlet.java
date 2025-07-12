@@ -57,7 +57,7 @@ public class GradeAllQuestionsServlet extends HttpServlet {
      *   <li>Store grading results in session attributes</li>
      *   <li>Redirect to the quiz results page</li>
      * </ol>
-     * </p>
+     *
      *
      * @param req  HttpServletRequest containing user responses and session data
      * @param resp HttpServletResponse used to redirect to the quiz result page
