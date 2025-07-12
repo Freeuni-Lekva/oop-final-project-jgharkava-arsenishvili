@@ -99,7 +99,7 @@ Here is a preview of the basic user page
 - **Friend Requests**: Accept or decline connection requests.
 - **Quiz Challenges**: View, accept, or decline challenges from friends. Accepting a challenge redirects the user to the quiz.
 
-![Basic User Page](assets/img_1.png)
+<img src="assets/img_1.png" alt="Basic User Page" style="max-width:600px; width:100%; height:auto;" />
 
 The user dashboard offers quick access to key actions and information:
 
@@ -112,11 +112,11 @@ The user dashboard offers quick access to key actions and information:
   - View your own quiz history, also sorted by creation or completion date.
 - View and send **messages**
 
-![Dashboard](assets/img_2.png)
+<img src="assets/img_2.png" alt="User Dashboard" style="max-width:600px; width:100%; height:auto;" />
 
 If you're an administrator, you can switch to **Administrator Mode** to access admin-only features and tools.
 
-![Admin Mode](assets/img_3.png)
+<img src="assets/img_3.png" alt="Administrator Mode" style="max-width:600px; width:100%; height:auto;" />
 
 ### 👤 Visiting a User's Page
 
@@ -127,7 +127,7 @@ When viewing another user's profile, you can:
 
 _(available only if you're friends)._
 
-![User Profile](assets/img_4.png)
+<img src="assets/img_4.png" alt="Visiting User Profile" style="max-width:600px; width:100%; height:auto;" />
 
 ### 📜 User's Full Quiz History
 
@@ -139,7 +139,7 @@ The quiz history page provides a detailed record of all quizzes a user has compl
   - Shows **time taken** to complete each quiz
   - Includes the **date of completion**
 
-![User History](assets/img_5.png)
+<img src="assets/img_5.png" alt="User Quiz History" style="max-width:600px; width:100%; height:auto;" />
 
 ### 🔍 Quiz Lookup
 
@@ -155,7 +155,7 @@ Users can easily find quizzes using search and sorting options:
   - **Creation Date**
   - **Number of Participants**
 
-![Quiz Lookup](assets/img_6.png)
+<img src="assets/img_6.png" alt="Quiz Lookup" style="max-width:600px; width:100%; height:auto;" />
 
 ### 📊 Quiz Overview
 
@@ -176,7 +176,7 @@ Each quiz includes a detailed overview page with the following information:
     - Last month
     - Last year
 
-![Quiz Overview](assets/img_7.png)
+<img src="assets/img_7.png" alt="Quiz Overview" style="max-width:600px; width:100%; height:auto;" />
 
 ### 📝 Taking a Quiz
 
@@ -191,11 +191,11 @@ Quizzes can be taken in different correction modes:
 - All questions are shown (on one or multiple pages).
 - Answers are evaluated **after** completing the quiz.
 
-![Final Correction Mode](assets/img_8.png)
+<img src="assets/img_8.png" alt="Final Correction Mode" style="max-width:600px; width:100%; height:auto;" />
 
 The view on quiz results page after quiz completion:
 
-![Quiz Results](assets/img_10.png)
+<img src="assets/img_10.png" alt="Quiz Results" style="max-width:600px; width:100%; height:auto;" />
 
 ---
 
@@ -204,7 +204,7 @@ The view on quiz results page after quiz completion:
 - Questions appear one at a time.
 - After answering, the user receives **immediate feedback**.
 
-![Immediate Correction Mode](assets/img_9.png)
+<img src="assets/img_9.png" alt="Immediate Correction Mode" style="max-width:600px; width:100%; height:auto;" />
 
 ### 💬 Feedback and Challenges
 
@@ -214,7 +214,7 @@ After completing a quiz, you can:
 - Rate the quiz on a **0–5 star scale**.
 - **Send a challenge** to your friends to take the same quiz.
 
-![Feedback & Challenge](assets/img_11.png)
+<img src="assets/img_11.png" alt="Feedback and Challenges" style="max-width:600px; width:100%; height:auto;" />
 
 ### ✏️ Create Question
 
@@ -223,15 +223,18 @@ Example: **Fill-in-the-Blank**
 - Dynamically choose the position of the blank within the question.
 - Add one or more correct answers dynamically.
 
-![Create Fill-in-the-Blank](assets/img_12.png)
-![Dropdown Arrow](assets/img_13.png)
+<img src="assets/img_12.png" alt="Create Fill-in-the-Blank" style="max-width:600px; width:100%; height:auto;" />
+
+Blank chosen:
+
+<img src="assets/img_13.png" alt="Dropdown Arrow" style="max-width:600px; width:100%; height:auto;" />
 
 Example: **Multi-Answer**
 
 - Add new answers **below** or **at the end** of the list (especially important for ordered questions).
 - Provide **alternative options** for each answer.
 
-![Create Multi-Answer](assets/img_14.png)
+<img src="assets/img_14.png" alt="Create Multi-Answer" style="max-width:600px; width:100%; height:auto;" />
 
 ### ✏️ Edit Question
 
@@ -243,11 +246,11 @@ Example: **Fill-in-the-Blank**
 - Delete existing answer options.
 - Add new answer options.
 
-![Edit Fill-in-the-Blank](assets/img_15.png)
+<img src="assets/img_15.png" alt="Edit Fill-in-the-Blank" style="max-width:600px; width:100%; height:auto;" />
 
 - The **Delete Option** button becomes disabled if only one option is left, ensuring that at least one answer option is always present until a new one is added.
 
-![Delete Button Disabled](assets/img_16.png)
+<img src="assets/img_16.png" alt="Delete Option Disabled" style="max-width:600px; width:100%; height:auto;" />
 
 ### 💡 Little Insights
 
@@ -255,35 +258,18 @@ Example: **Fill-in-the-Blank**
 
 Interactive buttons provide visual feedback on hover:
 
-![Hovering Button](assets/img_17.png)
+<img src="assets/img_17.png" alt="Hovering Buttons" style="max-width:600px; width:100%; height:auto;" />
 
 #### 🚫 User Pic Not Found
 
 Oops, could not find your picture:
 
-![User Not Found](assets/img_18.png)
+<img src="assets/img_18.png" alt="User Pic Not Found" style="max-width:600px; width:100%; height:auto;" />
 
 #### 🏷️ Add Tags for a Quiz
-The Best UI You’ll See Today!
 
-![Add Tags](assets/img_19.png)
+<img src="assets/img_19.png" alt="Add Tags" style="max-width:600px; width:100%; height:auto;" />
 
 #### 🏷️ Remove Tags from a Quiz
-And more!
 
-![Remove Tags](assets/img_20.png)
-
----
-
-## 🙌 Final Notes
-
-Thank you for checking out this Quiz Website project!
-
-We hope you'll enjoy it!
-
-Yours truly,  
-**Team JA**
-
----
-
-### 🚀 Ready for a quiz? Let’s go!
+<img src="assets/img_20.png" alt="Remove Tags" style="max-width:600px; width:100%; height:auto;" />
