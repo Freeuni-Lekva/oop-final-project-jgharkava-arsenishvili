@@ -27,7 +27,7 @@
 ### ⭐ Ratings and Reviews
 
 - Users can leave a written **review** on any quiz to share feedback or thoughts.
-- Quizzes can be **rated on a 0–5 star scale** to reflect overall quality and usefulness.
+- Quizzes can be **rated on a 1–5 star scale** to reflect overall quality and usefulness.
 
 ## Question Features
 
