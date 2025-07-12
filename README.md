@@ -273,3 +273,19 @@ Oops, could not find your picture:
 #### 🏷️ Remove Tags from a Quiz
 
 <img src="assets/img_20.png" alt="Remove Tags" style="max-width:600px; width:100%; height:auto;" />
+
+
+---
+
+## 🙌 Final Notes
+
+Thank you for checking out this Quiz Website project!
+
+We hope you'll enjoy it!
+
+Yours truly,  
+**Team JA**
+
+---
+
+### 🚀 Ready for a quiz? Let’s go!
