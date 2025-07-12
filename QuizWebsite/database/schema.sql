@@ -37,7 +37,6 @@ create table tags(
 -- Whether the questions appear ordered (as of creation) or randomized, so-called shuffled;
 -- Whether the questions should be presented on a single-page or one question per page;
 -- Whether (in case of multiple pages) the answers should be corrected immediately or together at once
--- (check constraint is provided so that immediate correction is available only in case of multiple-page option)
 create table quizzes(
     quiz_id bigint primary key auto_increment,
     quiz_name varchar(64) unique not null,
@@ -53,11 +52,6 @@ create table quizzes(
     question_order_status enum('ordered','randomized') not null default 'ordered',
     question_placement_status enum('one-page','multiple-page') not null default 'one-page',
     question_correction_status enum('immediate-correction','final-correction') not null default 'final-correction',
-
-    check (
-        question_placement_status != 'one-page'
-            or question_correction_status = 'final-correction'
-    ),
 
     foreign key (creator_id) references users(user_id) on delete cascade,
     foreign key (category_id) references categories(category_id) on delete cascade
@@ -81,25 +75,6 @@ create table questions(
 
     num_answers int not null default 1,
     order_status enum('unordered', 'ordered') not null default 'ordered',
-
-    check (
-        question is not null or image_url is not null
-    ),
-
-    check (
-        question_type != 'picture-response'
-        or image_url is not null
-    ),
-
-    check (
-        question_type in ('multi-answer', 'multi-choice-multi-answers', 'matching')
-        or num_answers = 1
-    ),
-
-    check (
-        order_status != 'unordered'
-        or question_type = 'multi-answer'
-    ),
 
     foreign key (quiz_id) references quizzes(quiz_id) on delete cascade
 );
@@ -231,7 +206,7 @@ create table history(
 create table quiz_rating(
     quiz_id bigint not null,
     user_id bigint not null,
-    rating tinyint not null check (rating between 0 and 5),
+    rating tinyint not null,
     review text,
 
     primary key (quiz_id, user_id),
